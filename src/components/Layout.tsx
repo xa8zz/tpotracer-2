@@ -13,7 +13,14 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children, onUsernameChange, currentUsername }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLeaderboardVisible, setIsLeaderboardVisible] = useState(false);
-  const { leaderboardData } = useLeaderboard();
+  
+  const { 
+    leaderboardData, 
+    isLoading, 
+    refreshTime, 
+    userPosition, 
+    forceRefresh 
+  } = useLeaderboard({ username: currentUsername });
 
   useEffect(() => {
     const setInitialLeaderboardVisibility = () => {
@@ -72,14 +79,21 @@ const Layout: React.FC<LayoutProps> = ({ children, onUsernameChange, currentUser
           </div>
           <h2 className="text-xl font-mono font-bold text-gray-100 p-4 border-b border-gray-700">Leaderboard</h2>
           <div className="flex-1 overflow-y-auto">
-            <Leaderboard data={leaderboardData} />
+            <Leaderboard 
+              data={leaderboardData} 
+              isLoading={isLoading}
+              refreshTime={refreshTime}
+              userPosition={userPosition}
+              currentUsername={currentUsername}
+              onRefresh={forceRefresh}
+            />
           </div>
         </div>
       )}
 
       {/* Right side - Main Panel */}
       <div className="flex-1 flex flex-col">
-        <div className="flex-1 relative">
+        <div className="flex-1 relative overflow-y-auto">
           {children}
           
           {/* Settings overlay */}

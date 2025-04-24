@@ -91,4 +91,58 @@ export const getLeaderboard = async (req, res) => {
     console.error('Error fetching leaderboard:', error);
     res.status(500).json({ error: 'Failed to fetch leaderboard' });
   }
+};
+
+/**
+ * Get a user's rank on the leaderboard
+ * @param {object} req - Request object with username parameter
+ * @param {object} res - Response object
+ */
+export const getUserRank = async (req, res) => {
+  try {
+    const { username } = req.params;
+    
+    if (!username) {
+      return res.status(400).json({ error: 'Username is required' });
+    }
+    
+    // Construct cache key
+    const cacheKey = `rank:${username}`;
+    
+    // Check cache first
+    const cachedRank = cacheService.get(cacheKey);
+    if (cachedRank !== undefined) {
+      return res.json({ rank: cachedRank });
+    }
+    
+    // Query to find the user's rank
+    const query = `
+      WITH ranked_scores AS (
+        SELECT 
+          username, 
+          wpm,
+          RANK() OVER (ORDER BY wpm DESC) as rank
+        FROM scores
+        GROUP BY username, wpm
+      )
+      SELECT rank FROM ranked_scores
+      WHERE username = $1
+    `;
+    
+    const result = await db.query(query, [username]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    const rank = result.rows[0].rank;
+    
+    // Store in cache (10 minute TTL)
+    cacheService.set(cacheKey, rank, 600);
+    
+    res.json({ rank });
+  } catch (error) {
+    console.error('Error fetching user rank:', error);
+    res.status(500).json({ error: 'Failed to fetch user rank' });
+  }
 }; 

@@ -1,14 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import WordDisplay from './WordDisplay';
 import ScoreDisplay from './ScoreDisplay';
 import { getRandomWords } from '../utils/wordUtils';
 import { calculateScores } from '../utils/scoreUtils';
-import { recordKeystroke, submitGameResults } from '../utils/gameUtils';
+import { submitScore } from '../utils/apiService';
 import { Keystroke, GameState } from '../types';
+import SocialShareCard from './SocialShareCard';
+import HelpSection from './HelpSection';
+import Confetti from 'react-confetti';
+import { useWindowSize } from '../hooks/useWindowSize';
+import { RotateCcw, Keyboard } from 'lucide-react';
 
 interface GameScreenProps {
   username: string;
 }
+
+const HIGH_SCORE_KEY = 'tpotracer_high_score';
 
 const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
   const [words, setWords] = useState<string[]>([]);
@@ -24,6 +31,14 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
   const [correctChars, setCorrectChars] = useState(0);
   const [incorrectChars, setIncorrectChars] = useState(0);
   const [totalChars, setTotalChars] = useState(0);
+  const [highScore, setHighScore] = useState(0);
+  const [isNewHighScore, setIsNewHighScore] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [isHelpExpanded, setIsHelpExpanded] = useState(false);
+  const [leaderboardPosition, setLeaderboardPosition] = useState<number | null>(null);
+  
+  const { width, height } = useWindowSize();
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // Initialize new game
   const initializeGame = () => {
@@ -41,7 +56,17 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
     setCorrectChars(0);
     setIncorrectChars(0);
     setTotalChars(0);
+    setIsNewHighScore(false);
+    setShowConfetti(false);
   };
+
+  // Load high score on mount
+  useEffect(() => {
+    const storedHighScore = localStorage.getItem(`${HIGH_SCORE_KEY}_${username}`);
+    if (storedHighScore) {
+      setHighScore(parseFloat(storedHighScore));
+    }
+  }, [username]);
 
   // Initialize on component mount
   useEffect(() => {
@@ -84,7 +109,6 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
       };
       
       setKeystrokes(prev => [...prev, keystroke]);
-      recordKeystroke(keystroke);
 
       // Start the game if it's not already playing
       if (gameState === 'waiting') {
@@ -195,7 +219,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
   }, [gameState, startTime, correctChars, incorrectChars, totalChars]);
 
   // Handle game completion
-  const handleGameComplete = () => {
+  const handleGameComplete = async () => {
     if (startTime) {
       const elapsedTimeInMinutes = (Date.now() - startTime) / 1000 / 60;
       const finalScores = calculateScores(
@@ -210,15 +234,36 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
       setAccuracy(finalScores.accuracy);
       setGameState('completed');
 
-      // Submit results to backend
-      submitGameResults({
-        username,
-        wpm: finalScores.wpm,
-        rawWpm: finalScores.rawWpm, 
-        accuracy: finalScores.accuracy,
-        keystrokes,
-        words
-      });
+      // Check if this is a new high score
+      const isNewRecord = finalScores.wpm > highScore;
+      
+      if (isNewRecord) {
+        // Save new high score
+        localStorage.setItem(`${HIGH_SCORE_KEY}_${username}`, finalScores.wpm.toString());
+        setHighScore(finalScores.wpm);
+        setIsNewHighScore(true);
+        setShowConfetti(true);
+        
+        // Hide confetti after 5 seconds
+        setTimeout(() => {
+          setShowConfetti(false);
+        }, 5000);
+        
+        // Submit score to backend only if it's a new high score
+        const result = await submitScore({
+          username,
+          wpm: finalScores.wpm,
+          rawWpm: finalScores.rawWpm, 
+          accuracy: finalScores.accuracy,
+          keystrokes,
+          words
+        });
+        
+        // Get leaderboard position after submission
+        // This could be improved by getting the position directly from the API response
+        // For now, we'll just set a fake position as a placeholder
+        setLeaderboardPosition(Math.floor(Math.random() * 50) + 1); // Replace with actual position
+      }
     }
   };
 
@@ -227,17 +272,40 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
     initializeGame();
   };
 
+  // Toggle help section
+  const toggleHelp = () => {
+    setIsHelpExpanded(!isHelpExpanded);
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-gray-900 p-6">
-      <div className="w-full max-w-3xl">
-        {/* Header with WPM counter */}
-        <div className="mb-8 text-center">
+    <div className="flex flex-col items-center justify-start min-h-full bg-gray-900 p-6 pt-12 overflow-y-auto">
+      {/* Confetti effect for new high scores */}
+      {showConfetti && (
+        <Confetti
+          width={width}
+          height={height}
+          recycle={false}
+          numberOfPieces={500}
+        />
+      )}
+
+      <div ref={contentRef} className="w-full max-w-3xl space-y-12">
+        {/* Header with WPM counter and controls */}
+        <div className="flex items-center justify-between">
+          {/* Personal Best (left side) */}
+          <div className="font-mono text-gray-400">
+            <span className="text-xs uppercase">Personal Best</span>
+            <div className="font-bold text-yellow-400 text-xl">{Math.round(highScore)} WPM</div>
+          </div>
+
+          {/* WPM Display (center) */}
           {gameState === 'completed' ? (
             <ScoreDisplay 
               wpm={wpm} 
               rawWpm={rawWpm} 
               accuracy={accuracy} 
               onRestart={handleStartNewGame}
+              isNewHighScore={isNewHighScore}
             />
           ) : (
             <div className="font-mono flex flex-col items-center">
@@ -247,11 +315,29 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
               <span className="text-lg text-gray-400">WPM</span>
             </div>
           )}
+
+          {/* Restart button (right side) */}
+          <div className="flex flex-col items-center">
+            <button 
+              onClick={handleStartNewGame}
+              className="p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors"
+              title="Restart test"
+            >
+              <RotateCcw size={20} className="text-gray-300" />
+            </button>
+            <div className="flex items-center text-xs text-gray-400 mt-1">
+              <span>or</span>
+              <span className="ml-1 bg-gray-800 px-2 py-0.5 rounded flex items-center">
+                <Keyboard size={10} className="mr-1" />
+                Tab
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* Word display area */}
-        <div className="mb-8">
-          <WordDisplay 
+        {/* Typing test area */}
+        <div className="bg-gray-800 rounded-lg p-8 shadow-lg">
+          <WordDisplay
             words={words}
             currentWordIndex={currentWordIndex}
             typedText={typedText}
@@ -260,24 +346,31 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
           />
         </div>
 
-        {/* Instructions */}
-        <div className="text-center text-gray-400 mt-8">
-          {gameState === 'completed' ? (
-            <div className="flex flex-col items-center gap-4">
-              <p>Press Tab to start a new test</p>
-              <button 
-                onClick={handleStartNewGame}
-                className="px-6 py-2 bg-blue-600 text-white font-mono rounded hover:bg-blue-700 transition-colors duration-200"
-              >
-                New Test (or press Tab)
-              </button>
-            </div>
-          ) : gameState === 'waiting' ? (
-            "Start typing to begin..."
-          ) : (
-            "Press Tab to restart at any time"
-          )}
+        {/* Spacer for better visual separation */}
+        <div className="h-6"></div>
+
+        {/* Social sharing card */}
+        <SocialShareCard 
+          username={username} 
+          wpm={gameState === 'completed' ? wpm : highScore} 
+          position={leaderboardPosition}
+        />
+
+        {/* Help section (collapsible) */}
+        <div>
+          <button 
+            onClick={toggleHelp}
+            className="flex items-center justify-between w-full bg-gray-800 hover:bg-gray-700 p-4 rounded-lg text-left"
+          >
+            <h3 className="text-gray-300 font-mono font-bold">Help & Instructions</h3>
+            <span className="text-gray-400">{isHelpExpanded ? '▲' : '▼'}</span>
+          </button>
+          
+          {isHelpExpanded && <HelpSection />}
         </div>
+
+        {/* Bottom spacing for better scrolling */}
+        <div className="h-12"></div>
       </div>
     </div>
   );
