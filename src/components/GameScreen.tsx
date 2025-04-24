@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import WordDisplay from './WordDisplay';
 import ScoreDisplay from './ScoreDisplay';
 import { getRandomWords } from '../utils/wordUtils';
@@ -23,7 +23,6 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
   const [correctChars, setCorrectChars] = useState(0);
   const [incorrectChars, setIncorrectChars] = useState(0);
   const [totalChars, setTotalChars] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   // Initialize new game
   const initializeGame = () => {
@@ -40,11 +39,6 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
     setCorrectChars(0);
     setIncorrectChars(0);
     setTotalChars(0);
-    
-    // Focus the input
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
   };
 
   // Initialize on component mount
@@ -52,9 +46,14 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
     initializeGame();
   }, []);
 
-  // Keep input focused and handle global keypresses
+  // Handle global keypresses
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Don't capture modifier key combinations (e.g., Cmd+C, Ctrl+V)
+      if (e.metaKey || e.ctrlKey || e.altKey) {
+        return;
+      }
+
       // Handle Tab key press at any time to restart the game
       if (e.code === 'Tab') {
         e.preventDefault();
@@ -62,27 +61,81 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
         return;
       }
 
-      // Don't handle keys if they're pressed while typing in the input
-      if (e.target instanceof HTMLInputElement) {
-        return;
-      }
-
-      // Don't capture modifier key combinations (e.g., Cmd+C, Ctrl+V)
-      if (e.metaKey || e.ctrlKey || e.altKey) {
-        return;
-      }
-
-      // Focus input and simulate the keypress if it's a printable character
-      if (inputRef.current && e.key.length === 1) {
+      // Prevent default for space to avoid scrolling
+      if (e.key === ' ') {
         e.preventDefault();
-        inputRef.current.focus();
-        // Simulate the keypress in the input
-        const newEvent = new KeyboardEvent('keydown', {
-          key: e.key,
-          code: e.code,
-          bubbles: true
-        });
-        inputRef.current.dispatchEvent(newEvent);
+      }
+
+      // Don't handle keys if game is completed
+      if (gameState === 'completed') {
+        if (e.code === 'Tab') {
+          e.preventDefault();
+          handleStartNewGame();
+        }
+        return;
+      }
+
+      // Record keystroke
+      const keystroke: Keystroke = {
+        key: e.key,
+        timestamp: Date.now()
+      };
+      
+      setKeystrokes(prev => [...prev, keystroke]);
+      recordKeystroke(keystroke);
+
+      // Start the game if it's not already playing
+      if (gameState === 'waiting') {
+        setGameState('playing');
+        setStartTime(Date.now());
+      }
+
+      // Handle space key (move to next word)
+      if (e.key === ' ' && typedText.length > 0) {
+        // Count space as a correct character when the word is typed correctly
+        const currentWord = words[currentWordIndex];
+        if (typedText === currentWord) {
+          setCorrectChars(prev => prev + 1);
+          setTotalChars(prev => prev + 1);
+        }
+
+        // If this is the last word, complete the game
+        if (currentWordIndex === words.length - 1) {
+          handleGameComplete();
+          return;
+        }
+
+        setCurrentWordIndex(prev => prev + 1);
+        setTypedText('');
+        return;
+      }
+
+      // Handle backspace
+      if (e.key === 'Backspace') {
+        setTypedText(prev => prev.slice(0, -1));
+        return;
+      }
+
+      // Handle regular keypress
+      if (e.key.length === 1) {
+        const currentWord = words[currentWordIndex];
+        const newTypedText = typedText + e.key;
+        
+        // Update character count statistics
+        setTotalChars(prev => prev + 1);
+        if (newTypedText.length <= currentWord.length && 
+            currentWord[newTypedText.length - 1] === e.key) {
+          setCorrectChars(prev => prev + 1);
+        } else {
+          setIncorrectChars(prev => prev + 1);
+        }
+
+        setTypedText(newTypedText);
+
+        // Check if word is completed
+        if (newTypedText === currentWord && currentWordIndex === words.length - 1) {
+          handleGameComplete();
+        }
       }
     };
 
@@ -91,7 +144,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
     return () => {
       window.removeEventListener('keydown', handleGlobalKeyDown);
     };
-  }, [gameState]);
+  }, [gameState, currentWordIndex, typedText, words]);
 
   // Calculate WPM in real-time
   useEffect(() => {
@@ -160,87 +213,6 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
     }
   };
 
-  // Handle key press
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Handle Tab key press to restart game
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      handleStartNewGame();
-      return;
-    }
-
-    // Prevent default for space to avoid scrolling
-    if (e.key === ' ') {
-      e.preventDefault();
-    }
-
-    // Record keystroke
-    const keystroke: Keystroke = {
-      key: e.key,
-      timestamp: Date.now()
-    };
-    
-    setKeystrokes(prev => [...prev, keystroke]);
-    recordKeystroke(keystroke);
-
-    // Start the game if it's not already playing
-    if (gameState === 'waiting') {
-      setGameState('playing');
-      setStartTime(Date.now());
-    }
-
-    // Handle space key (move to next word)
-    if (e.key === ' ' && typedText.length > 0) {
-      // Count space as a correct character when the word is typed correctly
-      const currentWord = words[currentWordIndex];
-      if (typedText === currentWord) {
-        setCorrectChars(prev => prev + 1);
-        setTotalChars(prev => prev + 1);
-      }
-
-      // If this is the last word, complete the game
-      if (currentWordIndex === words.length - 1) {
-        handleGameComplete();
-        return;
-      }
-
-      setCurrentWordIndex(prev => prev + 1);
-      setTypedText('');
-      return;
-    }
-
-    // Handle backspace
-    if (e.key === 'Backspace') {
-      return; // The onChange handler will update typedText
-    }
-
-    // Handle regular keypress
-    if (e.key.length === 1) {
-      const currentWord = words[currentWordIndex];
-      const newTypedText = typedText + e.key;
-      const isCorrect = currentWord.startsWith(newTypedText);
-      
-      // Update character count statistics
-      setTotalChars(prev => prev + 1);
-      if (newTypedText.length <= currentWord.length && 
-          currentWord[newTypedText.length - 1] === e.key) {
-        setCorrectChars(prev => prev + 1);
-      } else {
-        setIncorrectChars(prev => prev + 1);
-      }
-
-      // Check if word is completed
-      if (newTypedText === currentWord && currentWordIndex === words.length - 1) {
-        handleGameComplete();
-      }
-    }
-  };
-
-  // Handle input change
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTypedText(e.target.value);
-  };
-
   // Start a new game
   const handleStartNewGame = () => {
     initializeGame();
@@ -278,23 +250,14 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
           />
         </div>
 
-        {/* Input field */}
-        <div className="relative">
-          <input
-            ref={inputRef}
-            type="text"
-            value={typedText}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            className="w-full p-4 text-2xl bg-gray-800 border-2 border-gray-700 rounded-md focus:border-blue-500 outline-none font-mono text-white"
-            placeholder={gameState === 'completed' ? "Type to start a new test..." : "Start typing..."}
-            aria-label="Type here"
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck="false"
-            disabled={gameState === 'completed'}
-          />
+        {/* Instructions */}
+        <div className="text-center text-gray-400 mt-8">
+          {gameState === 'completed' ? 
+            "Press Tab to start a new test" : 
+            gameState === 'waiting' ? 
+              "Start typing to begin..." :
+              "Press Tab to restart at any time"
+          }
         </div>
       </div>
     </div>
