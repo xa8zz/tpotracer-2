@@ -23,7 +23,7 @@ const ScoreDisplay: React.FC<ScoreDisplayProps> = ({
         </div>
       </div>
       
-      <div className="grid grid-cols-2 gap-8 mb-6">
+      <div className="grid grid-cols-2 gap-8">
         <div className="flex flex-col items-center">
           <span className="text-gray-400 font-mono mb-1">RAW</span>
           <span className="text-3xl font-mono text-gray-200">{Math.round(rawWpm)}</span>
@@ -36,17 +36,6 @@ const ScoreDisplay: React.FC<ScoreDisplayProps> = ({
           <span className="text-sm font-mono text-gray-500">accuracy</span>
         </div>
       </div>
-      
-      <p className="text-gray-400 font-mono text-center mb-6">
-        Press Tab or type to start a new test
-      </p>
-      
-      <button 
-        onClick={onRestart}
-        className="px-6 py-2 bg-blue-600 text-white font-mono rounded hover:bg-blue-700 transition-colors duration-200"
-      >
-        New Test (or press Tab)
-      </button>
     </div>
   );
 };
