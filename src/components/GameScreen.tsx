@@ -52,40 +52,81 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
     initializeGame();
   }, []);
 
-  // Keep input focused
+  // Keep input focused and handle global keypresses
   useEffect(() => {
-    const handleFocus = () => {
-      if (inputRef.current) {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Handle Tab key press at any time to restart the game
+      if (e.code === 'Tab') {
+        e.preventDefault();
+        handleStartNewGame();
+        return;
+      }
+
+      // Don't handle keys if they're pressed while typing in the input
+      if (e.target instanceof HTMLInputElement) {
+        return;
+      }
+
+      // Don't capture modifier key combinations (e.g., Cmd+C, Ctrl+V)
+      if (e.metaKey || e.ctrlKey || e.altKey) {
+        return;
+      }
+
+      // Focus input and simulate the keypress if it's a printable character
+      if (inputRef.current && e.key.length === 1) {
+        e.preventDefault();
         inputRef.current.focus();
+        // Simulate the keypress in the input
+        const newEvent = new KeyboardEvent('keydown', {
+          key: e.key,
+          code: e.code,
+          bubbles: true
+        });
+        inputRef.current.dispatchEvent(newEvent);
       }
     };
 
-    window.addEventListener('click', handleFocus);
+    window.addEventListener('keydown', handleGlobalKeyDown);
     
     return () => {
-      window.removeEventListener('click', handleFocus);
+      window.removeEventListener('keydown', handleGlobalKeyDown);
     };
-  }, []);
+  }, [gameState]);
 
   // Calculate WPM in real-time
   useEffect(() => {
     if (gameState === 'playing' && startTime) {
+      // Calculate immediately first
+      const elapsedTimeInMinutes = (Date.now() - startTime) / 1000 / 60;
+      if (elapsedTimeInMinutes > 0) {
+        const scores = calculateScores(
+          correctChars,
+          incorrectChars,
+          totalChars,
+          elapsedTimeInMinutes
+        );
+        
+        setWpm(scores.wpm);
+        setRawWpm(scores.rawWpm);
+        setAccuracy(scores.accuracy);
+      }
+
+      // Then set up interval for future updates
       const intervalId = setInterval(() => {
-        const elapsedTimeInMinutes = (Date.now() - startTime) / 1000 / 60;
-        if (elapsedTimeInMinutes > 0) {
-          // Calculate current scores
+        const currentElapsedTimeInMinutes = (Date.now() - startTime) / 1000 / 60;
+        if (currentElapsedTimeInMinutes > 0) {
           const scores = calculateScores(
             correctChars,
             incorrectChars,
             totalChars,
-            elapsedTimeInMinutes
+            currentElapsedTimeInMinutes
           );
           
           setWpm(scores.wpm);
           setRawWpm(scores.rawWpm);
           setAccuracy(scores.accuracy);
         }
-      }, 500);
+      }, 250);
 
       return () => clearInterval(intervalId);
     }
@@ -121,6 +162,13 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
 
   // Handle key press
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Handle Tab key press to restart game
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      handleStartNewGame();
+      return;
+    }
+
     // Prevent default for space to avoid scrolling
     if (e.key === ' ') {
       e.preventDefault();
@@ -143,6 +191,13 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
 
     // Handle space key (move to next word)
     if (e.key === ' ' && typedText.length > 0) {
+      // Count space as a correct character when the word is typed correctly
+      const currentWord = words[currentWordIndex];
+      if (typedText === currentWord) {
+        setCorrectChars(prev => prev + 1);
+        setTotalChars(prev => prev + 1);
+      }
+
       // If this is the last word, complete the game
       if (currentWordIndex === words.length - 1) {
         handleGameComplete();
@@ -238,6 +293,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
             autoCorrect="off"
             autoCapitalize="off"
             spellCheck="false"
+            disabled={gameState === 'completed'}
           />
         </div>
       </div>
