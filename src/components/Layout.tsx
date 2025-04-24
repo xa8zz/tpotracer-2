@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Leaderboard from './Leaderboard';
 import Settings from './Settings';
 import { Settings as SettingsIcon, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -12,8 +12,20 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, onUsernameChange, currentUsername }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isLeaderboardVisible, setIsLeaderboardVisible] = useState(true);
+  const [isLeaderboardVisible, setIsLeaderboardVisible] = useState(false);
   const { leaderboardData } = useLeaderboard();
+
+  useEffect(() => {
+    const setInitialLeaderboardVisibility = () => {
+      setIsLeaderboardVisible(window.innerWidth >= 1000);
+    };
+
+    setInitialLeaderboardVisibility();
+
+    // Update visibility on window resize
+    window.addEventListener('resize', setInitialLeaderboardVisibility);
+    return () => window.removeEventListener('resize', setInitialLeaderboardVisibility);
+  }, []);
 
   const toggleSettings = () => {
     setIsSettingsOpen(!isSettingsOpen);
