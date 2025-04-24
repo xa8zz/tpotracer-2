@@ -121,7 +121,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
 
       // Handle backspace
       if (e.key === 'Backspace') {
-        setTypedText(prev => prev.slice(0, -1));
+        e.preventDefault(); // Prevent the default backspace behavior
         return;
       }
 
