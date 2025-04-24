@@ -38,14 +38,14 @@ const ScoreDisplay: React.FC<ScoreDisplayProps> = ({
       </div>
       
       <p className="text-gray-400 font-mono text-center mb-6">
-        Type to start a new test
+        Press Tab or type to start a new test
       </p>
       
       <button 
         onClick={onRestart}
         className="px-6 py-2 bg-blue-600 text-white font-mono rounded hover:bg-blue-700 transition-colors duration-200"
       >
-        New Test
+        New Test (or press Tab)
       </button>
     </div>
   );
