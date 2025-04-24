@@ -262,12 +262,21 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
 
         {/* Instructions */}
         <div className="text-center text-gray-400 mt-8">
-          {gameState === 'completed' ? 
-            "Press Tab to start a new test" : 
-            gameState === 'waiting' ? 
-              "Start typing to begin..." :
-              "Press Tab to restart at any time"
-          }
+          {gameState === 'completed' ? (
+            <div className="flex flex-col items-center gap-4">
+              <p>Press Tab to start a new test</p>
+              <button 
+                onClick={handleStartNewGame}
+                className="px-6 py-2 bg-blue-600 text-white font-mono rounded hover:bg-blue-700 transition-colors duration-200"
+              >
+                New Test (or press Tab)
+              </button>
+            </div>
+          ) : gameState === 'waiting' ? (
+            "Start typing to begin..."
+          ) : (
+            "Press Tab to restart at any time"
+          )}
         </div>
       </div>
     </div>
