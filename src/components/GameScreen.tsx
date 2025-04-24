@@ -14,6 +14,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
   const [words, setWords] = useState<string[]>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [typedText, setTypedText] = useState('');
+  const [typedHistory, setTypedHistory] = useState<string[]>([]);
   const [keystrokes, setKeystrokes] = useState<Keystroke[]>([]);
   const [gameState, setGameState] = useState<GameState>('waiting');
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -30,6 +31,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
     setWords(newWords);
     setCurrentWordIndex(0);
     setTypedText('');
+    setTypedHistory([]);
     setKeystrokes([]);
     setGameState('waiting');
     setStartTime(null);
@@ -98,6 +100,13 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
           setCorrectChars(prev => prev + 1);
           setTotalChars(prev => prev + 1);
         }
+
+        // Store the typed text in history
+        setTypedHistory(prev => {
+          const newHistory = [...prev];
+          newHistory[currentWordIndex] = typedText;
+          return newHistory;
+        });
 
         // If this is the last word, complete the game
         if (currentWordIndex === words.length - 1) {
@@ -246,6 +255,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
             words={words}
             currentWordIndex={currentWordIndex}
             typedText={typedText}
+            typedHistory={typedHistory}
             gameState={gameState}
           />
         </div>

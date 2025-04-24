@@ -5,6 +5,7 @@ interface WordDisplayProps {
   words: string[];
   currentWordIndex: number;
   typedText: string;
+  typedHistory: string[];
   gameState: GameState;
 }
 
@@ -12,11 +13,14 @@ const WordDisplay: React.FC<WordDisplayProps> = ({
   words,
   currentWordIndex,
   typedText,
+  typedHistory,
   gameState
 }) => {
-  // Function to highlight characters in the current word
-  const highlightCurrentWord = (word: string, index: number) => {
-    if (index !== currentWordIndex || gameState === 'completed') {
+  // Function to highlight characters in a word
+  const highlightWord = (word: string, index: number) => {
+    const textToCompare = index === currentWordIndex ? typedText : typedHistory[index] || '';
+    
+    if (index > currentWordIndex || gameState === 'completed') {
       return <span key={index} className="text-gray-400">{word}</span>;
     }
 
@@ -25,14 +29,14 @@ const WordDisplay: React.FC<WordDisplayProps> = ({
         {word.split('').map((char, charIndex) => {
           let className = 'text-gray-400'; // Default color
           
-          if (charIndex < typedText.length) {
+          if (charIndex < textToCompare.length) {
             // Character has been typed
-            if (char === typedText[charIndex]) {
+            if (char === textToCompare[charIndex]) {
               className = 'text-green-400'; // Correct
             } else {
               className = 'text-red-500'; // Incorrect
             }
-          } else if (charIndex === typedText.length) {
+          } else if (index === currentWordIndex && charIndex === textToCompare.length) {
             className = 'text-gray-200 border-b-2 border-blue-500'; // Current character
           }
           
@@ -40,9 +44,9 @@ const WordDisplay: React.FC<WordDisplayProps> = ({
         })}
         
         {/* Show incorrect extra characters */}
-        {typedText.length > word.length && (
+        {textToCompare.length > word.length && (
           <span className="text-red-500">
-            {typedText.slice(word.length)}
+            {textToCompare.slice(word.length)}
           </span>
         )}
       </span>
@@ -54,7 +58,7 @@ const WordDisplay: React.FC<WordDisplayProps> = ({
       <div className="flex flex-wrap gap-4 text-2xl md:text-3xl leading-relaxed">
         {words.map((word, index) => (
           <React.Fragment key={index}>
-            {highlightCurrentWord(word, index)}
+            {highlightWord(word, index)}
             {index < words.length - 1 && <span className="text-gray-600">·</span>}
           </React.Fragment>
         ))}
