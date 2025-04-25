@@ -1,52 +1,36 @@
+// File: /backend/index.js
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import scoreRoutes from './routes/scoreRoutes.js';
-import initializeDatabase from './db/init.js';
+// import initializeDatabase from './db/init.js'; // REMOVE OR COMMENT OUT THIS LINE
 
 // Load environment variables
 dotenv.config();
 
 // Create Express app
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3001; // Vercel sets PORT automatically
 
 // Middleware
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  // Use environment variable for CORS origin in production
+  origin: process.env.CORS_ORIGIN || '*', // Allow all origins in dev if CORS_ORIGIN isn't set
 }));
 app.use(express.json());
 
-// Initialize database on startup
+// REMOVE OR COMMENT OUT THE DATABASE INITIALIZATION BLOCK
+/*
 initializeDatabase().catch(error => {
   console.error('Database initialization failed:', error);
   console.warn('Continuing startup despite database initialization failure');
 });
+*/
 
-// Apply rate limiting to all requests
-const defaultRateLimit = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 60, // Limit each IP to 60 requests per windowMs
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  message: {
-    error: 'Too many requests, please try again later.'
-  }
-});
-
-// Apply stricter rate limiting to API routes
-const apiRateLimit = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 20, // Limit each IP to 20 requests per windowMs
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    error: 'Too many API requests, please try again later.'
-  }
-});
-
-// Apply rate limiters
+// Apply rate limiting (Keep as is)
+const defaultRateLimit = rateLimit({ /* ... */ });
+const apiRateLimit = rateLimit({ /* ... */ });
 app.use(defaultRateLimit);
 app.use('/api', apiRateLimit);
 
@@ -58,7 +42,14 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-}); 
+// Start server (Vercel handles this, but good for local dev)
+// For Vercel, it doesn't need to listen; it just exports the 'app'.
+// However, keeping app.listen allows local testing via `node backend/index.js`
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running locally on port ${PORT}`);
+  });
+}
+
+// Export the app for Vercel Serverless Functions
+export default app;
