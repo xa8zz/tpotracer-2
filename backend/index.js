@@ -4,7 +4,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import scoreRoutes from './routes/scoreRoutes.js';
-// import initializeDatabase from './db/init.js'; // REMOVE OR COMMENT OUT THIS LINE
 
 // Load environment variables
 dotenv.config();
@@ -14,16 +13,8 @@ const app = express();
 const PORT = process.env.PORT || 3001; // Vercel sets PORT automatically
 
 // Middleware
-app.use(cors({ origin: process.env.CORS_ORIGIN }));
+app.use(cors({ origin: process.env.CORS_ORIGIN || '*' })); // Use env variable or allow all if not set
 app.use(express.json());
-
-// REMOVE OR COMMENT OUT THE DATABASE INITIALIZATION BLOCK
-/*
-initializeDatabase().catch(error => {
-  console.error('Database initialization failed:', error);
-  console.warn('Continuing startup despite database initialization failure');
-});
-*/
 
 // Apply rate limiting (Keep as is)
 const defaultRateLimit = rateLimit({
@@ -46,9 +37,7 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-// Start server (Vercel handles this, but good for local dev)
-// For Vercel, it doesn't need to listen; it just exports the 'app'.
-// However, keeping app.listen allows local testing via `node backend/index.js`
+// Start server only for local development
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`Server running locally on port ${PORT}`);
