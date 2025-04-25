@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { LeaderboardEntry } from '../types';
-import { 
-  fetchLeaderboard, 
-  isLeaderboardCacheStale, 
+import {
+  fetchLeaderboard,
   getTimeUntilNextRefresh,
   LEADERBOARD_REFRESH_INTERVAL
-} from '../utils/apiService';
+} from '../utils/apiService'; // Removed isLeaderboardCacheStale import as it's not directly used here now
 
 interface UseLeaderboardProps {
   username?: string;
@@ -15,69 +14,72 @@ interface LeaderboardState {
   data: LeaderboardEntry[];
   isLoading: boolean;
   error: string | null;
-  refreshTime: number;
-  userPosition?: {
-    position: number;
-    entry: LeaderboardEntry;
-  };
-}
+  refreshTime: number; // Seconds until next refresh
+  userPosition?: number;
+};
 
 export const useLeaderboard = ({ username }: UseLeaderboardProps = {}) => {
   const [state, setState] = useState<LeaderboardState>({
     data: [],
     isLoading: true,
     error: null,
-    refreshTime: 0,
+    refreshTime: Math.ceil(LEADERBOARD_REFRESH_INTERVAL / 1000), // Initial display value
     userPosition: undefined
   });
 
+  // Memoized function to load leaderboard data
   const loadLeaderboard = useCallback(async (force = false) => {
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
+    // Only set loading if we are actually fetching (or forced)
+    if (force || state.isLoading || state.error) {
+         setState(prev => ({ ...prev, isLoading: true, error: null }));
+    }
     try {
-      const result = await fetchLeaderboard(force, username);
-      setState({
+      const result = await fetchLeaderboard(force, username); // fetchLeaderboard handles its own cache check
+      setState(prev => ({ // Use functional update to avoid stale state issues
+        ...prev,
         data: result.data,
         isLoading: false,
-        error: null,
-        refreshTime: getTimeUntilNextRefresh(),
+        error: null, // Clear error on success
+        refreshTime: Math.ceil(getTimeUntilNextRefresh() / 1000), // Update countdown on successful fetch
         userPosition: result.userPosition
-      });
+      }));
     } catch (error) {
-      setState(prev => ({ 
-        ...prev, 
-        isLoading: false, 
-        error: error instanceof Error ? error.message : 'An error occurred'
+      console.error("Error in loadLeaderboard callback:", error);
+      setState(prev => ({ // Use functional update
+        ...prev,
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'An error occurred fetching leaderboard'
       }));
     }
-  }, [username]);
+  }, [username, state.isLoading, state.error]); // Add dependencies that might influence fetching logic
 
+  // Effect for initial load and setting up intervals
   useEffect(() => {
     // Initial load
     loadLeaderboard();
 
-    // Set up a timer to update the refresh time countdown
+    // Interval to update the countdown timer display every second
     const timerId = setInterval(() => {
-      if (isLeaderboardCacheStale()) {
-        loadLeaderboard();
-      } else {
-        setState(prev => ({
-          ...prev,
-          refreshTime: getTimeUntilNextRefresh()
-        }));
-      }
+      setState(prev => ({
+        ...prev,
+        refreshTime: Math.ceil(getTimeUntilNextRefresh() / 1000)
+      }));
     }, 1000);
 
-    // Set up an interval to refresh the leaderboard based on the refresh interval
+    // Interval to force refresh the data periodically
     const refreshId = setInterval(() => {
-      loadLeaderboard(true);
+      loadLeaderboard(true); // Force refresh
     }, LEADERBOARD_REFRESH_INTERVAL);
 
+    // Cleanup function to clear intervals when the component unmounts or dependencies change
     return () => {
       clearInterval(timerId);
       clearInterval(refreshId);
     };
+    // Rerun effect if loadLeaderboard function identity changes (due to username change)
   }, [loadLeaderboard]);
 
+  // Function to allow manual refresh from the component
   const forceRefresh = useCallback(() => {
     loadLeaderboard(true);
   }, [loadLeaderboard]);
