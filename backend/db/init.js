@@ -17,16 +17,8 @@ const initializeDatabase = async () => {
     const schemaPath = path.join(__dirname, 'schema.sql');
     const schemaSql = fs.readFileSync(schemaPath, 'utf8');
     
-    // Split by semicolon to execute each statement
-    const statements = schemaSql
-      .split(';')
-      .filter(statement => statement.trim() !== '')
-      .map(statement => statement + ';');
-    
-    // Execute each statement
-    for (const statement of statements) {
-      await db.query(statement);
-    }
+    // Execute the entire schema file at once instead of splitting
+    await db.query(schemaSql);
     
     console.log('Database schema initialized successfully');
   } catch (error) {

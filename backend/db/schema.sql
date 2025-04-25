@@ -27,7 +27,7 @@ RETURNS TABLE (
   id INTEGER,
   username VARCHAR(255),
   wpm FLOAT,
-  timestamp TIMESTAMP
+  created_at TIMESTAMP
 ) AS $$
 BEGIN
   RETURN QUERY
@@ -36,14 +36,15 @@ BEGIN
       s.id,
       s.username,
       s.wpm,
-      s.timestamp,
+      s.timestamp as created_at,
       ROW_NUMBER() OVER (PARTITION BY s.username ORDER BY s.wpm DESC) as rn
     FROM scores s
   )
-  SELECT rs.id, rs.username, rs.wpm, rs.timestamp
+  SELECT rs.id, rs.username, rs.wpm, rs.created_at
   FROM ranked_scores rs
   WHERE rs.rn = 1
   ORDER BY rs.wpm DESC
   LIMIT limit_count;
 END;
-$$ LANGUAGE plpgsql; 
+$$
+LANGUAGE plpgsql; 
