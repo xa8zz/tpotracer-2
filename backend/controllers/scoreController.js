@@ -8,29 +8,52 @@ import cacheService from '../services/cacheService.js';
  */
 export const submitScore = async (req, res) => {
   try {
+    // Destructure data from request body
     const { username, wpm, rawWpm, accuracy, keystrokes, words } = req.body;
+    console.log(`[Backend] Received submission for user: ${username}, WPM: ${wpm}`); // Log entry
 
     // Validate required fields
     if (!username || wpm === undefined || rawWpm === undefined || accuracy === undefined) {
+      console.warn('[Backend] Submission rejected: Missing required fields.', req.body);
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Insert new score
+    // Prepare data for database insertion
     const query = `
       INSERT INTO scores (username, wpm, raw_wpm, accuracy, keystrokes, words)
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING id, username, wpm, timestamp
     `;
-
+    // Ensure keystrokes is stringified if it's an object/array
     const values = [username, wpm, rawWpm, accuracy, JSON.stringify(keystrokes), words];
+
+    // Execute the database query
+    console.log(`[Backend] Executing insert query for user: ${username}`);
     const result = await db.query(query, values);
+    console.log(`[Backend] Score inserted successfully for user: ${username}, ID: ${result.rows[0]?.id}`);
 
-    // Clear the leaderboard cache to ensure fresh data
-    cacheService.del('leaderboard:default');
+    // --- Cache Invalidation ---
+    // Clear the general leaderboard cache
+    const defaultLeaderboardKey = 'leaderboard:default'; // Consider making limit part of the key if applicable
+    const deletedLeaderboardCount = cacheService.del(defaultLeaderboardKey);
+    console.log(`[Backend] Cleared default leaderboard cache ('${defaultLeaderboardKey}'). Deleted count: ${deletedLeaderboardCount}`);
 
+    // !!! ADDED: Clear the specific user's rank cache !!!
+    const userRankKey = `rank:${username}`;
+    const deletedRankCount = cacheService.del(userRankKey);
+    console.log(`[Backend] Cleared user rank cache ('${userRankKey}'). Deleted count: ${deletedRankCount}`);
+    // -------------------------
+
+    // Respond with the inserted data
     res.status(201).json(result.rows[0]);
+
   } catch (error) {
-    console.error('Error submitting score:', error);
+    console.error('[Backend] Error submitting score:', error); // Log the full error
+    console.error('[Backend] Error details:', { // Log context if helpful
+      message: error.message,
+      stack: error.stack,
+      requestBody: req.body // Be cautious logging full body if sensitive data exists
+    });
     res.status(500).json({ error: 'Failed to submit score' });
   }
 };
@@ -45,7 +68,7 @@ export const getLeaderboard = async (req, res) => {
     const limit = parseInt(req.query.limit) || 20;
     const search = req.query.search || '';
     const fresh = req.query.fresh === 'true';
-    
+
     // Construct cache key based on query parameters
     const cacheKey = `leaderboard:${search ? search : 'default'}:${limit}`;
 
@@ -53,38 +76,52 @@ export const getLeaderboard = async (req, res) => {
     if (!fresh) {
       const cachedData = cacheService.get(cacheKey);
       if (cachedData) {
+        console.log(`Cache hit for ${cacheKey}`);
         return res.json(cachedData);
       }
+       console.log(`Cache miss for ${cacheKey}`);
+    } else {
+         console.log(`Cache forced refresh for ${cacheKey}`);
     }
 
-    // Build query based on parameters
-    let query = `
-      SELECT username, wpm, timestamp
+    // Build query to get the best score for each user, potentially filtered by search
+    let baseQuery = `
+      SELECT DISTINCT ON (username)
+        username, wpm, timestamp
       FROM scores
     `;
-
     const queryParams = [];
     let paramIndex = 1;
 
-    // Add search filter if provided
     if (search) {
-      query += ` WHERE username ILIKE $${paramIndex}`;
+      baseQuery += ` WHERE username ILIKE $${paramIndex}`;
       queryParams.push(`%${search}%`);
       paramIndex++;
     }
 
-    // Add sorting and limit
-    query += `
+    // DISTINCT ON requires ORDER BY username first, then the field determining distinctness (wpm DESC)
+    baseQuery += ` ORDER BY username, wpm DESC`;
+
+    // Wrap to apply the overall WPM sorting and limit *after* getting distinct users
+    const finalQuery = `
+      WITH distinct_user_scores AS (${baseQuery})
+      SELECT username, wpm, timestamp
+      FROM distinct_user_scores
       ORDER BY wpm DESC
-      LIMIT $${paramIndex}
+      LIMIT $${paramIndex};
     `;
     queryParams.push(limit);
 
+
+    console.log('Executing leaderboard query:', finalQuery);
+    console.log('Query params:', queryParams);
+
     // Execute query
-    const result = await db.query(query, queryParams);
+    const result = await db.query(finalQuery, queryParams);
 
     // Store in cache
     cacheService.set(cacheKey, result.rows);
+    console.log(`Cache set for ${cacheKey}`);
 
     res.json(result.rows);
   } catch (error) {
@@ -101,48 +138,59 @@ export const getLeaderboard = async (req, res) => {
 export const getUserRank = async (req, res) => {
   try {
     const { username } = req.params;
-    
+
     if (!username) {
       return res.status(400).json({ error: 'Username is required' });
     }
-    
+
     // Construct cache key
     const cacheKey = `rank:${username}`;
-    
+
     // Check cache first
     const cachedRank = cacheService.get(cacheKey);
     if (cachedRank !== undefined) {
+        console.log(`Cache hit for rank:${username}`);
       return res.json({ rank: cachedRank });
     }
-    
-    // Query to find the user's rank
+     console.log(`Cache miss for rank:${username}`);
+
+    // Query to find the user's rank based on their best WPM
     const query = `
-      WITH ranked_scores AS (
-        SELECT 
-          username, 
-          wpm,
-          RANK() OVER (ORDER BY wpm DESC) as rank
+      WITH user_max_wpm AS (
+        SELECT
+          username,
+          MAX(wpm) as max_wpm
         FROM scores
-        GROUP BY username, wpm
+        GROUP BY username
+      ), ranked_users AS (
+        SELECT
+          username,
+          RANK() OVER (ORDER BY max_wpm DESC, MIN(timestamp) ASC) as rank -- Add timestamp tie-breaker
+        FROM user_max_wpm
+        JOIN scores ON user_max_wpm.username = scores.username AND user_max_wpm.max_wpm = scores.wpm
+        GROUP BY user_max_wpm.username, user_max_wpm.max_wpm -- Ensure grouping if MAX appears multiple times
       )
-      SELECT rank FROM ranked_scores
-      WHERE username = $1
+      SELECT rank FROM ranked_users
+      WHERE username = $1;
     `;
-    
+
+    console.log('Executing rank query for:', username);
     const result = await db.query(query, [username]);
-    
+
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
+       console.log(`User not found for rank query: ${username}`);
+      return res.status(404).json({ error: 'User not found or has no scores' });
     }
-    
-    const rank = result.rows[0].rank;
-    
+
+    const rank = parseInt(result.rows[0].rank, 10); // Ensure rank is a number
+
     // Store in cache (10 minute TTL)
     cacheService.set(cacheKey, rank, 600);
-    
+     console.log(`Cache set for rank:${username}, rank: ${rank}`);
+
     res.json({ rank });
   } catch (error) {
     console.error('Error fetching user rank:', error);
     res.status(500).json({ error: 'Failed to fetch user rank' });
   }
-}; 
+};
