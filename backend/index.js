@@ -14,10 +14,7 @@ const app = express();
 const PORT = process.env.PORT || 3001; // Vercel sets PORT automatically
 
 // Middleware
-app.use(cors({
-  // Use environment variable for CORS origin in production
-  origin: process.env.CORS_ORIGIN || '*', // Allow all origins in dev if CORS_ORIGIN isn't set
-}));
+app.use(cors({ origin: process.env.CORS_ORIGIN }));
 app.use(express.json());
 
 // REMOVE OR COMMENT OUT THE DATABASE INITIALIZATION BLOCK
@@ -29,8 +26,15 @@ initializeDatabase().catch(error => {
 */
 
 // Apply rate limiting (Keep as is)
-const defaultRateLimit = rateLimit({ /* ... */ });
-const apiRateLimit = rateLimit({ /* ... */ });
+const defaultRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max:      100             // limit each IP to 100 requests per window
+});
+const apiRateLimit = rateLimit({
+  windowMs: 1 * 60 * 1000,  // 1 minute
+  max:      20              // limit to 20 API calls/minute
+});
+
 app.use(defaultRateLimit);
 app.use('/api', apiRateLimit);
 

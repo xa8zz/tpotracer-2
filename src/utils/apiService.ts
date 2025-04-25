@@ -3,7 +3,10 @@
 import { LeaderboardEntry, GameResult } from '../types';
 
 // Use Vite environment variable for API base URL
-const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL;;
+ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+ if (!API_BASE_URL) {
+   throw new Error("VITE_API_BASE_URL is not defined");
+ }
 console.log("API URL:", API_BASE_URL);
 
 // Types

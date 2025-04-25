@@ -3,11 +3,17 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Parse TTL from environment or default to 1800 seconds
+const ttlSec = process.env.CACHE_TTL
+  ? parseInt(process.env.CACHE_TTL, 10) / 1000
+  : 1800;
+
 // Create a new cache instance
 const cache = new NodeCache({
-  stdTTL: parseInt(process.env.CACHE_TTL) / 1000 || 1800, // Default to 30 minutes if not set
+  stdTTL: ttlSec,
   checkperiod: 120,
 });
+
 
 /**
  * Get a value from the cache
