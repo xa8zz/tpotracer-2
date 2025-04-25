@@ -19,15 +19,23 @@ app.use(express.json());
 // Apply rate limiting (Keep as is)
 const defaultRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max:      100             // limit each IP to 100 requests per window
+  max:      200             // limit each IP to 100 requests per window
 });
 const apiRateLimit = rateLimit({
   windowMs: 1 * 60 * 1000,  // 1 minute
-  max:      20              // limit to 20 API calls/minute
+  max:      35              // limit to 20 API calls/minute
 });
 
 app.use(defaultRateLimit);
 app.use('/api', apiRateLimit);
+
+app.use('/api', (req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  if (apiKey !== process.env.API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+});
 
 // Routes
 app.use('/api', scoreRoutes);

@@ -92,9 +92,13 @@ export const submitScore = async (
   try {
     const response = await fetch(`${API_BASE_URL}/submit-score`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': import.meta.env.VITE_API_KEY, 
+      },
       body: JSON.stringify(result),
     });
+    
 
     if (!response.ok) throw new Error('Score submission failed');
 
