@@ -27,7 +27,7 @@ const initializeDatabase = async () => {
 };
 
 // Run as standalone script if called directly
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   initializeDatabase().then(() => {
     console.log('Database initialization complete');
     process.exit(0);
