@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import UsernameForm from './components/UsernameForm';
-import GameScreen from './components/GameScreen';
 import { getUsername, setUsername } from './utils/storageUtils';
 import NewGameScreen from './components/NewGameScreen';
 
-function App() {
+function NewApp() {
   const [username, setUsernameSt] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -44,4 +43,4 @@ function App() {
   );
 }
 
-export default App;
+export default NewApp;

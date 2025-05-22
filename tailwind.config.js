@@ -5,6 +5,7 @@ export default {
     extend: {
       fontFamily: {
         mono: ['Roboto Mono', 'monospace'],
+        ptclean: ['ProggyCleanTT', 'monospace'],
       },
       colors: {
         gray: {
@@ -39,6 +40,15 @@ export default {
           600: '#d97706',
           500: '#f59e0b',
         },
+        tpotracer: {
+          100: '#A7F1FA',
+          150: "#77DFF6",
+          200: '#2A8FC3',
+          
+          250: '#0d3f62',
+          300: '#03223F',
+          400: '#02182D',
+        }
       },
       keyframes: {
         blink: {
