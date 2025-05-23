@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Keystroke, GameState } from '../types';
 import { useWindowSize } from '../hooks/useWindowSize';
+import NewButton from './NewButton';
 
 interface NewGameScreenProps {
-  username: string;
+  username: string | null;
 }
 
 const HIGH_SCORE_KEY = 'tpotracer_high_score';
@@ -28,7 +29,6 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username }) => {
   const [leaderboardPosition, setLeaderboardPosition] = useState<number | null>(null);
   
   const { width, height } = useWindowSize();
-  const contentRef = useRef<HTMLDivElement>(null);
 
   // Initialize new game
   const initializeGame = () => {
@@ -47,6 +47,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username }) => {
 
   // Load high score on mount
   useEffect(() => {
+    if (!username) return;
     const storedHighScore = localStorage.getItem(`${HIGH_SCORE_KEY}_${username}`);
     if (storedHighScore) {
       setHighScore(parseFloat(storedHighScore));
@@ -79,15 +80,38 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username }) => {
   }, [gameState, startTime, correctChars, incorrectChars, totalChars]);
 
   return (
-    <div ref={contentRef} className="new-game-screen">
-      <div className="placeholder-container">
-        <h2>New Game Screen!</h2>
-        <p>This is a placeholder component with the same state as GameScreen.</p>
-        <div className="game-stats">
-          <p>Current WPM: {wpm.toFixed(1)}</p>
-          <p>Accuracy: {accuracy.toFixed(1)}%</p>
-          <p>High Score: {highScore}</p>
+    <div className="new-game-screen bg-tpotracer-400 w-full h-full flex items-center justify-center">
+      <div className="game-container relative">
+        <span className="absolute font-ptclean glow-text-shadow text-tpotracer-100 text-2xl top-[90px] left-[86px]">
+          Best WPM:
+        </span>
+        <span className="absolute font-ptclean glow-text-shadow text-tpotracer-100 font-bold text-4xl top-[116px] left-[96px]">
+          150 WPM
+        </span>
+        <span className="absolute font-ptclean text-tpotracer-100 font-bold text-4xl top-[82px] left-[304px]">
+          4th
+        </span>
+        <NewButton className="absolute top-[112px] left-[471px]">
+          Retry (Tab)
+        </NewButton>
+        <NewButton className="absolute top-[112px] left-[659px]">
+          Settings
+        </NewButton>
+        <div className="inner-screen absolute top-[210px] left-[240px] w-[474px] h-[338px] rounded-[49px] flex flex-col p-[40px]">
+          <div className="badge-row">fuck fuck fuck</div>
+          <div className="wordlist font-ptclean text-tpotracer-100 text-5xl mt-[20px]">
+          stand · other · point · now · out · which · group · after · new · they
+          </div>
         </div>
+        <div className="share-preview absolute top-[592px] left-[131px] w-[304px] h-[188px] bg-tpotracer-300 rounded-[29px]">
+
+        </div>
+        <NewButton className="absolute top-[596px] left-[469px]">
+          Share Image
+        </NewButton>
+        <NewButton className="absolute top-[596px] left-[657px]">
+          Share on X
+        </NewButton>
       </div>
     </div>
   );

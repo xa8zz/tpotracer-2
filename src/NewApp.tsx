@@ -26,18 +26,18 @@ function NewApp() {
   };
 
   if (isLoading) {
-    return <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-      <p className="text-gray-300 font-mono">Loading...</p>
-    </div>;
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <p className="text-gray-300 font-mono">Loading...</p>
+      </div>
+    );
   }
 
   return (
     <Layout onUsernameChange={handleUsernameChange} currentUsername={username || ''}>
-      {!username ? (
+      <NewGameScreen username={username} />
+      {!username && (
         <UsernameForm onSubmit={handleUsernameSubmit} />
-      ) : (
-        <NewGameScreen username={username} />
-        // <GameScreen username={username} />
       )}
     </Layout>
   );
