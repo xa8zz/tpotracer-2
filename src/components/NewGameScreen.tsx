@@ -91,6 +91,12 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username }) => {
         <span className="absolute font-ptclean glow-text-shadow text-tpotracer-100 font-bold text-4xl top-[96px] left-[314px]">
           4th
         </span>
+        <span className="user-avatar bg-tpotracer-100 rounded-[400px] absolute w-[40px] h-[40px] top-[36px] left-[470px]">
+
+        </span>
+        <span className="absolute font-ptclean glow-text-shadow text-tpotracer-100 text-3xl top-[40px] left-[520px]">
+          @marcusquest
+        </span>
         <NewButton className="absolute top-[128px] left-[480px]">
           Retry (Tab)
         </NewButton>
