@@ -39,9 +39,9 @@ input:focus {
 }
 
 .game-container {
-  width: 853px;
-  height: 805px;
-  background-image: url('./assets/mainbody.png');
+  width: 903px;
+  height: 865px;
+  background-image: url('./assets/mainbodyscanlines.png');
   background-size: contain;
   background-repeat: no-repeat;
 }
