@@ -42,11 +42,29 @@ input:focus {
   width: 903px;
   height: 865px;
   background-image: url('./assets/mainbodyscanlines.png');
-  background-size: contain;
+  background-size: 903px 865px;
   background-repeat: no-repeat;
 }
 
-.new-game-screen {
+.leaderboard-container {
+  width: 474px;
+  height: 820px;
+  background-image: url('./assets/leaderboardfull.png');
+  background-size: 474px 820px;
+  background-repeat: no-repeat;
+  margin-top: 10px;
+}
+
+.leaderboard-condensed {
+  width: 110px;
+  height: 110px;
+  background-image: url('./assets/leaderboardcondensedfull.png');
+  background-size: 110px 110px;
+  background-repeat: no-repeat;
+  margin-top: 10px;
+}
+
+body {
   background-image: url('./assets/trbg3.png');
   background-size: 2160px 2160px;
   background-repeat: repeat;

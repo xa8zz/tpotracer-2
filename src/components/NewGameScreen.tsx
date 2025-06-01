@@ -80,8 +80,8 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username }) => {
   }, [gameState, startTime, correctChars, incorrectChars, totalChars]);
 
   return (
-    <div className="new-game-screen bg-tpotracer-400 w-full h-full flex items-center justify-center">
-      <div className="game-container relative">
+    <div className="">
+      <div className="game-container relative grow">
         <span className="absolute font-ptclean glow-text-shadow text-tpotracer-100 text-2xl top-[108px] left-[100px]">
           Best WPM:
         </span>
@@ -121,7 +121,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username }) => {
             </ul>
           </div>
           <div className="wordlist font-ptclean glow-text-shadow text-tpotracer-100 text-5xl mt-[20px] grow flex items-center">
-          stand other point now out which group after new they
+            stand other point now out which group after new they
           </div>
         </div>
         <div className="share-preview absolute top-[609px] left-[141px] w-[304px] h-[188px] bg-tpotracer-300 rounded-[29px]">
