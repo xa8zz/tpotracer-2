@@ -121,7 +121,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username }) => {
             </ul>
           </div>
           <div className="wordlist font-ptclean glow-text-shadow text-tpotracer-100 text-5xl mt-[20px] grow flex items-center">
-            stand other point now out which group after new they
+          increase increase increase increase increase increase increase increase increase increase
           </div>
         </div>
         <div className="share-preview absolute top-[609px] left-[141px] w-[304px] h-[188px] bg-tpotracer-300 rounded-[29px]">
