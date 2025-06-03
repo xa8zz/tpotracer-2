@@ -72,10 +72,17 @@ body {
 }
 
 .new-button {
-  background-image: url('./assets/buttonunpressed.png');
-  background-size: contain;
+  background-image: url('./assets/button.png');
+  background-size: 181px 63px;
+  background-position: -8px -7px;
   background-repeat: no-repeat;
   text-shadow: 0 0 1px #03223F;
+  font-size: 24px;
+}
+
+.new-button:active {
+  background-image: url('./assets/buttondepressedalt.png');
+  font-size: 23px;
 }
 
 .glow-text-shadow {
