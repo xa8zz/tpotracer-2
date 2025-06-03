@@ -8,9 +8,71 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+      #video-overlay {
+        position: fixed;
+        top: -25%;
+        left: -25%;
+        width: 150%;
+        height: 150%;
+        z-index: -1;
+        pointer-events: none;
+        background-color: #03223F;
+        mix-blend-mode: hue;
+      }
+    </style>
   </head>
   <body>
+    <iframe
+      id="video"
+      width="560"
+      height="315"
+      src="https://www.youtube.com/embed/zyRSaVtEzZ4?si=4wvkfRYB-qTeM6Rx&controls=0&autoplay=1&muted=1&enablejsapi=1&start=63"
+      title="YouTube video player"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen>
+    </iframe>
+
+    <div id="video-overlay"></div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const video = document.getElementById('video');
+        
+        video.style.position = 'fixed';
+        video.style.top = '-25%';
+        video.style.left = '-25%';
+        video.style.width = '150%';
+        video.style.height = '150%';
+        video.style.zIndex = '-2';
+        video.style.opacity = '1.0';
+        video.style.pointerEvents = 'none';
+        video.style.filter = 'blur(16px) brightness(1.25) contrast(1.25)';
+        
+        // Enable JavaScript API and start playback (muted by URL parameter)
+        const playVideo = () => {
+          if (video.contentWindow) {
+            setInterval(() => {
+              if (video.contentWindow) {
+                video.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[63, true]}', '*');
+              }
+            }, 78000); // 78,000 milliseconds = 78 seconds loop duration
+          }
+        };
+
+        // Try multiple times to start playback
+        playVideo();
+        
+        // Reload iframe if video fails to play
+        setTimeout(() => {
+          if (!video.contentWindow) {
+            video.src = video.src;
+          }
+        }, 3000);
+      });
+    </script>
   </body>
 </html>

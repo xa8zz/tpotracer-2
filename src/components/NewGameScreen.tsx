@@ -108,20 +108,20 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username }) => {
             <ul className="flex gap-[20px]">
               <li className="font-ptclean glow-text-shadow text-2xl text-tpotracer-100">
                 {"WPM: "}
-                <span className="bg-tpotracer-100 text-tpotracer-400 font-bold px-[10px] py-[2px] rounded-[4px] shadow-[0_0_1px_1px_#A7F1FA] [text-shadow:0_0_1px_#02182D]">150</span>
+                <span className="bg-tpotracer-100 text-tpotracer-400 font-bold px-[10px] pt-[2px] rounded-[4px] shadow-[0_0_1px_1px_#A7F1FA] [text-shadow:0_0_1px_#02182D]">150</span>
               </li>
               <li className="font-ptclean glow-text-shadow text-2xl text-tpotracer-100">
                 {"RAW: "}
-                <span className="bg-tpotracer-100 text-tpotracer-400 font-bold px-[10px] py-[2px] rounded-[4px] shadow-[0_0_1px_1px_#A7F1FA] [text-shadow:0_0_1px_#02182D]">150</span>
+                <span className="bg-tpotracer-100 text-tpotracer-400 font-bold px-[10px] pt-[2px] rounded-[4px] shadow-[0_0_1px_1px_#A7F1FA] [text-shadow:0_0_1px_#02182D]">150</span>
               </li>
               <li className="font-ptclean glow-text-shadow text-2xl text-tpotracer-100">
                 {"ACC: "}
-                <span className="bg-tpotracer-100 text-tpotracer-400 font-bold px-[10px] py-[2px] rounded-[4px] shadow-[0_0_1px_1px_#A7F1FA] [text-shadow:0_0_1px_#02182D]">100%</span>
+                <span className="bg-tpotracer-100 text-tpotracer-400 font-bold px-[10px] pt-[2px] rounded-[4px] shadow-[0_0_1px_1px_#A7F1FA] [text-shadow:0_0_1px_#02182D]">100%</span>
               </li>
             </ul>
           </div>
           <div className="wordlist font-ptclean glow-text-shadow text-tpotracer-100 text-5xl mt-[20px] grow flex items-center">
-          increase increase increase increase increase increase increase increase increase increase
+          increase increase increase increase increase increase increase increase increase increase 
           </div>
         </div>
         <div className="share-preview absolute top-[609px] left-[141px] w-[304px] h-[188px] bg-tpotracer-300 rounded-[29px]">
