@@ -152,21 +152,21 @@ body {
 }
 
 .leaderboard-badge-1 {
-  background: linear-gradient(to bottom, #ffd700, #b8860b);
+  background: linear-gradient(to bottom, #ffd700 0%, #b8860b 90%, #ffd700 100%);
   box-shadow: 0 0 1px 1px #ffd700;
   color: #fff;
   text-shadow: 0 0 1px #fff;
 }
 
 .leaderboard-badge-2 {
-  background: linear-gradient(to bottom, #c0c0c0, #808080);
+  background: linear-gradient(to bottom, #c0c0c0 0%, #808080 90%, #c0c0c0 100%);
   box-shadow: 0 0 1px 1px #c0c0c0;
   color: #fff;
   text-shadow: 0 0 1px #fff;
 }
 
 .leaderboard-badge-3 {
-  background: linear-gradient(to bottom, #cd7f32, #8b4513);
+  background: linear-gradient(to bottom, #cd7f32 0%, #8b4513 90%, #cd7f32 100%);
   box-shadow: 0 0 1px 1px #cd7f32;
   color: #fff;
   text-shadow: 0 0 1px #fff;
