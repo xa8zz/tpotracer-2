@@ -4,6 +4,7 @@ import UsernameForm from './components/UsernameForm';
 import { getUsername, setUsername } from './utils/storageUtils';
 import NewGameScreen from './components/NewGameScreen';
 import NewLayout from './components/NewLayout';
+import NewSettings from './components/NewSettings';
 
 function NewApp() {
   const [username, setUsernameSt] = useState<string | null>(null);
@@ -14,6 +15,11 @@ function NewApp() {
     const storedUsername = getUsername();
     setUsernameSt(storedUsername);
     setIsLoading(false);
+
+    (window as any)._debugRemoveUsername = function() {
+      setUsernameSt(null);
+      setUsername(null);
+    }
   }, []);
 
   const handleUsernameSubmit = (newUsername: string) => {
@@ -35,12 +41,12 @@ function NewApp() {
   }
 
   return (
-    <NewLayout onUsernameChange={handleUsernameChange} currentUsername={username || ''}>
-      <NewGameScreen username={username} />
-      {!username && (
-        <UsernameForm onSubmit={handleUsernameSubmit} />
-      )}
-    </NewLayout>
+    <div className="relative">
+      <NewLayout onUsernameChange={handleUsernameChange} currentUsername={username || ''}>
+        <NewGameScreen username={username} />
+      </NewLayout>
+      <NewSettings onClose={() => {}} onUsernameChange={handleUsernameChange} currentUsername={username || ''} />
+    </div>
   );
 }
 

@@ -48,10 +48,10 @@ input:focus {
 }
 
 .leaderboard {
-  width: 474px;
+  width: 500px;
   height: 820px;
-  background-image: url('./assets/leaderboardfull.png');
-  background-size: 474px 820px;
+  background-image: url('./assets/leaderboardwidercropped.png');
+  background-size: 500px 820px;
   background-repeat: no-repeat;
   margin-top: 10px;
 }

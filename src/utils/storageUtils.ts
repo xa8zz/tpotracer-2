@@ -1,4 +1,4 @@
-const USERNAME_KEY = 'tpotracer_username';
+export const USERNAME_KEY = 'tpotracer_username';
 
 /**
  * Get username from local storage
@@ -12,6 +12,10 @@ export const getUsername = (): string | null => {
  * Set username in local storage
  * @param username Username to store
  */
-export const setUsername = (username: string): void => {
-  localStorage.setItem(USERNAME_KEY, username);
+export const setUsername = (username: string | null): void => {
+  if (!username || username === '') {
+    localStorage.removeItem(USERNAME_KEY);
+  } else {
+    localStorage.setItem(USERNAME_KEY, username);
+  }
 };

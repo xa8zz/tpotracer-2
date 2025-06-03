@@ -36,7 +36,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
     { username: "@swiftkeys", wpm: 149 },
     { username: "@typewriter", wpm: 142 },
     { username: "@quickfingers", wpm: 138 },
-    { username: "@keyboard_warrior", wpm: 132 },
+    { username: "@keyboard_warriorzzzz", wpm: 132 },
     { username: "@typing_novice", wpm: 125 },
   ]
 
@@ -52,10 +52,10 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
         <span className="absolute font-ptclean dark-text-shadow text-tpotracer-400 text-4xl font-bold top-[125px] left-[164px]">
           -10:24:51
         </span>
-        <table className="leaderboard-table text-center absolute top-[190px] left-[74px] w-[360px] rounded-[26px]">
+        <table className="leaderboard-table text-center absolute top-[190px] left-[75px] w-[380px] rounded-[26px]">
           <thead>
             <tr className="font-ptclean h-[45px] glow-text-shadow text-tpotracer-100 text-2xl">
-              <th className="w-[60px]">#</th>
+              <th className="w-[75px]">#</th>
               <th className="text-left">USERNAME</th>
               <th className="w-[75px]">WPM</th>
             </tr>
