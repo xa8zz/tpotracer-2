@@ -98,7 +98,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
         </table>
       </div>
       <div className="leaderboard-condensed">
-        <button className="absolute dark-text-shadow font-ptclean text-2xl w-[50px] h-[50px] top-[29px] left-[29px]" onClick={toggleSetVisible}>
+        <button className="absolute small-button dark-text-shadow font-ptclean text-2xl w-[50px] h-[50px] top-[29px] left-[29px]" onClick={toggleSetVisible}>
           v
         </button>
       </div>

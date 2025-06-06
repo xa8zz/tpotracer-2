@@ -59,7 +59,7 @@ input:focus {
 .leaderboard-condensed {
   width: 110px;
   height: 110px;
-  background-image: url('./assets/leaderboardcondensedfull.png');
+  background-image: url('./assets/leaderboardcondensednobuttonfull.png');
   background-size: 110px 110px;
   background-repeat: no-repeat;
   margin-top: 10px;
