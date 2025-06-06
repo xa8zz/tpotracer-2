@@ -50,7 +50,7 @@ input:focus {
 .leaderboard {
   width: 500px;
   height: 820px;
-  background-image: url('./assets/leaderboardwidercropped.png');
+  background-image: url('./assets/leaderboardfinal.png');
   background-size: 500px 820px;
   background-repeat: no-repeat;
   margin-top: 10px;
@@ -170,4 +170,17 @@ body {
   box-shadow: 0 0 1px 1px #cd7f32;
   color: #fff;
   text-shadow: 0 0 1px #fff;
+}
+
+.small-button {
+  background-image: url('./assets/smallbutton.png');
+  background-size: 49px 49px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: transparent;
+}
+
+.small-button:active {
+  background-image: url('./assets/smallbuttonpressed.png');
+  font-size: 23px;
 }

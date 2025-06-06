@@ -1,6 +1,32 @@
 import { LeaderboardEntry } from '../types';
 
 const LEADERBOARD_KEY = 'tpotracer_leaderboard';
+const TIME_LIMIT = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // One week from now
+
+/**
+ * Get the remaining time until the time limit ends
+ * @returns Formatted string like "-D:hh:mm:ss"
+ */
+export const getRemainingTimeUntilEnd = (): string => {
+  const now = new Date();
+  const timeLeft = TIME_LIMIT.getTime() - now.getTime();
+  
+  // If time has passed, return "0:00:00:00"
+  if (timeLeft <= 0) {
+    return "-0:00:00:00";
+  }
+  
+  // Calculate days, hours, minutes, seconds
+  const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+  
+  // Format with leading zeros for hours, minutes, seconds
+  const formatTime = (num: number): string => num.toString().padStart(2, '0');
+  
+  return `-${days}:${formatTime(hours)}:${formatTime(minutes)}:${formatTime(seconds)}`;
+};
 
 /**
  * Get the leaderboard data from local storage

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLeaderboard } from '../hooks/useLeaderboard';
+import { getRemainingTimeUntilEnd } from '../utils/leaderboardUtils';
 
 interface LeaderboardProps {
   currentUsername: string | null;
@@ -46,11 +47,11 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
   return (
     <div className={`leaderboard-container ${visible ? "tr-visible" : ""}`}>
       <div className="leaderboard">
-        <button className="absolute dark-text-shadow font-ptclean text-2xl pt-[10px] w-[50px] h-[50px] top-[34px] left-[34px]" onClick={toggleSetVisible}>
+        <button className="absolute small-button dark-text-shadow font-ptclean text-2xl pt-[10px] w-[50px] h-[50px] top-[36px] left-[34px]" onClick={toggleSetVisible}>
           ^
         </button>
-        <span className="absolute font-ptclean dark-text-shadow text-tpotracer-400 text-4xl font-bold top-[125px] left-[164px]">
-          -10:24:51
+        <span className="absolute font-ptclean dark-text-shadow text-tpotracer-400 text-4xl font-bold top-[125px] left-[162px]">
+          {getRemainingTimeUntilEnd()}
         </span>
         <table className="leaderboard-table text-center absolute top-[190px] left-[75px] w-[380px] rounded-[26px]">
           <thead>
