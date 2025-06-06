@@ -42,15 +42,45 @@
       document.addEventListener('DOMContentLoaded', function() {
         const video = document.getElementById('video');
         
-        video.style.position = 'fixed';
-        video.style.top = '-25%';
-        video.style.left = '-25%';
-        video.style.width = '150%';
-        video.style.height = '150%';
-        video.style.zIndex = '-2';
-        video.style.opacity = '1.0';
-        video.style.pointerEvents = 'none';
-        video.style.filter = 'blur(16px) brightness(1.25) contrast(1.25)';
+        // Function to resize video to cover entire viewport
+        function resizeVideoToFitScreen() {
+          const windowWidth = window.innerWidth;
+          const windowHeight = window.innerHeight;
+          
+          // YouTube video aspect ratio (16:9)
+          const videoAspectRatio = 16 / 9;
+          const windowAspectRatio = windowWidth / windowHeight;
+          
+          let newWidth, newHeight;
+          
+          if (windowAspectRatio > videoAspectRatio) {
+            // Window is wider than video aspect ratio
+            // Scale based on width
+            newWidth = windowWidth * 1.5; // 50% larger for coverage
+            newHeight = newWidth / videoAspectRatio;
+          } else {
+            // Window is taller than video aspect ratio
+            // Scale based on height
+            newHeight = windowHeight * 1.5; // 50% larger for coverage
+            newWidth = newHeight * videoAspectRatio;
+          }
+          
+          video.style.position = 'fixed';
+          video.style.top = `${(windowHeight - newHeight) / 2}px`;
+          video.style.left = `${(windowWidth - newWidth) / 2}px`;
+          video.style.width = `${newWidth}px`;
+          video.style.height = `${newHeight}px`;
+          video.style.zIndex = '-2';
+          video.style.opacity = '1.0';
+          video.style.pointerEvents = 'none';
+          video.style.filter = 'blur(16px) brightness(1.25) contrast(1.25)';
+        }
+        
+        // Initial resize
+        resizeVideoToFitScreen();
+        
+        // Resize on window resize
+        window.addEventListener('resize', resizeVideoToFitScreen);
         
         // Enable JavaScript API and start playback (muted by URL parameter)
         const playVideo = () => {
@@ -63,7 +93,7 @@
           }
         };
 
-        // Try multiple times to start playback
+        // Try multiple times to start playbook
         playVideo();
         
         // Reload iframe if video fails to play
