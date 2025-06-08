@@ -36,21 +36,18 @@ const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) =>
 
   return (
     <>
-      <div className={`flex flex-row w-screen h-screen overflow-hidden items-center justify-center relative ${isSettingsOpen ? 'blur-sm' : ''}`}>
+      <div className={`flex flex-row w-screen h-screen overflow-hidden items-center justify-center relative transition-[filter] duration-200 ease ${isSettingsOpen ? 'blur-md' : ''}`}>
         <div className="flex flex-row relative max-h-screen">
           <NewGameScreen username={currentUsername} onSettingsClick={toggleSettings} />
           <NewLeaderboard currentUsername={currentUsername} />
         </div>
       </div>
-      {isSettingsOpen && (
-        <div className="absolute inset-0 w-screen h-screen">
-          <NewSettings
-            // onClose={() => setIsSettingsOpen(false)} 
-            // onUsernameChange={onUsernameChange}
-            currentUsername={currentUsername}
-          />
-        </div>
-      )}
+      <NewSettings
+        onClose={toggleSettings} 
+        visible={isSettingsOpen}
+        // onUsernameChange={onUsernameChange}
+        currentUsername={currentUsername}
+      />
     </>
   );
 };
