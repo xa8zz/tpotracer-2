@@ -7,19 +7,54 @@ interface SettingsProps {
   visible: boolean;
   className?: string;
   onClose: () => void;
+  onUsernameChange: (username: string) => void;
 }
 
 const Settings: React.FC<SettingsProps> = ({
   currentUsername,
   visible,
   className,
-  onClose
+  onClose,
+  onUsernameChange
 }) => {
   const [username, setUsername] = useState(currentUsername);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(true);
+  const [isAudioMuted, setIsAudioMuted] = useState(true); // Video starts muted by default
 
   const sanitizedSetUsername = (input: string) => {
     const sanitized = input.trim().replace(/^@+/, '');
     setUsername(sanitized);
+  };
+
+  const toggleVideo = () => {
+    const videoIframe = document.getElementById('video') as HTMLIFrameElement;
+    if (videoIframe && videoIframe.contentWindow) {
+      if (isVideoPlaying) {
+        videoIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+      } else {
+        videoIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+      }
+      setIsVideoPlaying(!isVideoPlaying);
+    }
+  };
+
+  const toggleAudio = () => {
+    const videoIframe = document.getElementById('video') as HTMLIFrameElement;
+    if (videoIframe && videoIframe.contentWindow) {
+      if (isAudioMuted) {
+        videoIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+      } else {
+        videoIframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+      }
+      setIsAudioMuted(!isAudioMuted);
+    }
+  };
+
+  const handleSave = () => {
+    if (username.trim() && username !== currentUsername) {
+      onUsernameChange(username.trim());
+    }
+    onClose();
   };
 
   return (
@@ -49,9 +84,21 @@ const Settings: React.FC<SettingsProps> = ({
             value={username}
             onChange={(e) => sanitizedSetUsername(e.target.value)}
           />
-          <NewButton size="md" className="absolute top-[158px] left-[353px]">Save</NewButton>
-          <NewButton size="lg" className="absolute top-[253px] left-[270px]">Toggle Audio</NewButton>
-          <NewButton size="lg" className="absolute top-[253px] left-[43px]">Toggle Video</NewButton>
+          <NewButton size="md" className="absolute top-[158px] left-[353px]" onClick={handleSave}>Save</NewButton>
+          <NewButton 
+            size="lg" 
+            className="absolute top-[253px] left-[270px]"
+            onClick={toggleAudio}
+          >
+            {isAudioMuted ? 'Unmute Audio' : 'Mute Audio'}
+          </NewButton>
+          <NewButton 
+            size="lg" 
+            className="absolute top-[253px] left-[43px]"
+            onClick={toggleVideo}
+          >
+            {isVideoPlaying ? 'Pause Video' : 'Play Video'}
+          </NewButton>
         </div>
       </div>
     </div>

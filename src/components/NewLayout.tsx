@@ -45,7 +45,7 @@ const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) =>
       <NewSettings
         onClose={toggleSettings} 
         visible={isSettingsOpen}
-        // onUsernameChange={onUsernameChange}
+        onUsernameChange={onUsernameChange}
         currentUsername={currentUsername}
       />
     </>
