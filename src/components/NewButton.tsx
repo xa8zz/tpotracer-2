@@ -4,17 +4,19 @@ interface NewButtonProps {
   onClick?: () => void;
   className?: string;
   children?: React.ReactNode;
+  size?: 'md' | 'lg';
 }
 
 const NewButton: React.FC<NewButtonProps> = ({
   onClick,
   className = '',
-  children
+  children,
+  size
 }) => {
   return (
     <button
       onClick={onClick}
-      className={`w-[167px] h-[49px] font-ptclean text-2xl new-button text-tpotracer-300 ${className}`}
+      className={`font-ptclean text-2xl ${size ? `new-button-${size}` : 'new-button'} text-tpotracer-300 ${className}`}
     >
       {children}
     </button>

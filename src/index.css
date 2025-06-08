@@ -74,7 +74,9 @@ body {
 .new-button {
   background-image: url('./assets/button.png');
   background-size: 181px 63px;
-  background-position: -8px -7px;
+  width: 181px;
+  height: 63px;
+  background-position: 0 0;
   background-repeat: no-repeat;
   text-shadow: 0 0 1px #03223F;
   font-size: 24px;
@@ -82,6 +84,21 @@ body {
 
 .new-button:active {
   background-image: url('./assets/buttondepressedalt.png');
+  font-size: 23px;
+}
+
+.new-button-md {
+  background-image: url('./assets/mdbutton.png');
+  background-size: 117px 49px;
+  width: 117px;
+  height: 49px;
+  background-repeat: no-repeat;
+  text-shadow: 0 0 1px #03223F;
+  font-size: 24px;
+}
+
+.new-button-md:active {
+  background-image: url('./assets/mdbuttonpressed.png');
   font-size: 23px;
 }
 

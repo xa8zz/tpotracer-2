@@ -98,10 +98,10 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         <span className="absolute font-ptclean glow-text-shadow text-tpotracer-100 text-3xl top-[40px] left-[520px]">
           @marcusquest
         </span>
-        <NewButton className="absolute top-[128px] left-[480px]">
+        <NewButton className="absolute top-[121px] left-[473px]">
           Retry (Tab)
         </NewButton>
-        <NewButton className="absolute top-[128px] left-[669px]" onClick={onSettingsClick}>
+        <NewButton className="absolute top-[121px] left-[661px]" onClick={onSettingsClick}>
           Settings
         </NewButton>
         <div className="inner-screen absolute top-[226px] left-[250px] w-[474px] h-[338px] rounded-[49px] flex flex-col p-[30px]">
@@ -128,10 +128,11 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         <div className="share-preview absolute top-[609px] left-[141px] w-[304px] h-[188px] bg-tpotracer-300 rounded-[29px]">
 
         </div>
-        <NewButton className="absolute top-[613px] left-[479px]">
+        <NewButton className="absolute top-[606px] left-[471px]">
+
           Share Image
         </NewButton>
-        <NewButton className="absolute top-[613px] left-[667px]">
+        <NewButton className="absolute top-[606px] left-[659px]">
           Share on X
         </NewButton>
       </div>
