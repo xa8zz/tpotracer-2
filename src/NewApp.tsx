@@ -42,10 +42,7 @@ function NewApp() {
 
   return (
     <div className="relative">
-      <NewLayout onUsernameChange={handleUsernameChange} currentUsername={username || ''}>
-        <NewGameScreen username={username} />
-      </NewLayout>
-      <NewSettings onClose={() => {}} onUsernameChange={handleUsernameChange} currentUsername={username || ''} />
+      <NewLayout onUsernameChange={handleUsernameChange} currentUsername={username || ''} />
     </div>
   );
 }

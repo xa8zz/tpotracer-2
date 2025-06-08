@@ -5,11 +5,12 @@ import NewButton from './NewButton';
 
 interface NewGameScreenProps {
   username: string | null;
+  onSettingsClick: () => void;
 }
 
 const HIGH_SCORE_KEY = 'tpotracer_high_score';
 
-const NewGameScreen: React.FC<NewGameScreenProps> = ({ username }) => {
+const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick }) => {
   const [words, setWords] = useState<string[]>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [typedText, setTypedText] = useState('');
@@ -100,7 +101,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username }) => {
         <NewButton className="absolute top-[128px] left-[480px]">
           Retry (Tab)
         </NewButton>
-        <NewButton className="absolute top-[128px] left-[669px]">
+        <NewButton className="absolute top-[128px] left-[669px]" onClick={onSettingsClick}>
           Settings
         </NewButton>
         <div className="inner-screen absolute top-[226px] left-[250px] w-[474px] h-[338px] rounded-[49px] flex flex-col p-[30px]">
