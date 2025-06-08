@@ -5,6 +5,7 @@ import { getUsername, setUsername } from './utils/storageUtils';
 import NewGameScreen from './components/NewGameScreen';
 import NewLayout from './components/NewLayout';
 import NewSettings from './components/NewSettings';
+import { GameContextProvider } from './contexts/GameContext';
 
 function NewApp() {
   const [username, setUsernameSt] = useState<string | null>(null);
@@ -42,7 +43,9 @@ function NewApp() {
 
   return (
     <div className="relative">
-      <NewLayout onUsernameChange={handleUsernameChange} currentUsername={username || ''} />
+      <GameContextProvider username={username || ''}>
+        <NewLayout onUsernameChange={handleUsernameChange} currentUsername={username || ''} />
+      </GameContextProvider>
     </div>
   );
 }

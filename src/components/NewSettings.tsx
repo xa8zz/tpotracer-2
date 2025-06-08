@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import NewButton from './NewButton';
 
@@ -21,9 +21,29 @@ const Settings: React.FC<SettingsProps> = ({
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
   const [isAudioMuted, setIsAudioMuted] = useState(true); // Video starts muted by default
 
+  // Reset username to current when modal opens
+  useEffect(() => {
+    if (visible) {
+      setUsername(currentUsername);
+    }
+  }, [visible, currentUsername]);
+
   const sanitizedSetUsername = (input: string) => {
-    const sanitized = input.trim().replace(/^@+/, '');
-    setUsername(sanitized);
+    // Remove @ symbols and trim, then filter to only alphanumeric and underscore
+    const cleaned = input.replace(/^@+/, '').trim();
+    const filtered = cleaned.replace(/[^a-zA-Z0-9_]/g, '');
+    // Limit to 20 characters max
+    const limited = filtered.slice(0, 20);
+    setUsername(limited);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      const currentValue = e.currentTarget.value;
+      const newValue = currentValue.slice(0, -1);
+      sanitizedSetUsername(newValue);
+    }
   };
 
   const toggleVideo = () => {
@@ -51,8 +71,9 @@ const Settings: React.FC<SettingsProps> = ({
   };
 
   const handleSave = () => {
-    if (username.trim() && username !== currentUsername) {
-      onUsernameChange(username.trim());
+    // Ensure username is not empty and different from current
+    if (username && username.length > 0 && username !== currentUsername) {
+      onUsernameChange(username);
     }
     onClose();
   };
@@ -83,6 +104,7 @@ const Settings: React.FC<SettingsProps> = ({
             className="absolute top-[162px] left-[46px] h-[42px] w-[285px] p-0 pl-[30px] rounded-[500px] font-ptclean dark-text-shadow text-2xl bg-transparent text-tpotracer-400 text-2xl"
             value={username}
             onChange={(e) => sanitizedSetUsername(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
           <NewButton size="md" className="absolute top-[158px] left-[353px]" onClick={handleSave}>Save</NewButton>
           <NewButton 
