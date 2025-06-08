@@ -102,6 +102,21 @@ body {
   font-size: 23px;
 }
 
+.new-button-lg {
+  background-image: url('./assets/lgbutton.png');
+  background-size: 199px 49px;
+  width: 199px;
+  height: 49px;
+  background-repeat: no-repeat;
+  text-shadow: 0 0 1px #03223F;
+  font-size: 24px;
+}
+
+.new-button-lg:active {
+  background-image: url('./assets/lgbuttonpressed.png');
+  font-size: 23px;
+}
+
 .glow-text-shadow {
   text-shadow: 0 0 1px #A7F1FA;
 }
@@ -215,3 +230,4 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+

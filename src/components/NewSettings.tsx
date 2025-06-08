@@ -50,7 +50,8 @@ const Settings: React.FC<SettingsProps> = ({
             onChange={(e) => sanitizedSetUsername(e.target.value)}
           />
           <NewButton size="md" className="absolute top-[158px] left-[353px]">Save</NewButton>
-          <NewButton size="lg" className="absolute top-[258px] left-[353px]">Toggle Audio</NewButton>
+          <NewButton size="lg" className="absolute top-[253px] left-[270px]">Toggle Audio</NewButton>
+          <NewButton size="lg" className="absolute top-[253px] left-[43px]">Toggle Video</NewButton>
         </div>
       </div>
     </div>
