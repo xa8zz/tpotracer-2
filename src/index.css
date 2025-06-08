@@ -184,3 +184,17 @@ body {
   background-image: url('./assets/smallbuttonpressed.png');
   font-size: 23px;
 }
+
+.new-settings-modal {
+  background-image: url('./assets/settingsmodalcropped.png');
+  background-size: 509px 403px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: transparent;
+  width: 509px;
+  height: 403px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

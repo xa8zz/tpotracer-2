@@ -13,7 +13,7 @@ const Settings: React.FC<SettingsProps> = ({
   const [username, setUsername] = useState(currentUsername);
 
   return (
-    <div className={`${className}`}>
+    <div className={`new-settings-modal ${className}`}>
       poop
     </div>
   );
