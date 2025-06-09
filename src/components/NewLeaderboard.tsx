@@ -47,8 +47,8 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
   return (
     <div className={`leaderboard-container ${visible ? "tr-visible" : ""}`}>
       <div className="leaderboard">
-        <button className="absolute small-button dark-text-shadow font-ptclean text-2xl pt-[10px] w-[50px] h-[50px] top-[36px] left-[34px]" onClick={toggleSetVisible}>
-          ^
+        <button className="absolute small-button dark-text-shadow font-ptclean text-2xl w-[50px] h-[50px] top-[36px] left-[34px]" onClick={toggleSetVisible}>
+          &lt;
         </button>
         <span className="absolute font-ptclean dark-text-shadow text-tpotracer-400 text-4xl font-bold top-[125px] left-[162px]">
           {getRemainingTimeUntilEnd()}
@@ -99,7 +99,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
       </div>
       <div className="leaderboard-condensed">
         <button className="absolute small-button dark-text-shadow font-ptclean text-2xl w-[50px] h-[50px] top-[29px] left-[29px]" onClick={toggleSetVisible}>
-          v
+          &gt;
         </button>
       </div>
     </div>

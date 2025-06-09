@@ -128,21 +128,18 @@ body {
 .leaderboard-container {
   position: relative;
   width: 110px; /* condensed leaderboard width */
-  transition: all 0.3s ease;
+  transition: opacity 0.2s ease, width 0.2s ease;
 }
 
 .leaderboard-condensed {
-  opacity: 1;
-  transform: translateY(0px);
   transition: inherit;
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 7px;
+  left: 5px;
 }
 
 .leaderboard {
   opacity: 0;
-  transform: translateY(-2000px);
   transition: inherit;
   position: absolute;
   top: 0;
@@ -155,12 +152,10 @@ body {
 
 .leaderboard-container.tr-visible .leaderboard-condensed {
   opacity: 0;
-  transform: translateY(2000px);
 }
 
 .leaderboard-container.tr-visible .leaderboard {
   opacity: 1;
-  transform: translateY(0px);
 }
 
 .leaderbaord-table-separator {
