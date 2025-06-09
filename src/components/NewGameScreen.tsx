@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import NewButton from './NewButton';
+import Cursor from './Cursor';
 import { useGameContext } from '../contexts/GameContext';
 
 interface NewGameScreenProps {
@@ -29,12 +30,15 @@ const renderPaddedNumber = (num: number): JSX.Element => {
   const numStr = cappedNum.toString();
   const paddedStr = numStr.padStart(3, '0');
   
+  // If the actual number is 0, all digits should have low opacity
+  const isActualZero = cappedNum === 0;
+  
   return (
     <>
       {paddedStr.split('').map((digit, index) => (
         <span 
           key={index} 
-          className={index < 3 - numStr.length ? 'opacity-40' : ''}
+          className={isActualZero || index < 3 - numStr.length ? 'opacity-40' : ''}
         >
           {digit}
         </span>
@@ -48,40 +52,84 @@ const renderWordsWithProgress = (
   words: string[], 
   currentWordIndex: number, 
   typedText: string, 
-  typedHistory: string[]
+  typedHistory: string[],
+  cursorRef: React.RefObject<HTMLSpanElement>
 ): JSX.Element => {
   return (
     <>
       {words.map((word, wordIndex) => {
         if (wordIndex < currentWordIndex) {
-          // Word has been completed
-          return (
-            <span key={wordIndex} className="opacity-100 inline-block">
-              {word}
-            </span>
-          );
-        } else if (wordIndex === currentWordIndex) {
-          // Current word being typed
+          // Word has been completed - show typing history with correct/incorrect styling
+          const typedWord = typedHistory[wordIndex] || '';
           return (
             <span key={wordIndex} className="inline-block">
               {word.split('').map((char, charIndex) => {
-                const isTyped = charIndex < typedText.length;
-                const isCorrect = isTyped && typedText[charIndex] === char;
+                const typedChar = typedWord[charIndex];
+                const wasTyped = charIndex < typedWord.length;
+                const wasCorrect = wasTyped && typedChar === char;
+                
+                let className = 'text-tpotracer-100 ';
+                if (wasTyped) {
+                  className += wasCorrect ? 'opacity-100' : 'text-red-300 opacity-100 [text-shadow:0_0_1px_rgb(252_165_165)]';
+                } else {
+                  // Character was never typed (word was shorter than expected)
+                  className += 'opacity-40';
+                }
+                
                 return (
-                  <span 
-                    key={charIndex}
-                    className={isTyped && isCorrect ? 'opacity-100' : 'opacity-50'}
-                  >
+                  <span key={charIndex} className={className}>
                     {char}
                   </span>
                 );
               })}
             </span>
           );
-        } else {
-          // Future words - half opacity
+        } else if (wordIndex === currentWordIndex) {
+          // Current word being typed
           return (
-            <span key={wordIndex} className="opacity-50 inline-block">
+            <span key={wordIndex} className="inline-block relative">
+              {word.split('').map((char, charIndex) => {
+                const isTyped = charIndex < typedText.length;
+                const isCorrect = isTyped && typedText[charIndex] === char;
+                const isCursorPosition = charIndex === typedText.length && typedText.length < word.length;
+                
+                let className = 'text-tpotracer-100 ';
+                if (isTyped) {
+                  className += isCorrect ? 'opacity-100' : 'text-red-300 opacity-100 [text-shadow:0_0_1px_rgb(252_165_165)]';
+                } else {
+                  className += 'opacity-40';
+                }
+                
+                return (
+                  <span key={charIndex} className="relative">
+                    <span className={className}>
+                      {char}
+                    </span>
+                    {isCursorPosition && (
+                      <span 
+                        ref={cursorRef}
+                        className="absolute left-0 top-0 w-0 h-full opacity-0 pointer-events-none"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </span>
+                );
+              })}
+              {/* Handle cursor at the end of completed current word - stays here until space is pressed */}
+              {typedText.length === word.length && (
+                <span 
+                  ref={cursorRef}
+                  className="absolute opacity-0 pointer-events-none top-0 h-full"
+                  style={{ left: '100%' }}
+                  aria-hidden="true"
+                />
+              )}
+            </span>
+          );
+        } else {
+          // Future words - tpotracer-100 with low opacity
+          return (
+            <span key={wordIndex} className="text-tpotracer-100 opacity-40 inline-block">
               {word}
             </span>
           );
@@ -92,6 +140,9 @@ const renderWordsWithProgress = (
 };
 
 const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick }) => {
+  // Create ref for cursor positioning
+  const cursorRef = useRef<HTMLSpanElement>(null);
+  
   // Destructure all values and functions from game context
   const {
     words,
@@ -120,6 +171,9 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     toggleHelp,
   } = useGameContext();
 
+  // Determine if cursor should be visible (during typing states)
+  const isCursorVisible = gameState === 'playing' || gameState === 'waiting';
+
   return (
     <div className="">
       <div className="game-container relative grow">
@@ -135,7 +189,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
               {leaderboardPosition}
               <sup className="text-2xl">{getOrdinalSuffix(leaderboardPosition)}</sup>
             </>
-          ) : '--'}
+          ) : ''}
         </span>
         <span className="user-avatar bg-tpotracer-100 rounded-[400px] absolute w-[40px] h-[40px] top-[36px] left-[470px]">
 
@@ -167,8 +221,8 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             </ul>
           </div>
           <div className="grow mt-[20px] flex justify-center">
-          <div className="wordlist font-ptclean content-center glow-text-shadow text-tpotracer-100 text-5xl mt-[20px] flex flex-wrap items-start gap-x-4">
-            {renderWordsWithProgress(words, currentWordIndex, typedText, typedHistory)}
+          <div className="wordlist font-ptclean content-center glow-text-shadow text-tpotracer-100 text-5xl mt-[20px] flex flex-wrap items-start gap-x-5">
+            {renderWordsWithProgress(words, currentWordIndex, typedText, typedHistory, cursorRef)}
           </div>
           </div>
         </div>
@@ -180,6 +234,9 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         <NewButton className="absolute top-[606px] left-[659px]">
           Share on X
         </NewButton>
+        
+        {/* Custom Cursor Component */}
+        <Cursor targetRef={cursorRef} isVisible={isCursorVisible} />
       </div>
     </div>
   );
