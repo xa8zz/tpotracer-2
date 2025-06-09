@@ -7,7 +7,7 @@ import {
 } from '../utils/apiService'; // Removed isLeaderboardCacheStale import as it's not directly used here now
 
 interface UseLeaderboardProps {
-  username?: string;
+  username: string | null;
 }
 
 interface LeaderboardState {
@@ -18,7 +18,7 @@ interface LeaderboardState {
   userPosition?: number;
 };
 
-export const useLeaderboard = ({ username }: UseLeaderboardProps = {}) => {
+export const useLeaderboard = ({ username }: UseLeaderboardProps = { username: null}) => {
   const [state, setState] = useState<LeaderboardState>({
     data: [],
     isLoading: true,

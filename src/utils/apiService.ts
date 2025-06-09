@@ -35,7 +35,7 @@ export const getTimeUntilNextRefresh = (): number => {
 // Fetch leaderboard (with optional force or username lookup)
 export const fetchLeaderboard = async (
   force = false,
-  username?: string
+  username: string | null
 ): Promise<LeaderboardCache> => {
   if (!force && !isLeaderboardCacheStale()) {
     return leaderboardCache;

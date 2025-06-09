@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import UsernameForm from './components/UsernameForm';
-import GameScreen from './components/GameScreen';
 import { getUsername, setUsername } from './utils/storageUtils';
 import NewGameScreen from './components/NewGameScreen';
+import NewLayout from './components/NewLayout';
+import NewSettings from './components/NewSettings';
+import { GameContextProvider } from './contexts/GameContext';
 
-function App() {
+function NewApp() {
   const [username, setUsernameSt] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -14,6 +16,11 @@ function App() {
     const storedUsername = getUsername();
     setUsernameSt(storedUsername);
     setIsLoading(false);
+
+    (window as any)._debugRemoveUsername = function() {
+      setUsernameSt(null);
+      setUsername(null);
+    }
   }, []);
 
   const handleUsernameSubmit = (newUsername: string) => {
@@ -27,21 +34,20 @@ function App() {
   };
 
   if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center">
-      <p className="text-gray-300 font-mono">Loading...</p>
-    </div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-300 font-mono">Loading...</p>
+      </div>
+    );
   }
 
   return (
-    <Layout onUsernameChange={handleUsernameChange} currentUsername={username || ''}>
-      {!username ? (
-        <UsernameForm onSubmit={handleUsernameSubmit} />
-      ) : (
-        <NewGameScreen username={username} />
-        // <GameScreen username={username} />
-      )}
-    </Layout>
+    <div className="relative">
+      <GameContextProvider username={username || ''}>
+        <NewLayout onUsernameChange={handleUsernameChange} currentUsername={username || ''} />
+      </GameContextProvider>
+    </div>
   );
 }
 
-export default App;
+export default NewApp;
