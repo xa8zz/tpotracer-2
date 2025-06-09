@@ -2,6 +2,8 @@ import React, { useRef } from 'react';
 import NewButton from './NewButton';
 import Cursor from './Cursor';
 import { useGameContext } from '../contexts/GameContext';
+import { preloadGameAssets } from '../utils/preloadAssets';
+import { whenVideoPlaying } from '../utils/youtube';
 
 interface NewGameScreenProps {
   username: string | null;
