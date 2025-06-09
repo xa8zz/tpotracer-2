@@ -36,6 +36,18 @@
     </iframe>
 
     <div id="video-overlay"></div>
+    <div id="loader">
+      <div class="fixed inset-0 bg-tpotracer-400 flex flex-col items-center justify-center z-50" style="font-family: 'ProggyCleanTT', monospace;">
+        <div class="text-center">
+            <h1 class="text-6xl font-bold text-tpotracer-100 glow-text-shadow mb-4">
+                tpotracer
+            </h1>
+            <p class="text-2xl text-tpotracer-100 glow-text-shadow">
+                Loading...
+            </p>
+        </div>
+      </div>
+    </div>
     <div id="root"></div>
     <script src="https://www.youtube.com/iframe_api"></script>
     <script type="module" src="/src/main.tsx"></script>

@@ -7,10 +7,17 @@ import NewLayout from './components/NewLayout';
 import NewSettings from './components/NewSettings';
 import { GameContextProvider } from './contexts/GameContext';
 
-function NewApp() {
+interface NewAppProps {
+  onReady: () => void;
+}
+
+function NewApp({ onReady }: NewAppProps) {
   const [username, setUsernameSt] = useState<string | null>(null);
 
   useEffect(() => {
+    // Signal that the app is mounted and ready
+    onReady();
+
     // Load username from local storage
     const storedUsername = getUsername();
     setUsernameSt(storedUsername);
@@ -19,7 +26,7 @@ function NewApp() {
       setUsernameSt(null);
       setUsername(null);
     }
-  }, []);
+  }, [onReady]);
 
   const handleUsernameSubmit = (newUsername: string) => {
     setUsername(newUsername);
