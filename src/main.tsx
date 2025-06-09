@@ -18,10 +18,15 @@ async function main() {
   const onAppReady = () => {
     const loader = document.getElementById('loader');
     if (loader) {
-      loader.classList.add('fade-out');
-      // Remove the loader from the DOM after the transition
+      // Set up the listener to remove the loader once the transition is complete.
       loader.addEventListener('transitionend', () => {
         loader.remove();
+      }, { once: true });
+
+      // Use requestAnimationFrame to ensure the browser has time to
+      // process the initial state before we trigger the fade-out transition.
+      requestAnimationFrame(() => {
+        loader.classList.add('fade-out');
       });
     }
   };
