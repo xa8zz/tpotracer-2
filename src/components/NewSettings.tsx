@@ -80,7 +80,7 @@ const Settings: React.FC<SettingsProps> = ({
 
   return (
     <div className={`absolute inset-0 w-screen h-screen transition-all duration-200 ease ${visible ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-      <div className="absolute inset-0 w-screen h-screen bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_100%)]"></div>
+      <div className="absolute inset-0 w-screen h-screen bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_40%)]"></div>
       <div className={`new-settings-modal ${className}`}>
         <div className="relative w-full h-full rounded-[51px] p-[30px]">
           <button 

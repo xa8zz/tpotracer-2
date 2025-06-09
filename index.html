@@ -27,7 +27,7 @@
       id="video"
       width="560"
       height="315"
-      src="https://www.youtube.com/embed/zyRSaVtEzZ4?si=4wvkfRYB-qTeM6Rx&controls=0&autoplay=1&muted=1&enablejsapi=1&start=63"
+      src="https://www.youtube.com/embed/zyRSaVtEzZ4?si=4wvkfRYB-qTeM6Rx&controls=0&autoplay=1&muted=1&enablejsapi=1&start=74"
       title="YouTube video player"
       frameborder="0"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -73,7 +73,7 @@
           video.style.zIndex = '-2';
           video.style.opacity = '1.0';
           video.style.pointerEvents = 'none';
-          video.style.filter = 'blur(16px) brightness(1.25) contrast(1.25)';
+          video.style.filter = 'blur(10px) brightness(1.25) contrast(1.25)';
         }
         
         // Initial resize
@@ -87,9 +87,9 @@
           if (video.contentWindow) {
             setInterval(() => {
               if (video.contentWindow) {
-                video.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[63, true]}', '*');
+                video.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[74, true]}', '*');
               }
-            }, 78000); // 78,000 milliseconds = 78 seconds loop duration
+            }, 67000); // because 141s end 74s start = 67s in between
           }
         };
 

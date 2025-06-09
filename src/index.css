@@ -36,11 +36,11 @@ input:focus {
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.3s ease-out forwards;
+  animation: fadeIn 0.2s ease-out forwards;
 }
 
 .game-container {
-  width: 903px;
+  width: 888px; /* was 903px */
   height: 865px;
   background-image: url('./assets/mainbodyscanlines.png');
   background-size: 903px 865px;
