@@ -136,6 +136,7 @@ body {
   position: absolute;
   top: 7px;
   left: 5px;
+  z-index: -1;
 }
 
 .leaderboard {
@@ -151,7 +152,7 @@ body {
 }
 
 .leaderboard-container.tr-visible .leaderboard-condensed {
-  opacity: 0;
+  opacity: 1;
 }
 
 .leaderboard-container.tr-visible .leaderboard {
