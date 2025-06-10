@@ -7,12 +7,17 @@ interface CursorProps {
 
 const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible }) => {
   const [position, setPosition] = useState({ left: 0, top: 0, height: 0 });
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const updatePosition = () => {
-    if (targetRef?.current && isVisible) {
+    if (targetRef?.current) {
       const rect = targetRef.current.getBoundingClientRect();
-      // Check if this is a next character ref by checking if it's green
-      // (if it's not green, it hasn't been typed yet, so it must be next)
+
+      // Don't position until we have a valid rect
+      if (rect.top === 0 && rect.left === 0 && rect.height === 0) {
+        return;
+      }
+      
       const isNextChar = !targetRef.current.className.includes('text-green-400');
       
       setPosition({
@@ -20,8 +25,18 @@ const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible }) => {
         top: rect.top,
         height: rect.height
       });
+
+      if (!isInitialized) {
+        setIsInitialized(true);
+      }
     }
   };
+
+  useEffect(() => {
+    if (!isVisible) {
+      setIsInitialized(false);
+    }
+  }, [isVisible]);
 
   useEffect(() => {
     updatePosition();
@@ -45,12 +60,7 @@ const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible }) => {
     };
   }, [targetRef, isVisible]);
 
-  // Also update position when target ref or visibility changes
-  useEffect(() => {
-    updatePosition();
-  }, [targetRef?.current, isVisible]);
-
-  if (!isVisible) return null;
+  if (!isVisible || !isInitialized) return null;
 
   return (
     <div
@@ -60,7 +70,6 @@ const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible }) => {
         top: `${position.top}px`,
         height: `${position.height}px`,
         transform: 'translateX(0)',
-        opacity: isVisible ? 1 : 0,
       }}
     />
   );
