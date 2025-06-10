@@ -72,7 +72,7 @@ const renderWordsWithProgress = (
                 
                 let className = 'text-tpotracer-100 ';
                 if (wasTyped) {
-                  className += wasCorrect ? 'opacity-100' : 'text-red-300 opacity-100 [text-shadow:0_0_1px_rgb(252_165_165)]';
+                  className += wasCorrect ? 'opacity-100' : 'text-red-400 opacity-100 [text-shadow:0_0_3px_rgb(248_113_113),0_0_6px_rgb(248_113_113)]';
                 } else {
                   // Character was never typed (word was shorter than expected)
                   className += 'opacity-40';
@@ -97,7 +97,7 @@ const renderWordsWithProgress = (
                 
                 let className = 'text-tpotracer-100 ';
                 if (isTyped) {
-                  className += isCorrect ? 'opacity-100' : 'text-red-300 opacity-100 [text-shadow:0_0_1px_rgb(252_165_165)]';
+                  className += isCorrect ? 'opacity-100' : 'text-red-400 opacity-100 [text-shadow:0_0_3px_rgb(248_113_113),0_0_6px_rgb(248_113_113)]';
                 } else {
                   className += 'opacity-40';
                 }
