@@ -121,8 +121,44 @@ body {
   text-shadow: 0 0 1px #A7F1FA;
 }
 
+.glow-text-shadow-sm {
+  text-shadow: 0 0 2px #A7F1FA;
+}
+
+.glow-text-shadow-md {
+  text-shadow: 0 0 4px #A7F1FA;
+}
+
+.glow-text-shadow-lg {
+  text-shadow: 0 0 8px #A7F1FA;
+}
+
 .dark-text-shadow {
-  text-shadow: 0 0 1px #03223F;
+  text-shadow: 0 0 1px #02182D;
+}
+
+.dark-text-shadow-sm {
+  text-shadow: 0 0 2px #02182D;
+}
+
+.dark-text-shadow-md {
+  text-shadow: 0 0 4px #02182D;
+}
+
+.dark-text-shadow-lg {
+  text-shadow: 0 0 8px #02182D;
+}
+
+.glow-shadow {
+  box-shadow: 0 0 1px 1px #A7F1FA;
+}
+
+.glow-shadow-sm {
+  box-shadow: 0 0 2px 1px #A7F1FA;
+}
+
+.glow-shadow-md {
+  box-shadow: 0 0 4px 1px #A7F1FA;
 }
 
 .leaderboard-container {
@@ -238,3 +274,11 @@ body {
   opacity: 0;
 }
 
+.special-p-container {
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.special-p-container:hover {
+  opacity: 1;
+}

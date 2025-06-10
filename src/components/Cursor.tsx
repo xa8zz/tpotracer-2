@@ -54,7 +54,7 @@ const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible }) => {
 
   return (
     <div
-      className="fixed w-0.5 bg-tpotracer-100 transition-all duration-100 ease-out animate-blink shadow-[0_0_4px_2px_rgba(167,241,250,0.5)]"
+      className="fixed w-0.5 bg-tpotracer-100 transition-all duration-100 ease-out animate-blink glow-shadow-sm"
       style={{
         left: `${position.left}px`,
         top: `${position.top}px`,

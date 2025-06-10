@@ -84,7 +84,7 @@ const Settings: React.FC<SettingsProps> = ({
       <div className={`new-settings-modal ${className}`}>
         <div className="relative w-full h-full rounded-[51px] p-[30px]">
           <button 
-            className="absolute small-button dark-text-shadow font-ptclean text-2xl w-[50px] h-[50px] top-[29px] left-[29px]"
+            className="absolute small-button dark-text-shadow-sm font-ptclean text-2xl w-[50px] h-[50px] top-[29px] left-[29px]"
             onClick={onClose}
           >
             x
