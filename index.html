@@ -9,6 +9,45 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+      @font-face {
+        font-family: 'ProggyCleanTT';
+        src: url('/src/assets/ProggyClean.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      #loader .loader-container {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color: #02182D; /* tpotracer-400 */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        font-family: 'ProggyCleanTT', monospace;
+      }
+
+      #loader .loader-content {
+        text-align: center;
+      }
+
+      #loader .loader-logo {
+        width: 200px;
+        margin-bottom: 16px;
+      }
+
+      #loader .loader-text {
+        font-size: 1.5rem; /* 24px */
+        line-height: 2rem; /* 32px */
+        color: #A7F1FA; /* tpotracer-100 */
+        text-shadow: 0 0 4px #A7F1FA; /* glow-text-shadow-md */
+        font-weight: 700;
+      }
+
       #video-overlay {
         position: fixed;
         top: -25%;
@@ -37,10 +76,10 @@
 
     <div id="video-overlay"></div>
     <div id="loader">
-      <div class="fixed inset-0 bg-tpotracer-400 flex flex-col items-center justify-center z-50" style="font-family: 'ProggyCleanTT', monospace;">
-        <div class="text-center">
-            <img src="/src/assets/logosm.png" alt="tpotracer logo" class="w-[200px] mb-[16px]" />
-            <p class="text-2xl text-tpotracer-100 glow-text-shadow-md font-bold">
+      <div class="loader-container">
+        <div class="loader-content">
+            <!-- <img src="/src/assets/logosm.png" alt="tpotracer logo" class="loader-logo" /> -->
+            <p class="loader-text">
               Loading...
             </p>
         </div>

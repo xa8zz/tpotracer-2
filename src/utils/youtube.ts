@@ -47,6 +47,8 @@ function ensurePlayerReady(): Promise<void> {
                 player = new (window as any).YT.Player('video', {
                     events: {
                         'onReady': () => {
+                            // Ensure video starts muted
+                            player.mute();
                             // Loop the video
                             setInterval(() => {
                                 player.seekTo(74, true);
@@ -59,6 +61,10 @@ function ensurePlayerReady(): Promise<void> {
         });
     }
     return playerReadyPromise;
+}
+
+export function getPlayer() {
+    return player;
 }
 
 export async function whenVideoPlaying(): Promise<void> {
@@ -106,6 +112,8 @@ export async function initializeAndWhenVideoPlaying(appRoot: HTMLElement) {
         player = new (window as any).YT.Player('video', {
             events: {
                 'onReady': () => {
+                    // Ensure video starts muted
+                    player.mute();
                     setInterval(() => player.seekTo(74, true), 67000);
 
                     const stateChangePromise = new Promise<void>(resolve => {
