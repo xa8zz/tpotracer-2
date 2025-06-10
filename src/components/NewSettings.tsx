@@ -82,7 +82,7 @@ const Settings: React.FC<SettingsProps> = ({
     <div
       className={`
         absolute inset-0 w-screen h-screen
-        transition-all duration-[0.4s] ease
+        transition-all duration-[0.3s] ease
         ${visible ? 'opacity-100 visible' : 'opacity-0 invisible'}
       `}
     >
