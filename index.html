@@ -27,7 +27,7 @@
       id="video"
       width="560"
       height="315"
-      src="https://www.youtube.com/embed/zyRSaVtEzZ4?si=4wvkfRYB-qTeM6Rx&controls=0&autoplay=1&muted=1&enablejsapi=1&start=63"
+      src="https://www.youtube.com/embed/zyRSaVtEzZ4?si=4wvkfRYB-qTeM6Rx&controls=0&autoplay=1&muted=1&enablejsapi=1&start=74"
       title="YouTube video player"
       frameborder="0"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -36,73 +36,18 @@
     </iframe>
 
     <div id="video-overlay"></div>
+    <div id="loader">
+      <div class="fixed inset-0 bg-tpotracer-400 flex flex-col items-center justify-center z-50" style="font-family: 'ProggyCleanTT', monospace;">
+        <div class="text-center">
+            <img src="/src/assets/logosm.png" alt="tpotracer logo" class="w-[200px] mb-[16px]" />
+            <p class="text-2xl text-tpotracer-100 glow-text-shadow-md font-bold">
+              Loading...
+            </p>
+        </div>
+      </div>
+    </div>
     <div id="root"></div>
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const video = document.getElementById('video');
-        
-        // Function to resize video to cover entire viewport
-        function resizeVideoToFitScreen() {
-          const windowWidth = window.innerWidth;
-          const windowHeight = window.innerHeight;
-          
-          // YouTube video aspect ratio (16:9)
-          const videoAspectRatio = 16 / 9;
-          const windowAspectRatio = windowWidth / windowHeight;
-          
-          let newWidth, newHeight;
-          
-          if (windowAspectRatio > videoAspectRatio) {
-            // Window is wider than video aspect ratio
-            // Scale based on width
-            newWidth = windowWidth * 1.5; // 50% larger for coverage
-            newHeight = newWidth / videoAspectRatio;
-          } else {
-            // Window is taller than video aspect ratio
-            // Scale based on height
-            newHeight = windowHeight * 1.5; // 50% larger for coverage
-            newWidth = newHeight * videoAspectRatio;
-          }
-          
-          video.style.position = 'fixed';
-          video.style.top = `${(windowHeight - newHeight) / 2}px`;
-          video.style.left = `${(windowWidth - newWidth) / 2}px`;
-          video.style.width = `${newWidth}px`;
-          video.style.height = `${newHeight}px`;
-          video.style.zIndex = '-2';
-          video.style.opacity = '1.0';
-          video.style.pointerEvents = 'none';
-          video.style.filter = 'blur(16px) brightness(1.25) contrast(1.25)';
-        }
-        
-        // Initial resize
-        resizeVideoToFitScreen();
-        
-        // Resize on window resize
-        window.addEventListener('resize', resizeVideoToFitScreen);
-        
-        // Enable JavaScript API and start playback (muted by URL parameter)
-        const playVideo = () => {
-          if (video.contentWindow) {
-            setInterval(() => {
-              if (video.contentWindow) {
-                video.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[63, true]}', '*');
-              }
-            }, 78000); // 78,000 milliseconds = 78 seconds loop duration
-          }
-        };
-
-        // Try multiple times to start playbook
-        playVideo();
-        
-        // Reload iframe if video fails to play
-        setTimeout(() => {
-          if (!video.contentWindow) {
-            video.src = video.src;
-          }
-        }, 3000);
-      });
-    </script>
   </body>
 </html>

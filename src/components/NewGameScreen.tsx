@@ -2,6 +2,8 @@ import React, { useRef } from 'react';
 import NewButton from './NewButton';
 import Cursor from './Cursor';
 import { useGameContext } from '../contexts/GameContext';
+import { preloadGameAssets } from '../utils/preloadAssets';
+import { whenVideoPlaying } from '../utils/youtube';
 
 interface NewGameScreenProps {
   username: string | null;
@@ -177,13 +179,13 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   return (
     <div className="">
       <div className="game-container relative grow">
-        <span className="absolute font-ptclean glow-text-shadow text-tpotracer-100 text-2xl top-[108px] left-[104px]">
+        <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-2xl top-[108px] left-[104px]">
           Best WPM:
         </span>
-        <span className="absolute font-ptclean glow-text-shadow text-tpotracer-100 font-bold text-6xl top-[130px] left-[122px]">
+        <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold text-6xl top-[130px] left-[122px]">
           {renderPaddedNumber(highScore)}
         </span>
-        <span className="absolute font-ptclean glow-text-shadow text-tpotracer-100 font-bold text-4xl top-[96px] left-[314px]">
+        <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold text-4xl top-[96px] left-[314px]">
           {leaderboardPosition ? (
             <>
               {leaderboardPosition}
@@ -194,7 +196,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         <span className="user-avatar bg-tpotracer-100 rounded-[400px] absolute w-[40px] h-[40px] top-[36px] left-[470px]">
 
         </span>
-        <span className="absolute font-ptclean glow-text-shadow text-tpotracer-100 text-3xl top-[40px] left-[520px]">
+        <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-3xl top-[40px] left-[520px]">
           @{username}
         </span>
         <NewButton className="absolute top-[121px] left-[473px]" onClick={handleStartNewGame}>
@@ -206,22 +208,22 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         <div className="inner-screen absolute top-[226px] left-[250px] w-[474px] h-[338px] rounded-[49px] flex flex-col p-[30px]">
           <div className="badge-row">
             <ul className="flex gap-[20px]">
-              <li className="font-ptclean glow-text-shadow text-2xl text-tpotracer-100">
+              <li className="font-ptclean glow-text-shadow-sm text-2xl text-tpotracer-100">
                 {"WPM: "}
-                <span className="bg-tpotracer-100 text-tpotracer-400 font-bold px-[10px] pt-[2px] rounded-[4px] shadow-[0_0_1px_1px_#A7F1FA] [text-shadow:0_0_1px_#02182D]">{renderPaddedNumber(wpm)}</span>
+                <span className="bg-tpotracer-100 text-tpotracer-400 font-bold px-[10px] pt-[2px] rounded-[4px] glow-shadow-sm dark-text-shadow">{renderPaddedNumber(wpm)}</span>
               </li>
-              <li className="font-ptclean glow-text-shadow text-2xl text-tpotracer-100">
+              <li className="font-ptclean glow-text-shadow-sm text-2xl text-tpotracer-100">
                 {"RAW: "}
-                <span className="bg-tpotracer-100 text-tpotracer-400 font-bold px-[10px] pt-[2px] rounded-[4px] shadow-[0_0_1px_1px_#A7F1FA] [text-shadow:0_0_1px_#02182D]">{renderPaddedNumber(rawWpm)}</span>
+                <span className="bg-tpotracer-100 text-tpotracer-400 font-bold px-[10px] pt-[2px] rounded-[4px] glow-shadow-sm dark-text-shadow">{renderPaddedNumber(rawWpm)}</span>
               </li>
-              <li className="font-ptclean glow-text-shadow text-2xl text-tpotracer-100">
+              <li className="font-ptclean glow-text-shadow-sm text-2xl text-tpotracer-100">
                 {"ACC: "}
-                <span className="bg-tpotracer-100 text-tpotracer-400 font-bold px-[10px] pt-[2px] rounded-[4px] shadow-[0_0_1px_1px_#A7F1FA] [text-shadow:0_0_1px_#02182D]">{Math.round(accuracy)}%</span>
+                <span className="bg-tpotracer-100 text-tpotracer-400 font-bold px-[10px] pt-[2px] rounded-[4px] glow-shadow-sm dark-text-shadow">{Math.round(accuracy)}%</span>
               </li>
             </ul>
           </div>
           <div className="grow mt-[20px] flex justify-center">
-          <div className="wordlist font-ptclean content-center glow-text-shadow text-tpotracer-100 text-5xl mt-[20px] flex flex-wrap items-start gap-x-5">
+          <div className="wordlist font-ptclean content-center glow-text-shadow-sm text-tpotracer-100 text-5xl mt-[20px] flex flex-wrap items-start gap-x-5">
             {renderWordsWithProgress(words, currentWordIndex, typedText, typedHistory, cursorRef)}
           </div>
           </div>

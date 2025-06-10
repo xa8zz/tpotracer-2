@@ -6,6 +6,7 @@ import { useLeaderboard } from '../hooks/useLeaderboard';
 import NewLeaderboard from './NewLeaderboard';
 import NewGameScreen from './NewGameScreen';
 import NewSettings from './NewSettings';
+import Credits from './Credits';
 
 interface LayoutProps {
   onUsernameChange: (username: string) => void;
@@ -36,7 +37,7 @@ const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) =>
 
   return (
     <>
-      <div className={`flex flex-row w-screen h-screen overflow-hidden items-center justify-center relative transition-[filter] duration-200 ease ${isSettingsOpen ? 'blur-md' : ''}`}>
+      <div className={`flex flex-row w-screen h-screen overflow-hidden items-center justify-center relative transition-[filter] duration-200 ease ${isSettingsOpen ? 'blur-sm' : ''}`}>
         <div className="flex flex-row relative max-h-screen">
           <NewGameScreen username={currentUsername} onSettingsClick={toggleSettings} />
           <NewLeaderboard currentUsername={currentUsername} />
@@ -48,6 +49,7 @@ const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) =>
         onUsernameChange={onUsernameChange}
         currentUsername={currentUsername}
       />
+      <Credits />
     </>
   );
 };

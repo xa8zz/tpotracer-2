@@ -8,7 +8,7 @@ interface LeaderboardProps {
 
 function getBadgeClass(place: number): string {
   if (place >= 4) {
-    return "text-tpotracer-100 glow-text-shadow leaderboard-badge-plain"
+    return "text-tpotracer-100 glow-text-shadow-sm leaderboard-badge-plain"
   }
 
   return `leaderboard-badge-${place}`;
@@ -47,22 +47,22 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
   return (
     <div className={`leaderboard-container ${visible ? "tr-visible" : ""}`}>
       <div className="leaderboard">
-        <button className="absolute small-button dark-text-shadow font-ptclean text-2xl pt-[10px] w-[50px] h-[50px] top-[36px] left-[34px]" onClick={toggleSetVisible}>
-          ^
+        <button className="absolute small-button dark-text-shadow-sm font-ptclean text-2xl w-[50px] h-[50px] top-[36px] left-[34px]" onClick={toggleSetVisible}>
+          &lt;
         </button>
-        <span className="absolute font-ptclean dark-text-shadow text-tpotracer-400 text-4xl font-bold top-[125px] left-[162px]">
+        <span className="absolute font-ptclean dark-text-shadow-sm text-tpotracer-400 text-4xl top-[125px] left-[162px]">
           {getRemainingTimeUntilEnd()}
         </span>
         <table className="leaderboard-table text-center absolute top-[190px] left-[75px] w-[380px] rounded-[26px]">
           <thead>
-            <tr className="font-ptclean h-[45px] glow-text-shadow text-tpotracer-100 text-2xl">
+            <tr className="font-ptclean h-[45px] glow-text-shadow-sm text-tpotracer-100 text-2xl">
               <th className="w-[75px]">#</th>
               <th className="text-left">USERNAME</th>
               <th className="w-[75px]">WPM</th>
             </tr>
           </thead>
           <tbody className="align-top">
-            <tr className="font-ptclean relative h-[45px] glow-text-shadow text-tpotracer-100 text-2xl">
+            <tr className="font-ptclean relative h-[45px] glow-text-shadow-sm text-tpotracer-100 text-2xl">
               <td className="">
                 <span className={`inline-block text-tpotracer-100 font-bold w-[30px] h-[25px] leading-[28px] rounded-[4px] ${getBadgeClass(mockCurrentUserLeaderboardData.place)}`}>
                 {mockCurrentUserLeaderboardData.place}
@@ -87,19 +87,19 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                     {index + 1}
                   </span>
                 </td>
-                <td className="text-left flex items-center gap-[6px] glow-text-shadow">
+                <td className="text-left flex items-center gap-[6px] glow-text-shadow-sm">
                   <span className="user-avatar bg-tpotracer-100 mt-[-3px] rounded-[400px] w-[32px] h-[32px]"></span>
                   <span className="">{entry.username}</span>
                 </td>
-                <td className="glow-text-shadow">{entry.wpm}</td>
+                <td className="glow-text-shadow-sm">{entry.wpm}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <div className="leaderboard-condensed">
-        <button className="absolute small-button dark-text-shadow font-ptclean text-2xl w-[50px] h-[50px] top-[29px] left-[29px]" onClick={toggleSetVisible}>
-          v
+        <button className="absolute small-button dark-text-shadow-sm font-ptclean text-2xl w-[50px] h-[50px] top-[29px] left-[29px]" onClick={toggleSetVisible}>
+          &gt;
         </button>
       </div>
     </div>
