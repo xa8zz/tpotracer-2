@@ -37,7 +37,7 @@ const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) =>
 
   return (
     <>
-      <div className={`flex flex-row w-screen h-screen overflow-hidden items-center justify-center relative transition-[filter] duration-200 ease ${isSettingsOpen ? 'blur-sm' : ''}`}>
+      <div className={`flex flex-row w-screen h-screen overflow-hidden items-center justify-center relative transition-[filter] duration-[0.4s] ease ${isSettingsOpen ? 'blur-sm' : ''}`}>
         <div className="flex flex-row relative max-h-screen">
           <NewGameScreen username={currentUsername} onSettingsClick={toggleSettings} />
           <NewLeaderboard currentUsername={currentUsername} />

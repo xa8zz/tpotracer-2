@@ -77,7 +77,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
             </tr>
             <tr>
               <td colSpan={3} className="flex justify-center items-center">
-                <div className="h-[3px] bg-gradient-to-r from-[rgba(42,143,195,0)] via-[rgba(42,143,195,1)] to-[rgba(42,143,195,0)]"></div>
+                <div className="h-[3px] bg-gradient-to-r from-[rgba(42,143,195,0)] via-[rgba(242,143,195,1)] to-[rgba(42,143,195,0)]"></div>
               </td>
             </tr>
             {mockLeaderboardData.map((entry, index) => (

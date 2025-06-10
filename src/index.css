@@ -213,6 +213,7 @@ body {
   right: 0;
   bottom: 4px;
   background: linear-gradient(to right, rgba(167, 241, 250, 0) 0%, rgba(167, 241, 250, 0.2) 20%, rgba(167, 241, 250, 0.2) 80%, rgba(167, 241, 250, 0) 100%);
+  filter: blur(2px);
 }
 
 .leaderboard-badge-1 {
