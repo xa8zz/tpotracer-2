@@ -57,6 +57,8 @@ const renderWordsWithProgress = (
   typedHistory: string[],
   cursorRef: React.RefObject<HTMLSpanElement>
 ): JSX.Element => {
+  const incorrectCharClass = 'text-red-300 opacity-100 [text-shadow:0_0_2px_rgb(252,165,165)]';
+
   return (
     <>
       {words.map((word, wordIndex) => {
@@ -72,7 +74,7 @@ const renderWordsWithProgress = (
                 
                 let className = 'text-tpotracer-100 ';
                 if (wasTyped) {
-                  className += wasCorrect ? 'opacity-100' : 'text-red-400 opacity-100 [text-shadow:0_0_3px_rgb(248_113_113),0_0_6px_rgb(248_113_113)]';
+                  className += wasCorrect ? 'opacity-100' : incorrectCharClass;
                 } else {
                   // Character was never typed (word was shorter than expected)
                   className += 'opacity-40';
@@ -97,7 +99,7 @@ const renderWordsWithProgress = (
                 
                 let className = 'text-tpotracer-100 ';
                 if (isTyped) {
-                  className += isCorrect ? 'opacity-100' : 'text-red-400 opacity-100 [text-shadow:0_0_3px_rgb(248_113_113),0_0_6px_rgb(248_113_113)]';
+                  className += isCorrect ? 'opacity-100' : incorrectCharClass;
                 } else {
                   className += 'opacity-40';
                 }
