@@ -195,10 +195,16 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             </>
           ) : ''}
         </span>
-        <span 
-          className="user-avatar rounded-[400px] absolute w-[40px] h-[40px] top-[36px] left-[470px]"
-          style={{ '--avatar-url': `url(https://unavatar.io/x/${username})` } as React.CSSProperties}
-        ></span>
+        <a
+          href={`https://x.com/${username}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span 
+            className="user-avatar rounded-[400px] absolute w-[40px] h-[40px] top-[36px] left-[470px]"
+            style={{ '--avatar-url': `url(https://unavatar.io/x/${username})` } as React.CSSProperties}
+          ></span>
+        </a>
         <a 
           href={`https://x.com/${username}`}
           target="_blank"

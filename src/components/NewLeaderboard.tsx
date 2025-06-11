@@ -73,18 +73,20 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                 {currentUserLeaderboardData.place}
                 </span>
               </td>
-              <td className="text-left flex items-center gap-[6px]">
-                <span 
-                  className="user-avatar rounded-[400px] mt-[-3px] w-[32px] h-[32px]"
-                  style={{ '--avatar-url': `url(https://unavatar.io/x/${currentUserLeaderboardData.username})` } as React.CSSProperties}
-                ></span>
-                <a 
+              <td className="text-left">
+                <a
                   href={`https://x.com/${currentUserLeaderboardData.username}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:underline"
+                  className="flex items-center gap-[6px] group"
                 >
-                  @{currentUserLeaderboardData.username}
+                  <span
+                    className="user-avatar rounded-[400px] mt-[-3px] w-[32px] h-[32px]"
+                    style={{ '--avatar-url': `url(https://unavatar.io/x/${currentUserLeaderboardData.username})` } as React.CSSProperties}
+                  ></span>
+                  <span className="group-hover:underline">
+                    @{currentUserLeaderboardData.username}
+                  </span>
                 </a>
               </td>
               <td className="">{Math.round(currentUserLeaderboardData.wpm)}</td>
@@ -102,18 +104,20 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                     {index + 1}
                   </span>
                 </td>
-                <td className="text-left flex items-center gap-[6px] glow-text-shadow-sm">
-                  <span 
-                    className="user-avatar rounded-[400px] mt-[-3px] w-[32px] h-[32px]"
-                    style={{ '--avatar-url': `url(https://unavatar.io/x/${entry.username})` } as React.CSSProperties}
-                  ></span>
-                  <a 
+                <td className="text-left">
+                  <a
                     href={`https://x.com/${entry.username}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:underline"
+                    className="flex items-center gap-[6px] group"
                   >
-                    @{entry.username}
+                    <span
+                      className="user-avatar rounded-[400px] mt-[-3px] w-[32px] h-[32px]"
+                      style={{ '--avatar-url': `url(https://unavatar.io/x/${entry.username})` } as React.CSSProperties}
+                    ></span>
+                    <span className="glow-text-shadow-sm group-hover:underline">
+                      @{entry.username}
+                    </span>
                   </a>
                 </td>
                 <td className="glow-text-shadow-sm">{entry.wpm}</td>
