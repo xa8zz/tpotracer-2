@@ -9,11 +9,13 @@ const rootElement = document.getElementById('root')!;
 const root = createRoot(rootElement);
 
 async function main() {
+  console.log('[Debug] main function started.');
   // Concurrently load assets and wait for the video to start playing
   await Promise.all([
     preloadGameAssets(),
     whenVideoPlaying()
   ]);
+  console.log('[Debug] Promise.all completed. Assets loaded and video playing.');
 
   const onAppReady = () => {
     const loader = document.getElementById('loader');
