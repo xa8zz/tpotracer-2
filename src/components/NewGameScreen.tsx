@@ -201,13 +201,11 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold text-6xl top-[130px] left-[122px]">
           {renderPaddedNumber(highScore)}
         </span>
-        <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold text-4xl top-[96px] left-[314px]">
-          {leaderboardPosition ? (
-            <>
-              {leaderboardPosition}
-              <sup className="text-2xl">{getOrdinalSuffix(leaderboardPosition)}</sup>
-            </>
-          ) : ''}
+        <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-2xl top-[84px] left-[304px]">
+          Rank:
+        </span>
+        <span className="absolute text-center font-ptclean glow-text-shadow-sm w-[70px] text-tpotracer-100 font-bold text-5xl top-[108px] left-[314px]">
+          {leaderboardPosition}
         </span>
         <a
           href={`https://x.com/${username}`}
