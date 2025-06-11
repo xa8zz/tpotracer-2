@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import NewButton from './NewButton';
 import Cursor from './Cursor';
 import { useGameContext } from '../contexts/GameContext';
@@ -40,7 +40,7 @@ const renderPaddedNumber = (num: number): JSX.Element => {
       {paddedStr.split('').map((digit, index) => (
         <span 
           key={index} 
-          className={isActualZero || index < 3 - numStr.length ? 'opacity-40' : ''}
+          className={isActualZero || index < 3 - numStr.length ? 'opacity-20' : ''}
         >
           {digit}
         </span>
@@ -144,6 +144,7 @@ const renderWordsWithProgress = (
 };
 
 const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick }) => {
+  const [isFlashing, setIsFlashing] = useState(false);
   // Create ref for cursor positioning
   const cursorRef = useRef<HTMLSpanElement>(null);
   
@@ -174,6 +175,19 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     handleStartNewGame,
     toggleHelp,
   } = useGameContext();
+
+  useEffect(() => {
+    if (gameState === 'completed' && isNewHighScore) {
+      setIsFlashing(true);
+      const timer = setTimeout(() => {
+        setIsFlashing(false);
+      }, 3600);
+
+      return () => clearTimeout(timer);
+    } else {
+      setIsFlashing(false);
+    }
+  }, [gameState, isNewHighScore]);
 
   // Determine if cursor should be visible (during typing states)
   const isCursorVisible = gameState === 'playing' || gameState === 'waiting';
@@ -219,6 +233,38 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         <NewButton className="absolute top-[121px] left-[661px]" onClick={onSettingsClick}>
           Settings
         </NewButton>
+        <div className={`game-finished-screen absolute top-[306px] left-[254px] w-[461px] h-[200px] text-tpotracer-400 ${gameState === 'completed' ? 'tr-visible' : ''}`}>
+          <div className="relative w-full h-full">
+            <div className="game-finished-screen-bg absolute inset-0 z-0"></div>
+            <div className="absolute inset-0 z-10 flex flex-col justify-center px-[20px] gap-3 font-ptclean">
+              <h2 className="text-3xl text-tpotracer-100 glow-text-shadow-sm">
+                {isNewHighScore ? "NEW BEST WPM!" : "GAME COMPLETE!"}
+              </h2>
+              <div className="flex items-end gap-5">
+                <div className={`font-bold px-[18px] py-[8px] rounded-[8px] flex items-center justify-center w-[110px] ${isFlashing ? 'tr-flashing' : 'bg-tpotracer-300 text-tpotracer-100 tpotracer-300-shadow-sm glow-text-shadow-sm'}`}>
+                  <span className="text-6xl">
+                    {renderPaddedNumber(wpm)}
+                  </span>
+                </div>
+                <div className="flex flex-col text-3xl gap-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-tpotracer-100 glow-text-shadow-sm">RANK:</span>
+                    <span className="bg-tpotracer-100 text-tpotracer-400 h-[28px] leading-[31px] font-bold px-[10px] rounded-[4px] glow-shadow-sm dark-text-shadow text-center">
+                      {leaderboardPosition ?? '99'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-tpotracer-100 glow-text-shadow-sm">WPM TO BEAT:</span>
+                    <span className="bg-tpotracer-100 text-tpotracer-400 h-[28px] leading-[31px] font-bold px-[10px] rounded-[4px] glow-shadow-sm dark-text-shadow text-center">
+                      {renderPaddedNumber(wpm + 5)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-2xl mt-[10px] text-tpotracer-100 glow-text-shadow-sm">Press Tab, or click Retry, to try again.</p>
+            </div>
+          </div>
+        </div>
         <div className="inner-screen absolute top-[226px] left-[250px] w-[474px] h-[338px] rounded-[49px] flex flex-col p-[30px]">
           <div className="badge-row">
             <ul className="flex gap-[20px]">
@@ -237,7 +283,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             </ul>
           </div>
           <div className="grow mt-[20px] flex justify-center">
-          <div className="wordlist font-ptclean content-center glow-text-shadow-sm text-tpotracer-100 text-5xl mt-[20px] flex flex-wrap items-start gap-x-5">
+          <div className={`wordlist font-ptclean content-center glow-text-shadow-sm text-tpotracer-100 text-5xl mt-[20px] flex flex-wrap items-start gap-x-5${gameState !== 'completed' ? ' tr-visible' : ''}`}>
             {renderWordsWithProgress(words, currentWordIndex, typedText, typedHistory, cursorRef)}
           </div>
           </div>
