@@ -51,8 +51,8 @@ const Settings: React.FC<SettingsProps> = ({
     // Remove @ symbols and trim, then filter to only alphanumeric and underscore
     const cleaned = input.replace(/^@+/, '').trim();
     const filtered = cleaned.replace(/[^a-zA-Z0-9_]/g, '');
-    // Limit to 20 characters max
-    const limited = filtered.slice(0, 20);
+    // Limit to 15 characters max
+    const limited = filtered.slice(0, 15);
     setUsername(limited);
   };
 
@@ -127,6 +127,7 @@ const Settings: React.FC<SettingsProps> = ({
           <input 
             type="text"
             className="absolute top-[162px] left-[46px] h-[42px] w-[285px] p-0 pl-[30px] rounded-[500px] font-ptclean dark-text-shadow text-2xl bg-transparent text-tpotracer-400 text-2xl"
+            maxLength={15}
             value={username}
             onChange={(e) => sanitizedSetUsername(e.target.value)}
             onKeyDown={handleKeyDown}

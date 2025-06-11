@@ -42,7 +42,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
     { username: "swiftkeys", wpm: 149 },
     { username: "typewriter", wpm: 142 },
     { username: "quickfingers", wpm: 138 },
-    { username: "keyboard_warriorzzzz", wpm: 132 },
+    { username: "keyboard_warriorz", wpm: 132 },
     { username: "typing_novice", wpm: 125 },
   ];
 

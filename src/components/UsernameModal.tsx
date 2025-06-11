@@ -26,8 +26,8 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
     // Remove @ symbols and trim, then filter to only alphanumeric and underscore
     const cleaned = input.replace(/^@+/, '').trim();
     const filtered = cleaned.replace(/[^a-zA-Z0-9_]/g, '');
-    // Limit to 20 characters max
-    const limited = filtered.slice(0, 20);
+    // Limit to 15 characters max
+    const limited = filtered.slice(0, 15);
     setUsername(limited);
   };
 
@@ -74,6 +74,7 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
             value={username}
             onChange={(e) => sanitizedSetUsername(e.target.value)}
             onKeyDown={handleKeyDown}
+            maxLength={15}
           />
           <NewButton size="md" className="absolute top-[158px] left-[353px]" onClick={handleSave}>Save</NewButton>
         </div>

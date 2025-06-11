@@ -18,6 +18,15 @@ export const submitScore = async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    // Validate username: 1-15 chars, alphanumeric and underscores.
+    const usernameRegex = /^[a-zA-Z0-9_]{1,15}$/;
+    if (!usernameRegex.test(username)) {
+      console.warn(`[Backend] Submission rejected: Invalid username format for "${username}".`);
+      return res.status(400).json({ 
+        error: 'Username must be 1-15 characters long and contain only alphanumeric characters and underscores.' 
+      });
+    }
+
     // Prepare data for database insertion
     const query = `
       INSERT INTO scores (username, wpm, raw_wpm, accuracy, keystrokes, words)
