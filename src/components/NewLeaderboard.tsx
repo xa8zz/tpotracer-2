@@ -26,19 +26,19 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
   } = useLeaderboard({ username: currentUsername });
 
   const mockCurrentUserLeaderboardData =
-    { username: "@marcusquest", wpm: 100, place: 13 };
+    { username: "marcusquest", wpm: 100, place: 13 };
 
   const mockLeaderboardData = [
-    { username: "@yacineMTB", wpm: 200 },
-    { username: "@speedster", wpm: 185 },
-    { username: "@typingpro", wpm: 172 },
-    { username: "@keymaster", wpm: 168 },
-    { username: "@wordsmith", wpm: 155 },
-    { username: "@swiftkeys", wpm: 149 },
-    { username: "@typewriter", wpm: 142 },
-    { username: "@quickfingers", wpm: 138 },
-    { username: "@keyboard_warriorzzzz", wpm: 132 },
-    { username: "@typing_novice", wpm: 125 },
+    { username: "yacineMTB", wpm: 200 },
+    { username: "speedster", wpm: 185 },
+    { username: "typingpro", wpm: 172 },
+    { username: "keymaster", wpm: 168 },
+    { username: "wordsmith", wpm: 155 },
+    { username: "swiftkeys", wpm: 149 },
+    { username: "typewriter", wpm: 142 },
+    { username: "quickfingers", wpm: 138 },
+    { username: "keyboard_warriorzzzz", wpm: 132 },
+    { username: "typing_novice", wpm: 125 },
   ]
 
   const [visible, setVisible] = useState(window.innerWidth >= 1600);
@@ -69,8 +69,11 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                 </span>
               </td>
               <td className="text-left flex items-center gap-[6px]">
-                <span className="user-avatar bg-tpotracer-100 mt-[-3px] rounded-[400px] w-[32px] h-[32px]"></span>
-                <span className="">{mockCurrentUserLeaderboardData.username}</span>
+                <span 
+                  className="user-avatar mt-[-3px] rounded-[400px] w-[32px] h-[32px] bg-cover bg-center"
+                  style={{ backgroundImage: `url(https://unavatar.io/x/${mockCurrentUserLeaderboardData.username})` }}
+                ></span>
+                <span className="">@{mockCurrentUserLeaderboardData.username}</span>
               </td>
               <td className="">{mockCurrentUserLeaderboardData.wpm}</td>
               <div className="current-user-background"></div>
@@ -88,8 +91,11 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                   </span>
                 </td>
                 <td className="text-left flex items-center gap-[6px] glow-text-shadow-sm">
-                  <span className="user-avatar bg-tpotracer-100 mt-[-3px] rounded-[400px] w-[32px] h-[32px]"></span>
-                  <span className="">{entry.username}</span>
+                  <span 
+                    className="user-avatar mt-[-3px] rounded-[400px] w-[32px] h-[32px] bg-cover bg-center"
+                    style={{ backgroundImage: `url(https://unavatar.io/x/${entry.username})` }}
+                  ></span>
+                  <span className="">@{entry.username}</span>
                 </td>
                 <td className="glow-text-shadow-sm">{entry.wpm}</td>
               </tr>
