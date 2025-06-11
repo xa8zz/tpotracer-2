@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLeaderboard } from '../hooks/useLeaderboard';
+import { useGameContext } from '../contexts/GameContext';
 import { getRemainingTimeUntilEnd } from '../utils/leaderboardUtils';
 
 interface LeaderboardProps {
@@ -19,16 +20,20 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
 }) => {
   const { 
     leaderboardData, 
-    isLoading, 
-    refreshTime, 
-    userPosition, 
-    forceRefresh 
+    userPosition 
   } = useLeaderboard({ username: currentUsername });
 
-  const mockCurrentUserLeaderboardData =
-    { username: "marcusquest", wpm: 100, place: 13 };
+  const { wpm, leaderboardPosition } = useGameContext();
 
-  const mockLeaderboardData = [
+  // Use actual game data for current user
+  const currentUserLeaderboardData = {
+    username: currentUsername || "guest",
+    wpm: wpm,
+    place: leaderboardPosition || userPosition || 999
+  };
+
+  // Use actual leaderboard data or fallback to mock data
+  const displayLeaderboardData = leaderboardData.length > 0 ? leaderboardData : [
     { username: "yacineMTB", wpm: 200 },
     { username: "speedster", wpm: 185 },
     { username: "typingpro", wpm: 172 },
@@ -39,7 +44,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
     { username: "quickfingers", wpm: 138 },
     { username: "keyboard_warriorzzzz", wpm: 132 },
     { username: "typing_novice", wpm: 125 },
-  ]
+  ];
 
   const [visible, setVisible] = useState(window.innerWidth >= 1600);
   const toggleSetVisible = () => setVisible(!visible);
@@ -64,18 +69,18 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
           <tbody className="align-top">
             <tr className="font-ptclean relative h-[45px] glow-text-shadow-sm text-tpotracer-100 text-2xl">
               <td className="">
-                <span className={`inline-block text-tpotracer-100 font-bold w-[30px] h-[25px] leading-[28px] rounded-[4px] ${getBadgeClass(mockCurrentUserLeaderboardData.place)}`}>
-                {mockCurrentUserLeaderboardData.place}
+                <span className={`inline-block text-tpotracer-100 font-bold w-[30px] h-[25px] leading-[28px] rounded-[4px] ${getBadgeClass(currentUserLeaderboardData.place)}`}>
+                {currentUserLeaderboardData.place}
                 </span>
               </td>
               <td className="text-left flex items-center gap-[6px]">
                 <span 
-                  className="user-avatar mt-[-3px] rounded-[400px] w-[32px] h-[32px] bg-cover bg-center"
-                  style={{ backgroundImage: `url(https://unavatar.io/x/${mockCurrentUserLeaderboardData.username})` }}
+                  className="user-avatar rounded-[400px] mt-[-3px] w-[32px] h-[32px]"
+                  style={{ '--avatar-url': `url(https://unavatar.io/x/${currentUserLeaderboardData.username})` } as React.CSSProperties}
                 ></span>
-                <span className="">@{mockCurrentUserLeaderboardData.username}</span>
+                <span className="">@{currentUserLeaderboardData.username}</span>
               </td>
-              <td className="">{mockCurrentUserLeaderboardData.wpm}</td>
+              <td className="">{currentUserLeaderboardData.wpm}</td>
               <div className="current-user-background"></div>
             </tr>
             <tr>
@@ -83,7 +88,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                 <div className="h-[3px] bg-gradient-to-r from-[rgba(42,143,195,0)] via-[rgba(242,143,195,1)] to-[rgba(42,143,195,0)]"></div>
               </td>
             </tr>
-            {mockLeaderboardData.map((entry, index) => (
+            {displayLeaderboardData.map((entry, index) => (
               <tr key={index} className="font-ptclean h-[44px] text-tpotracer-100 text-2xl">
                 <td className="">
                   <span className={`inline-block font-bold w-[30px] h-[25px] leading-[28px] rounded-[4px] ${getBadgeClass(index + 1)}`}>
@@ -92,8 +97,8 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                 </td>
                 <td className="text-left flex items-center gap-[6px] glow-text-shadow-sm">
                   <span 
-                    className="user-avatar mt-[-3px] rounded-[400px] w-[32px] h-[32px] bg-cover bg-center"
-                    style={{ backgroundImage: `url(https://unavatar.io/x/${entry.username})` }}
+                    className="user-avatar rounded-[400px] mt-[-3px] w-[32px] h-[32px]"
+                    style={{ '--avatar-url': `url(https://unavatar.io/x/${entry.username})` } as React.CSSProperties}
                   ></span>
                   <span className="">@{entry.username}</span>
                 </td>

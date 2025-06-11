@@ -195,9 +195,10 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             </>
           ) : ''}
         </span>
-        <span className="user-avatar bg-tpotracer-100 rounded-[400px] absolute w-[40px] h-[40px] top-[36px] left-[470px]">
-
-        </span>
+        <span 
+          className="user-avatar rounded-[400px] absolute w-[40px] h-[40px] top-[36px] left-[470px]"
+          style={{ '--avatar-url': `url(https://unavatar.io/x/${username})` } as React.CSSProperties}
+        ></span>
         <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-3xl top-[40px] left-[520px]">
           @{username}
         </span>

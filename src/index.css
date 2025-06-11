@@ -283,3 +283,41 @@ body {
 .special-p-container:hover {
   opacity: 1;
 }
+
+.user-avatar {
+  position: relative;
+  /* Ensure the avatar is displayed as a block-level element */
+  display: inline-block;
+  /* The pseudo-elements will create the glow, so overflow needs to be visible */
+  overflow: visible;
+}
+
+/* Define common styles for both the glow and the sharp image */
+.user-avatar::before,
+.user-avatar::after {
+  content: "";
+  /* Use the CSS variable for the background image */
+  background-image: var(--avatar-url);
+  background-size: cover;
+  background-position: center;
+  border-radius: inherit;
+
+  /* Position the pseudo-elements to match the avatar */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* The ::before pseudo-element will be the blurred glow */
+.user-avatar::before {
+  /* Create the glow effect */
+  filter: blur(1px);
+  opacity: 1.0;
+}
+
+/* The ::after pseudo-element will be the sharp foreground image */
+.user-avatar::after {
+  /* This will render sharply on top of the ::before element */
+}
