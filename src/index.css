@@ -444,3 +444,8 @@ body {
   animation: spin-clockwise 0.2s ease-out;
 }
 
+.scrollable-leaderboard {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, white 2%, white 98%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, white 2%, white 98%, transparent 100%);
+}
+

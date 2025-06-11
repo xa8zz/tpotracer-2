@@ -19,7 +19,7 @@ function getBadgeClass(place: number): string {
 
 const allMockUsers = Array.from({ length: 100 }, (_, i) => ({
   username: `user${i + 1}`,
-  wpm: 200 - i,
+  wpm: 200.0 - (i * (0.5 + Math.random() * 0.5)),
 }));
 
 const NewLeaderboard: React.FC<LeaderboardProps> = ({
@@ -131,12 +131,12 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                 </span>
               </a>
             </div>
-            <div className="w-[75px]">{Math.round(currentUserLeaderboardData.wpm)}</div>
+            <div className="w-[75px]" title={currentUserLeaderboardData.wpm.toFixed(3)}>{Math.round(currentUserLeaderboardData.wpm)}</div>
             <div className="current-user-background"></div>
           </div>
           
           {/* Scrollable user list */}
-          <div ref={scrollContainerRef} onScroll={handleScroll} className="overflow-y-auto flex-grow">
+          <div ref={scrollContainerRef} onScroll={handleScroll} className="overflow-y-auto flex-grow scrollable-leaderboard">
             {visibleUsers.map((entry, index) => (
               <div key={index} className="font-ptclean h-[44px] text-tpotracer-100 text-2xl flex items-center">
                 <div className="w-[75px]">
@@ -160,7 +160,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                     </span>
                   </a>
                 </div>
-                <div className="w-[75px] glow-text-shadow-sm">{entry.wpm}</div>
+                <div className="w-[75px] glow-text-shadow-sm" title={entry.wpm.toFixed(3)}>{Math.round(entry.wpm)}</div>
               </div>
             ))}
           </div>
