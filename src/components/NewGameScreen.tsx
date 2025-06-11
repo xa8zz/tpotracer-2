@@ -230,7 +230,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           href={`https://x.com/${username}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-3xl top-[40px] left-[520px] hover:underline"
+          className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-3xl top-[40px] left-[528px] hover:underline"
         >
           @{username}
         </a>
