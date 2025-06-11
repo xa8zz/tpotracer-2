@@ -233,11 +233,12 @@ body {
 .current-user-background {
   position: absolute;
   left: -35px;
-  top: -8px;
+  top: 0;
   right: 0;
-  bottom: 4px;
+  bottom: 0;
   background: linear-gradient(to right, rgba(167, 241, 250, 0) 0%, rgba(167, 241, 250, 0.2) 20%, rgba(167, 241, 250, 0.2) 80%, rgba(167, 241, 250, 0) 100%);
   filter: blur(2px);
+  z-index: -1;
 }
 
 .leaderboard-badge-1 {
@@ -429,5 +430,23 @@ body {
 
 .tr-flashing {
   animation: tr-flash 0.6s linear infinite;
+}
+
+@keyframes spin-clockwise {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin-once {
+  animation: spin-clockwise 0.2s ease-out;
+}
+
+.scrollable-leaderboard {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, white 2%, white 98%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, white 2%, white 98%, transparent 100%);
 }
 
