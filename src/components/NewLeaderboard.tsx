@@ -109,7 +109,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
           </div>
           
           {/* Current User */}
-          <div className="font-ptclean relative h-[49px] glow-text-shadow-sm text-tpotracer-100 text-2xl flex items-center shrink-0">
+          <div className="font-ptclean relative h-[49px] glow-text-shadow-sm text-tpotracer-100 text-2xl flex items-center shrink-0 isolate">
             <div className="w-[75px]">
               <span className={`inline-block text-tpotracer-100 font-bold w-[30px] h-[25px] leading-[28px] rounded-[4px] ${getBadgeClass(currentUserLeaderboardData.place)}`}>
               {currentUserLeaderboardData.place}
