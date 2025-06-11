@@ -7,6 +7,7 @@ import NewLeaderboard from './NewLeaderboard';
 import NewGameScreen from './NewGameScreen';
 import NewSettings from './NewSettings';
 import Credits from './Credits';
+import UsernameModal from './UsernameModal';
 
 interface LayoutProps {
   onUsernameChange: (username: string) => void;
@@ -35,9 +36,11 @@ const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) =>
     setIsSettingsOpen(!isSettingsOpen);
   };
 
+  const isUsernameModalVisible = !currentUsername || currentUsername === '';
+
   return (
     <>
-      <div className={`flex flex-row w-screen h-screen overflow-hidden items-center justify-center relative transition-[filter] duration-[0.2s] ease-out ${isSettingsOpen ? 'blur-sm' : ''}`}>
+      <div className={`flex flex-row w-screen h-screen overflow-hidden items-center justify-center relative transition-[filter] duration-[0.2s] ease-out ${isSettingsOpen || isUsernameModalVisible ? 'blur-sm' : ''}`}>
         <div className="flex flex-row relative max-h-screen">
           <NewGameScreen username={currentUsername} onSettingsClick={toggleSettings} />
           <NewLeaderboard currentUsername={currentUsername} />
@@ -46,6 +49,11 @@ const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) =>
       <NewSettings
         onClose={toggleSettings} 
         visible={isSettingsOpen}
+        onUsernameChange={onUsernameChange}
+        currentUsername={currentUsername}
+      />
+      <UsernameModal
+        visible={isUsernameModalVisible}
         onUsernameChange={onUsernameChange}
         currentUsername={currentUsername}
       />

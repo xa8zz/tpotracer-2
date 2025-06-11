@@ -161,6 +161,15 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
   // Handle global keypresses
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // If an input or textarea is focused, don't handle game keypresses
+      if (
+        document.activeElement &&
+        (document.activeElement.tagName === 'INPUT' ||
+          document.activeElement.tagName === 'TEXTAREA')
+      ) {
+        return;
+      }
+
       // Don't capture modifier key combinations (e.g., Cmd+C, Ctrl+V)
       if (e.metaKey || e.ctrlKey || e.altKey) {
         return;
