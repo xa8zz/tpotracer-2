@@ -22,6 +22,9 @@ const allMockUsers = Array.from({ length: 100 }, (_, i) => ({
   wpm: 200.0 - (i * (0.5 + Math.random() * 0.5)),
 }));
 
+const INITIAL_USER_COUNT = 12;
+const USER_LOAD_INCREMENT = 12;
+
 const NewLeaderboard: React.FC<LeaderboardProps> = ({
   currentUsername
 }) => {
@@ -31,7 +34,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
   } = useLeaderboard({ username: currentUsername });
 
   const { highScore, leaderboardPosition } = useGameContext();
-  const [loadedUsersCount, setLoadedUsersCount] = useState(20);
+  const [loadedUsersCount, setLoadedUsersCount] = useState(INITIAL_USER_COUNT);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isSpinning, setIsSpinning] = useState(false);
@@ -46,7 +49,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
     placeholderAPICall();
     setIsSpinning(true);
 
-    setLoadedUsersCount(20);
+    setLoadedUsersCount(INITIAL_USER_COUNT);
     setIsLoadingMore(false);
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = 0;
@@ -77,7 +80,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
       setIsLoadingMore(true);
       setTimeout(() => {
         setLoadedUsersCount(prev => {
-            const newCount = prev + 20;
+            const newCount = prev + USER_LOAD_INCREMENT;
             return newCount > totalUsers ? totalUsers : newCount;
         });
         setIsLoadingMore(false);
@@ -136,7 +139,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
           </div>
           
           {/* Scrollable user list */}
-          <div ref={scrollContainerRef} onScroll={handleScroll} className="overflow-y-auto flex-grow scrollable-leaderboard">
+          <div ref={scrollContainerRef} onScroll={handleScroll} className="overflow-y-auto flex-grow scrollable-leaderboard pt-[5px]">
             {visibleUsers.map((entry, index) => (
               <div key={index} className="font-ptclean h-[44px] text-tpotracer-100 text-2xl flex items-center">
                 <div className="w-[75px]">
