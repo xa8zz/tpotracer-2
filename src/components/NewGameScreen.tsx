@@ -4,6 +4,7 @@ import Cursor from './Cursor';
 import { useGameContext } from '../contexts/GameContext';
 import { preloadGameAssets } from '../utils/preloadAssets';
 import { whenVideoPlaying } from '../utils/youtube';
+import UserAvatar from './UserAvatar';
 
 interface NewGameScreenProps {
   username: string | null;
@@ -212,10 +213,10 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span 
-            className="user-avatar rounded-[400px] absolute w-[40px] h-[40px] top-[36px] left-[470px]"
-            style={{ '--avatar-url': `url(https://unavatar.io/x/${username})` } as React.CSSProperties}
-          ></span>
+          <UserAvatar 
+            username={username}
+            className="rounded-[400px] absolute w-[40px] h-[40px] top-[36px] left-[470px]"
+          />
         </a>
         <a 
           href={`https://x.com/${username}`}

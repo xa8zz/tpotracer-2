@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLeaderboard } from '../hooks/useLeaderboard';
 import { useGameContext } from '../contexts/GameContext';
 import { getRemainingTimeUntilEnd } from '../utils/leaderboardUtils';
+import UserAvatar from './UserAvatar';
 
 interface LeaderboardProps {
   currentUsername: string | null;
@@ -80,10 +81,10 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                   rel="noopener noreferrer"
                   className="flex items-center gap-[6px] group"
                 >
-                  <span
-                    className="user-avatar rounded-[400px] mt-[-3px] w-[32px] h-[32px]"
-                    style={{ '--avatar-url': `url(https://unavatar.io/x/${currentUserLeaderboardData.username})` } as React.CSSProperties}
-                  ></span>
+                  <UserAvatar
+                    username={currentUserLeaderboardData.username}
+                    className="rounded-[400px] mt-[-3px] w-[32px] h-[32px]"
+                  />
                   <span className="group-hover:underline">
                     @{currentUserLeaderboardData.username}
                   </span>
@@ -111,10 +112,10 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                     rel="noopener noreferrer"
                     className="flex items-center gap-[6px] group"
                   >
-                    <span
-                      className="user-avatar rounded-[400px] mt-[-3px] w-[32px] h-[32px]"
-                      style={{ '--avatar-url': `url(https://unavatar.io/x/${entry.username})` } as React.CSSProperties}
-                    ></span>
+                    <UserAvatar
+                      username={entry.username}
+                      className="rounded-[400px] mt-[-3px] w-[32px] h-[32px]"
+                    />
                     <span className="glow-text-shadow-sm group-hover:underline">
                       @{entry.username}
                     </span>

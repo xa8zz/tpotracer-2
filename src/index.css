@@ -328,6 +328,13 @@ body {
   display: inline-block;
   /* The pseudo-elements will create the glow, so overflow needs to be visible */
   overflow: visible;
+  /* Placeholder */
+  background-color: rgba(167, 241, 250, 0.2); /* tpotracer-100 with opacity */
+  transition: background-color 0.3s ease-in-out;
+}
+
+.user-avatar.avatar-loaded {
+  background-color: transparent;
 }
 
 /* Define common styles for both the glow and the sharp image */
@@ -346,13 +353,21 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
+  
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* When the avatar is loaded, fade in the pseudo-elements */
+.user-avatar.avatar-loaded::before,
+.user-avatar.avatar-loaded::after {
+  opacity: 1;
 }
 
 /* The ::before pseudo-element will be the blurred glow */
 .user-avatar::before {
   /* Create the glow effect */
   filter: blur(1px);
-  opacity: 1.0;
 }
 
 /* The ::after pseudo-element will be the sharp foreground image */
