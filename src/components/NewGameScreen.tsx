@@ -199,9 +199,14 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           className="user-avatar rounded-[400px] absolute w-[40px] h-[40px] top-[36px] left-[470px]"
           style={{ '--avatar-url': `url(https://unavatar.io/x/${username})` } as React.CSSProperties}
         ></span>
-        <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-3xl top-[40px] left-[520px]">
+        <a 
+          href={`https://x.com/${username}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-3xl top-[40px] left-[520px] hover:underline"
+        >
           @{username}
-        </span>
+        </a>
         <NewButton className="absolute top-[121px] left-[473px]" onClick={handleStartNewGame}>
           Retry (Tab)
         </NewButton>

@@ -23,12 +23,12 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
     userPosition 
   } = useLeaderboard({ username: currentUsername });
 
-  const { wpm, leaderboardPosition } = useGameContext();
+  const { highScore, leaderboardPosition } = useGameContext();
 
   // Use actual game data for current user
   const currentUserLeaderboardData = {
     username: currentUsername || "guest",
-    wpm: wpm,
+    wpm: highScore,
     place: leaderboardPosition || userPosition || 999
   };
 
@@ -78,9 +78,16 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                   className="user-avatar rounded-[400px] mt-[-3px] w-[32px] h-[32px]"
                   style={{ '--avatar-url': `url(https://unavatar.io/x/${currentUserLeaderboardData.username})` } as React.CSSProperties}
                 ></span>
-                <span className="">@{currentUserLeaderboardData.username}</span>
+                <a 
+                  href={`https://x.com/${currentUserLeaderboardData.username}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  @{currentUserLeaderboardData.username}
+                </a>
               </td>
-              <td className="">{currentUserLeaderboardData.wpm}</td>
+              <td className="">{Math.round(currentUserLeaderboardData.wpm)}</td>
               <div className="current-user-background"></div>
             </tr>
             <tr>
@@ -100,7 +107,14 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                     className="user-avatar rounded-[400px] mt-[-3px] w-[32px] h-[32px]"
                     style={{ '--avatar-url': `url(https://unavatar.io/x/${entry.username})` } as React.CSSProperties}
                   ></span>
-                  <span className="">@{entry.username}</span>
+                  <a 
+                    href={`https://x.com/${entry.username}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    @{entry.username}
+                  </a>
                 </td>
                 <td className="glow-text-shadow-sm">{entry.wpm}</td>
               </tr>
