@@ -3,6 +3,7 @@ import { useLeaderboard } from '../hooks/useLeaderboard';
 import { useGameContext } from '../contexts/GameContext';
 import { getRemainingTimeUntilEnd } from '../utils/leaderboardUtils';
 import UserAvatar from './UserAvatar';
+import retryIcon from '../assets/path291.png';
 
 interface LeaderboardProps {
   currentUsername: string | null;
@@ -53,6 +54,9 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
   return (
     <div className={`leaderboard-container ${visible ? "tr-visible" : ""}`}>
       <div className="leaderboard">
+        <button className="absolute top-[203px] left-[62px]">
+          <img src={retryIcon} alt="Retry" className="w-[14px] h-[14px]" style={{ filter: 'drop-shadow(0 0 1px #A7F1FA)' }} />
+        </button>
         <button className="absolute small-button dark-text-shadow-sm font-ptclean text-2xl w-[50px] h-[50px] top-[36px] left-[34px]" onClick={toggleSetVisible}>
           &lt;
         </button>
