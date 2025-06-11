@@ -72,12 +72,12 @@ const renderWordsWithProgress = (
                 const wasTyped = charIndex < typedWord.length;
                 const wasCorrect = wasTyped && typedChar === char;
                 
-                let className = 'text-tpotracer-100 ';
+                let className = '';
                 if (wasTyped) {
-                  className += wasCorrect ? 'opacity-100' : incorrectCharClass;
+                  className += wasCorrect ? 'text-tpotracer-100 opacity-100' : incorrectCharClass;
                 } else {
                   // Character was never typed (word was shorter than expected)
-                  className += 'opacity-40';
+                  className += 'text-tpotracer-100 opacity-40';
                 }
                 
                 return (
@@ -97,11 +97,11 @@ const renderWordsWithProgress = (
                 const isCorrect = isTyped && typedText[charIndex] === char;
                 const isCursorPosition = charIndex === typedText.length && typedText.length < word.length;
                 
-                let className = 'text-tpotracer-100 ';
+                let className = '';
                 if (isTyped) {
-                  className += isCorrect ? 'opacity-100' : incorrectCharClass;
+                  className += isCorrect ? 'text-tpotracer-100 opacity-100' : incorrectCharClass;
                 } else {
-                  className += 'opacity-40';
+                  className += 'text-tpotracer-100 opacity-40';
                 }
                 
                 return (
