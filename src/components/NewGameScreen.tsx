@@ -220,17 +220,18 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           href={`https://x.com/${username}`}
           target="_blank"
           rel="noopener noreferrer"
+          className="absolute w-[40px] h-[40px] top-[36px] left-[470px]"
         >
           <UserAvatar 
             username={username}
-            className="rounded-[400px] absolute w-[40px] h-[40px] top-[36px] left-[470px]"
+            className="rounded-[400px] w-[40px] h-[40px]"
           />
         </a>
         <a 
           href={`https://x.com/${username}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-3xl top-[40px] left-[528px] hover:underline"
+          className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-3xl top-[40px] left-[520px] hover:underline"
         >
           @{username}
         </a>
