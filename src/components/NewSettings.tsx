@@ -28,6 +28,25 @@ const Settings: React.FC<SettingsProps> = ({
     }
   }, [visible, currentUsername]);
 
+  // Handle Escape key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key === 'Escape' &&
+        visible &&
+        document.activeElement?.tagName !== 'INPUT'
+      ) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [visible, onClose]);
+
   const sanitizedSetUsername = (input: string) => {
     // Remove @ symbols and trim, then filter to only alphanumeric and underscore
     const cleaned = input.replace(/^@+/, '').trim();
