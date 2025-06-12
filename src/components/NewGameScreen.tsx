@@ -211,7 +211,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-2xl top-[64px] left-[284px]">
               Rank:
             </span>
-            <span className="absolute text-center font-ptclean glow-text-shadow-sm w-[70px] text-tpotracer-100 font-bold text-5xl top-[88px] left-[295px]">
+            <span className="absolute text-center font-ptclean glow-text-shadow-sm w-[70px] text-tpotracer-100 font-bold text-5xl top-[88px] left-[290px]">
               {leaderboardPosition}
             </span>
           </>
@@ -241,7 +241,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         <NewButton className="absolute top-[105px] left-[580px]" onClick={onSettingsClick}>
           Settings
         </NewButton>
-        <NewButton size="circle" className="absolute top-[112px] left-[777px] dark-text-shadow-sm" onClick={() => {}}>?</NewButton>
+        <NewButton size="circle" className="absolute top-[112px] left-[777px] dark-text-shadow-sm" onClick={toggleHelp}>?</NewButton>
         <div className={`game-finished-screen absolute top-[306px] left-[254px] w-[461px] h-[200px] text-tpotracer-400 ${gameState === 'completed' ? 'tr-visible' : ''}`}>
           <div className="relative w-full h-full">
             <div className="game-finished-screen-bg absolute inset-0 z-0"></div>

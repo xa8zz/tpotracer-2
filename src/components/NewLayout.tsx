@@ -8,6 +8,8 @@ import NewGameScreen from './NewGameScreen';
 import NewSettings from './NewSettings';
 import Credits from './Credits';
 import UsernameModal from './UsernameModal';
+import HelpModal from './HelpModal';
+import { useGameContext } from '../contexts/GameContext';
 
 interface LayoutProps {
   onUsernameChange: (username: string) => void;
@@ -17,6 +19,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLeaderboardVisible, setIsLeaderboardVisible] = useState(false);
+  const { isHelpExpanded, toggleHelp } = useGameContext();
 
   const defaultLeaderboardOpen = window.innerWidth >= 1000;
 
@@ -40,7 +43,7 @@ const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) =>
 
   return (
     <>
-      <div className={`flex flex-row w-screen h-screen overflow-hidden items-center justify-center relative transition-[filter] duration-[0.2s] ease-out ${isSettingsOpen || isUsernameModalVisible ? 'blur-sm' : ''}`}>
+      <div className={`flex flex-row w-screen h-screen overflow-hidden items-center justify-center relative transition-[filter] duration-[0.2s] ease-out ${isSettingsOpen || isUsernameModalVisible || isHelpExpanded ? 'blur-sm' : ''}`}>
         <div className="flex flex-row relative max-h-screen">
           <NewGameScreen username={currentUsername} onSettingsClick={toggleSettings} />
           <NewLeaderboard currentUsername={currentUsername} />
@@ -56,6 +59,10 @@ const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) =>
         visible={isUsernameModalVisible}
         onUsernameChange={onUsernameChange}
         currentUsername={currentUsername}
+      />
+      <HelpModal
+        visible={isHelpExpanded}
+        onClose={toggleHelp}
       />
       <Credits />
     </>
