@@ -182,7 +182,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
       setIsFlashing(true);
       const timer = setTimeout(() => {
         setIsFlashing(false);
-      }, 3600);
+      }, 900);
 
       return () => clearTimeout(timer);
     } else {
