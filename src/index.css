@@ -290,13 +290,13 @@ body {
 }
 
 .username-modal {
-  background-image: url('./assets/justusernamemodalcropped.png');
-  background-size: 509px 309px;
+  background-image: url('./assets/welcomemodal2cropped.png');
+  background-size: 628px 781px;
   background-repeat: no-repeat;
   background-position: center;
   background-color: transparent;
-  width: 509px;
-  height: 309px;
+  width: 628px;
+  height: 781px;
   position: absolute;
   top: 50%;
   left: 50%;

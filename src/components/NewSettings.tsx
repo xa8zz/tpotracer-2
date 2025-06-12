@@ -57,7 +57,9 @@ const Settings: React.FC<SettingsProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace') {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Backspace') {
       e.preventDefault();
       const currentValue = e.currentTarget.value;
       const newValue = currentValue.slice(0, -1);
@@ -104,9 +106,13 @@ const Settings: React.FC<SettingsProps> = ({
         transition-all duration-[0.2s] ease-out
         ${visible ? 'opacity-100 visible' : 'opacity-0 invisible'}
       `}
+      onClick={onClose}
     >
       <div className="absolute inset-0 w-screen h-screen bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_40%)]"></div>
-      <div className={`new-settings-modal ${className}`}>
+      <div
+        className={`new-settings-modal ${className}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="relative w-full h-full rounded-[51px] p-[30px]">
           <button 
             className="absolute small-button dark-text-shadow-sm font-ptclean text-2xl w-[50px] h-[50px] top-[29px] left-[29px]"

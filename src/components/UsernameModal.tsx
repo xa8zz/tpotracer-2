@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import NewButton from './NewButton';
+import logo from '../assets/logosm.png';
 
 interface UsernameModalProps {
   currentUsername: string;
@@ -32,7 +33,9 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace') {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Backspace') {
       e.preventDefault();
       const currentValue = e.currentTarget.value;
       const newValue = currentValue.slice(0, -1);
@@ -55,28 +58,50 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
         ${visible ? 'opacity-100 visible' : 'opacity-0 invisible'}
       `}
     >
-      <div className="absolute inset-0 w-screen h-screen bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_40%)]"></div>
+      <div className="absolute inset-0 w-screen h-screen bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_70%)]"></div>
       <div className={`username-modal ${className}`}>
         <div className="relative w-full h-full rounded-[51px] p-[30px]">
-          <span 
-            className="absolute top-[110px] left-[50px] font-ptclean dark-text-shadow text-tpotracer-400 text-2xl"
+          <img className="absolute top-[-30px] left-[-25px]" src={logo} alt="tpotracer logo" />
+          <span
+            className="absolute top-[121px] left-[40px] text-4xl font-ptclean text-white"
+            style={{ textShadow: '0 0 1px #fff' }}
           >
-            What is your X username?
+            Instructions
+          </span>
+          <div className="instructions-text absolute font-ptclean text-2xl dark-text-shadow text-tpotracer-400 left-[40px] right-[30px] top-[178px] leading-[1]">
+          <p>tpotracer is a 1-week speed typing challenge for X (Twitter) users. Your goal is to climb to the top of the leaderboard.</p>
+          <br />
+          <p>Enter your X username, then type the 10 displayed words as quickly as possible.</p>
+          <br />
+          <p>Don't correct any errors; Accuracy (ACC) and Raw Speed (RAW) are factored into your final WPM (Words Per Minute) score.</p>
+          <br />
+          <p>Only your highest score is considered in the leaderboard.</p>
+          </div>
+          <span
+            className="absolute top-[522px] left-[40px] text-4xl font-ptclean text-white"
+            style={{ textShadow: '0 0 1px #fff' }}
+          >
+            Ready to play?
           </span>
           <span 
-            className="absolute top-[166px] left-[58px] font-ptclean dark-text-shadow text-tpotracer-400 text-3xl opacity-30"
+            className="absolute top-[581px] left-[40px] font-ptclean dark-text-shadow text-tpotracer-400 text-2xl"
+          >
+            Enter your X username below.
+          </span>
+          <span 
+            className="absolute top-[639px] left-[53px] font-ptclean dark-text-shadow text-tpotracer-400 text-3xl opacity-30"
           >
             @
           </span>
           <input 
             type="text"
-            className="absolute top-[162px] left-[46px] h-[42px] w-[285px] p-0 pl-[30px] rounded-[500px] font-ptclean dark-text-shadow text-2xl bg-transparent text-tpotracer-400 text-2xl"
+            className="absolute top-[635px] left-[41px] h-[42px] w-[285px] p-0 pl-[30px] rounded-[500px] font-ptclean dark-text-shadow text-2xl bg-transparent text-tpotracer-400 text-2xl"
             value={username}
             onChange={(e) => sanitizedSetUsername(e.target.value)}
             onKeyDown={handleKeyDown}
             maxLength={15}
           />
-          <NewButton size="md" className="absolute top-[158px] left-[353px]" onClick={handleSave}>Save</NewButton>
+          <NewButton size="md" className="absolute top-[631px] left-[347px]" onClick={handleSave}>Save</NewButton>
         </div>
       </div>
     </div>
