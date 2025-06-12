@@ -182,7 +182,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
       setIsFlashing(true);
       const timer = setTimeout(() => {
         setIsFlashing(false);
-      }, 3600);
+      }, 900);
 
       return () => clearTimeout(timer);
     } else {
@@ -198,20 +198,20 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
       <div className="game-container relative grow">
         {highScore && highScore > 0 && (
           <>
-            <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-2xl top-[108px] left-[104px]">
+            <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-2xl top-[88px] left-[89px]">
               Best WPM:
             </span>
-            <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold text-6xl top-[130px] left-[122px]">
+            <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold text-6xl top-[110px] left-[107px]">
               {renderPaddedNumber(highScore)}
             </span>
           </>
         )}
         {leaderboardPosition && (
           <>
-            <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-2xl top-[84px] left-[304px]">
+            <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-2xl top-[64px] left-[284px]">
               Rank:
             </span>
-            <span className="absolute text-center font-ptclean glow-text-shadow-sm w-[70px] text-tpotracer-100 font-bold text-5xl top-[108px] left-[314px]">
+            <span className="absolute text-center font-ptclean glow-text-shadow-sm w-[70px] text-tpotracer-100 font-bold text-5xl top-[88px] left-[290px]">
               {leaderboardPosition}
             </span>
           </>
@@ -220,7 +220,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           href={`https://x.com/${username}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute w-[40px] h-[40px] top-[36px] left-[470px]"
+          className="absolute w-[40px] h-[40px] top-[21px] left-[460px]"
         >
           <UserAvatar 
             username={username}
@@ -231,16 +231,17 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           href={`https://x.com/${username}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-3xl top-[40px] left-[520px] hover:underline"
+          className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-3xl top-[25px] left-[510px] hover:underline"
         >
           @{username}
         </a>
-        <NewButton className="absolute top-[121px] left-[473px]" onClick={handleStartNewGame}>
+        <NewButton className="absolute top-[105px] left-[410px]" onClick={handleStartNewGame}>
           Retry (Tab)
         </NewButton>
-        <NewButton className="absolute top-[121px] left-[661px]" onClick={onSettingsClick}>
+        <NewButton className="absolute top-[105px] left-[580px]" onClick={onSettingsClick}>
           Settings
         </NewButton>
+        <NewButton size="circle" className="absolute top-[112px] left-[777px] dark-text-shadow-sm" onClick={toggleHelp}>?</NewButton>
         <div className={`game-finished-screen absolute top-[306px] left-[254px] w-[461px] h-[200px] text-tpotracer-400 ${gameState === 'completed' ? 'tr-visible' : ''}`}>
           <div className="relative w-full h-full">
             <div className="game-finished-screen-bg absolute inset-0 z-0"></div>
@@ -273,7 +274,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             </div>
           </div>
         </div>
-        <div className="inner-screen absolute top-[226px] left-[250px] w-[474px] h-[338px] rounded-[49px] flex flex-col p-[30px]">
+        <div className="inner-screen absolute top-[212px] left-[241px] w-[471px] h-[336px] rounded-[49px] flex flex-col p-[30px]">
           <div className="badge-row">
             <ul className="flex gap-[20px]">
               <li className="font-ptclean glow-text-shadow-sm text-2xl text-tpotracer-100">
@@ -296,12 +297,12 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           </div>
           </div>
         </div>
-        <div className="share-preview absolute top-[609px] left-[141px] w-[304px] h-[188px] bg-tpotracer-300 rounded-[29px]">
+        <div className="share-preview absolute top-[593px] left-[155px] w-[277px] h-[188px] rounded-[29px]">
         </div>
-        <NewButton className="absolute top-[606px] left-[471px]">
+        <NewButton className="absolute top-[590px] left-[455px]">
           Share Image
         </NewButton>
-        <NewButton className="absolute top-[606px] left-[659px]">
+        <NewButton className="absolute top-[590px] left-[624px]">
           Share on X
         </NewButton>
         

@@ -114,12 +114,13 @@ const Settings: React.FC<SettingsProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative w-full h-full rounded-[51px] p-[30px]">
-          <button 
-            className="absolute small-button dark-text-shadow-sm font-ptclean text-2xl w-[50px] h-[50px] top-[29px] left-[29px]"
+          <NewButton
+            size="circle"
+            className="absolute top-[30px] left-[29px] dark-text-shadow-sm"
             onClick={onClose}
           >
             x
-          </button>
+          </NewButton>
           <span 
             className="absolute top-[110px] left-[50px] font-ptclean dark-text-shadow text-tpotracer-400 text-2xl"
           >

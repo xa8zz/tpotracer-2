@@ -4,6 +4,7 @@ import { useGameContext } from '../contexts/GameContext';
 import { getRemainingTimeUntilEnd } from '../utils/leaderboardUtils';
 import UserAvatar from './UserAvatar';
 import retryIcon from '../assets/path291.png';
+import NewButton from './NewButton';
 
 interface LeaderboardProps {
   currentUsername: string | null;
@@ -97,9 +98,9 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
         <button className="absolute top-[203px] left-[62px]" onClick={handleRetry}>
           <img src={retryIcon} alt="Retry" className={`w-[13px] h-[13px] ${isSpinning ? 'spin-once' : ''}`} style={{ filter: 'drop-shadow(0 0 1px #A7F1FA)' }} />
         </button>
-        <button className="absolute small-button dark-text-shadow-sm font-ptclean text-2xl w-[50px] h-[50px] top-[36px] left-[34px]" onClick={toggleSetVisible}>
+        <NewButton size="circle" className="absolute dark-text-shadow-sm top-[36px] left-[34px]" onClick={toggleSetVisible}>
           &lt;
-        </button>
+        </NewButton>
         <span className="absolute font-ptclean dark-text-shadow-sm text-tpotracer-400 text-4xl top-[125px] left-[162px]">
           {getRemainingTimeUntilEnd()}
         </span>
@@ -170,9 +171,9 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
         </div>
       </div>
       <div className="leaderboard-condensed">
-        <button className="absolute small-button dark-text-shadow-sm font-ptclean text-2xl w-[50px] h-[50px] top-[29px] left-[29px]" onClick={toggleSetVisible}>
+        <NewButton size="circle" className="absolute dark-text-shadow-sm top-[29px] left-[29px]" onClick={toggleSetVisible}>
           &gt;
-        </button>
+        </NewButton>
       </div>
     </div>
   );
