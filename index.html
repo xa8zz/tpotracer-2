@@ -46,6 +46,40 @@
         color: #A7F1FA; /* tpotracer-100 */
         text-shadow: 0 0 2px #A7F1FA; /* glow-text-shadow-md */
         font-weight: 700;
+        width: 120px;
+      }
+
+      #video-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -2;
+        background-image: url('/src/assets/background.png');
+        background-size: cover;
+        background-position: center;
+        filter: blur(10px) brightness(1.25) contrast(1.25);
+        transition: transform 0.5s ease-in-out;
+      }
+
+      #video-container.is-loading {
+        transform: scale(1.1);
+      }
+
+      #video {
+        position: fixed;
+        top: -25%;
+        left: -25%;
+        width: 150%;
+        height: 150%;
+        z-index: -1;
+        pointer-events: none;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      #video.is-hidden {
+        opacity: 0;
       }
 
       #video-overlay {
@@ -62,8 +96,10 @@
     </style>
   </head>
   <body>
+    <div id="video-container" class="is-loading"></div>
     <iframe
       id="video"
+      class="is-hidden"
       width="560"
       height="315"
       src="https://www.youtube.com/embed/zyRSaVtEzZ4?si=4wvkfRYB-qTeM6Rx&controls=0&autoplay=1&muted=1&enablejsapi=1&start=74"
@@ -79,13 +115,42 @@
       <div class="loader-container">
         <div class="loader-content">
             <!-- <img src="/src/assets/logosm.png" alt="tpotracer logo" class="loader-logo" /> -->
-            <p class="loader-text">
-              Loading...
+            <p class="loader-text" id="loader-text">
+              Loading.
+            </p>
+            <p id="skip-loader" style="display: none; margin-top: 1rem;">
+              <a href="#" onclick="skipLoading(); return false;" style="color: #A7F1FA; font-size: 0.8rem; text-decoration: underline;">Taking too long? Skip loading</a>
             </p>
         </div>
       </div>
     </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      window._skipLoading = false;
+
+      const loaderText = document.getElementById('loader-text');
+      const dots = ['.', '..', '...'];
+      let currentDot = 0;
+
+      window.dotInterval = setInterval(() => {
+        if (loaderText) {
+          loaderText.innerHTML = 'Loading' + dots[currentDot];
+          currentDot = (currentDot + 1) % dots.length;
+        }
+      }, 400);
+
+      setTimeout(() => {
+        const skipLink = document.getElementById('skip-loader');
+        if (skipLink) {
+          skipLink.style.display = 'block';
+        }
+      }, 4000);
+
+      function skipLoading() {
+        console.log('[index.html] skipLoading called.');
+        window._skipLoading = true;
+      }
+    </script>
   </body>
 </html>

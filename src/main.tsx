@@ -9,13 +9,24 @@ const rootElement = document.getElementById('root')!;
 const root = createRoot(rootElement);
 
 async function main() {
-  console.log('[Debug] main function started.');
+  const skipLoadingPromise = new Promise(resolve => {
+    const checkSkip = () => {
+      if ((window as any)._skipLoading === true) {
+        resolve('skipped');
+      } else {
+        setTimeout(checkSkip, 100);
+      }
+    };
+    checkSkip();
+  });
   // Concurrently load assets and wait for the video to start playing
-  await Promise.all([
-    preloadGameAssets(),
-    whenVideoPlaying()
+  await Promise.race([
+    Promise.all([
+      preloadGameAssets(),
+      whenVideoPlaying()
+    ]),
+    skipLoadingPromise
   ]);
-  console.log('[Debug] Promise.all completed. Assets loaded and video playing.');
 
   const onAppReady = () => {
     const loader = document.getElementById('loader');
@@ -28,6 +39,9 @@ async function main() {
       // Use requestAnimationFrame to ensure the browser has time to
       // process the initial state before we trigger the fade-out transition.
       requestAnimationFrame(() => {
+        if ((window as any).dotInterval) {
+          clearInterval((window as any).dotInterval);
+        }
         loader.classList.add('fade-out');
       });
     }
