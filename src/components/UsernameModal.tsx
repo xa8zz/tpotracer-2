@@ -33,7 +33,9 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace') {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Backspace') {
       e.preventDefault();
       const currentValue = e.currentTarget.value;
       const newValue = currentValue.slice(0, -1);
