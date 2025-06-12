@@ -116,7 +116,7 @@ const Settings: React.FC<SettingsProps> = ({
         <div className="relative w-full h-full rounded-[51px] p-[30px]">
           <NewButton
             size="circle"
-            className="absolute top-[29px] left-[29px] dark-text-shadow-sm"
+            className="absolute top-[30px] left-[29px] dark-text-shadow-sm"
             onClick={onClose}
           >
             x

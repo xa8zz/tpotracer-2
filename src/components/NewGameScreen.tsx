@@ -238,10 +238,10 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         <NewButton className="absolute top-[105px] left-[410px]" onClick={handleStartNewGame}>
           Retry (Tab)
         </NewButton>
-        <NewButton className="absolute top-[106px] left-[580px]" onClick={onSettingsClick}>
+        <NewButton className="absolute top-[105px] left-[580px]" onClick={onSettingsClick}>
           Settings
         </NewButton>
-        <NewButton size="lg" className="absolute top-[106px] left-[740px]" onClick={() => {}}>?</NewButton>
+        <NewButton size="circle" className="absolute top-[112px] left-[777px] dark-text-shadow-sm" onClick={() => {}}>?</NewButton>
         <div className={`game-finished-screen absolute top-[306px] left-[254px] w-[461px] h-[200px] text-tpotracer-400 ${gameState === 'completed' ? 'tr-visible' : ''}`}>
           <div className="relative w-full h-full">
             <div className="game-finished-screen-bg absolute inset-0 z-0"></div>
@@ -274,7 +274,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             </div>
           </div>
         </div>
-        <div className="inner-screen absolute top-[226px] left-[250px] w-[474px] h-[338px] rounded-[49px] flex flex-col p-[30px]">
+        <div className="inner-screen absolute top-[212px] left-[241px] w-[471px] h-[336px] rounded-[49px] flex flex-col p-[30px]">
           <div className="badge-row">
             <ul className="flex gap-[20px]">
               <li className="font-ptclean glow-text-shadow-sm text-2xl text-tpotracer-100">
@@ -297,12 +297,12 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           </div>
           </div>
         </div>
-        <div className="share-preview absolute top-[609px] left-[141px] w-[304px] h-[188px] bg-tpotracer-300 rounded-[29px]">
+        <div className="share-preview absolute top-[593px] left-[155px] w-[277px] h-[188px] rounded-[29px]">
         </div>
-        <NewButton className="absolute top-[606px] left-[471px]">
+        <NewButton className="absolute top-[590px] left-[455px]">
           Share Image
         </NewButton>
-        <NewButton className="absolute top-[606px] left-[659px]">
+        <NewButton className="absolute top-[590px] left-[624px]">
           Share on X
         </NewButton>
         
