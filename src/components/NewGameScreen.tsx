@@ -5,6 +5,7 @@ import { useGameContext } from '../contexts/GameContext';
 import { preloadGameAssets } from '../utils/preloadAssets';
 import { whenVideoPlaying } from '../utils/youtube';
 import UserAvatar from './UserAvatar';
+import { getBadgeClass } from '../utils/leaderboardUtils';
 
 interface NewGameScreenProps {
   username: string | null;
@@ -242,7 +243,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           Settings
         </NewButton>
         <NewButton size="circle" className="absolute top-[112px] left-[777px] dark-text-shadow-sm" onClick={toggleHelp}>?</NewButton>
-        <div className={`game-finished-screen absolute top-[306px] left-[254px] w-[461px] h-[200px] text-tpotracer-400 ${gameState === 'completed' ? 'tr-visible' : ''}`}>
+        <div className={`game-finished-screen absolute top-[306px] left-[243px] rounded-[2px] w-[464px] h-[200px] text-tpotracer-400 ${gameState === 'completed' ? 'tr-visible' : ''}`}>
           <div className="relative w-full h-full">
             <div className="game-finished-screen-bg absolute inset-0 z-0"></div>
             <div className="absolute inset-0 z-10 flex flex-col justify-center px-[20px] gap-3 font-ptclean">
@@ -258,13 +259,13 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                 <div className="flex flex-col text-3xl gap-1">
                   <div className="flex items-center gap-2">
                     <span className="text-tpotracer-100 glow-text-shadow-sm">RANK:</span>
-                    <span className="bg-tpotracer-100 text-tpotracer-400 h-[28px] leading-[31px] font-bold px-[10px] rounded-[4px] glow-shadow-sm dark-text-shadow text-center">
+                    <span className={`h-[28px] leading-[31px] font-bold px-[10px] rounded-[4px] glow-shadow-sm text-center text-tpotracer-100 glow-text-shadow-sm ${getBadgeClass(leaderboardPosition ?? 99)}`}>
                       {leaderboardPosition ?? '99'}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-tpotracer-100 glow-text-shadow-sm">WPM TO BEAT:</span>
-                    <span className="bg-tpotracer-100 text-tpotracer-400 h-[28px] leading-[31px] font-bold px-[10px] rounded-[4px] glow-shadow-sm dark-text-shadow text-center">
+                    <span className="bg-tpotracer-300 text-tpotracer-100 h-[28px] leading-[31px] font-bold px-[10px] rounded-[4px] dark-shadow-sm glow-text-shadow text-center">
                       {renderPaddedNumber(wpm + 5)}
                     </span>
                   </div>

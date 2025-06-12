@@ -72,3 +72,11 @@ export const updateLeaderboard = (entry: LeaderboardEntry): void => {
   // Save to localStorage
   localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
 };
+
+// Returns the badge class for a given leaderboard place (1, 2, 3 get special classes)
+export function getBadgeClass(place: number): string {
+  if (place >= 4) {
+    return "text-tpotracer-100 glow-text-shadow-sm leaderboard-badge-plain";
+  }
+  return `leaderboard-badge-${place}`;
+}

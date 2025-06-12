@@ -1,21 +1,13 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useLeaderboard } from '../hooks/useLeaderboard';
 import { useGameContext } from '../contexts/GameContext';
-import { getRemainingTimeUntilEnd } from '../utils/leaderboardUtils';
+import { getRemainingTimeUntilEnd, getBadgeClass } from '../utils/leaderboardUtils';
 import UserAvatar from './UserAvatar';
 import retryIcon from '../assets/path291.png';
 import NewButton from './NewButton';
 
 interface LeaderboardProps {
   currentUsername: string | null;
-}
-
-function getBadgeClass(place: number): string {
-  if (place >= 4) {
-    return "text-tpotracer-100 glow-text-shadow-sm leaderboard-badge-plain"
-  }
-
-  return `leaderboard-badge-${place}`;
 }
 
 const allMockUsers = Array.from({ length: 100 }, (_, i) => ({
