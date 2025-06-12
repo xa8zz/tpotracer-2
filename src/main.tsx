@@ -39,6 +39,9 @@ async function main() {
       // Use requestAnimationFrame to ensure the browser has time to
       // process the initial state before we trigger the fade-out transition.
       requestAnimationFrame(() => {
+        if ((window as any).dotInterval) {
+          clearInterval((window as any).dotInterval);
+        }
         loader.classList.add('fade-out');
       });
     }

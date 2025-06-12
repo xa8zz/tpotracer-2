@@ -133,12 +133,10 @@
       const dots = ['.', '..', '...'];
       let currentDot = 0;
 
-      const dotInterval = setInterval(() => {
+      window.dotInterval = setInterval(() => {
         if (loaderText) {
           loaderText.innerHTML = 'Loading' + dots[currentDot];
           currentDot = (currentDot + 1) % dots.length;
-        } else {
-          clearInterval(dotInterval);
         }
       }, 400);
 
