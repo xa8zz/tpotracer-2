@@ -4,7 +4,7 @@ interface NewButtonProps {
   onClick?: () => void;
   className?: string;
   children?: React.ReactNode;
-  size?: 'md' | 'lg';
+  size?: 'md' | 'lg' | 'circle';
 }
 
 const NewButton: React.FC<NewButtonProps> = ({

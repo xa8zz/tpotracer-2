@@ -40,10 +40,10 @@ input:focus {
 }
 
 .game-container {
-  width: 888px; /* was 903px */
-  height: 865px;
-  background-image: url('./assets/mainbodyscanlines.png');
-  background-size: 903px 865px;
+  width: 853px; /* was 903px */
+  height: 806px;
+  background-image: url('./assets/gamescreencropped.png');
+  background-size: 853px 806px;
   background-repeat: no-repeat;
 }
 
@@ -113,12 +113,27 @@ body {
 }
 
 .new-button-lg:active {
-  background-image: url('./assets/lgbuttonpressed.png');
+  background-image: url('./assets/largebuttonpressed.png');
+  font-size: 25px;
+}
+
+.new-button-circle {
+  background-image: url('./assets/smallbutton.png');
+  background-size: 49px 49px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: transparent;
+  width: 50px;
+  height: 50px;
+}
+
+.new-button-circle:active {
+  background-image: url('./assets/smallbuttonpressed.png');
   font-size: 23px;
 }
 
 .glow-text-shadow {
-  text-shadow: 0 0 1px #A7F1FA;
+  text-shadow: 0 0 4px #A7F1FA;
 }
 
 .glow-text-shadow-sm {
@@ -260,19 +275,6 @@ body {
   box-shadow: 0 0 1px 1px #cd7f32;
   color: #fff;
   text-shadow: 0 0 1px #fff;
-}
-
-.small-button {
-  background-image: url('./assets/smallbutton.png');
-  background-size: 49px 49px;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-color: transparent;
-}
-
-.small-button:active {
-  background-image: url('./assets/smallbuttonpressed.png');
-  font-size: 23px;
 }
 
 .new-settings-modal {
