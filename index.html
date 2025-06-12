@@ -60,6 +60,11 @@
         background-size: cover;
         background-position: center;
         filter: blur(10px) brightness(1.25) contrast(1.25);
+        transition: transform 0.5s ease-in-out;
+      }
+
+      #video-container.is-loading {
+        transform: scale(1.1);
       }
 
       #video {
@@ -91,7 +96,7 @@
     </style>
   </head>
   <body>
-    <div id="video-container"></div>
+    <div id="video-container" class="is-loading"></div>
     <iframe
       id="video"
       class="is-hidden"

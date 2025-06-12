@@ -55,10 +55,13 @@ function ensurePlayerReady(): Promise<void> {
                             
                             player.addEventListener('onStateChange', (event: any) => {
                                 const videoElement = document.getElementById('video');
+                                const videoContainer = document.getElementById('video-container');
                                 if (event.data === 1) { // YT.PlayerState.PLAYING
                                     videoElement?.classList.remove('is-hidden');
+                                    videoContainer?.classList.remove('is-loading');
                                 } else {
                                     videoElement?.classList.add('is-hidden');
+                                    videoContainer?.classList.add('is-loading');
                                 }
                             });
 
