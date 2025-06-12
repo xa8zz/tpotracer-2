@@ -37,7 +37,12 @@ export const preloadGameAssets = async (): Promise<void> => {
         '/src/assets/smallbutton.png',
         '/src/assets/smallbuttonpressed.png',
         '/src/assets/settingsmodalcropped.png',
-        '/vite.svg'
+        '/vite.svg',
+        '/src/assets/gamescreencropped.png',
+        '/src/assets/largebuttonpressed.png',
+        '/src/assets/welcomemodal2cropped.png',
+        '/src/assets/helpmodalcropped.png',
+        '/src/assets/background.png'
     ];
 
     const fontDetails = [
