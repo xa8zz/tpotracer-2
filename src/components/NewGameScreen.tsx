@@ -147,6 +147,11 @@ const renderWordsWithProgress = (
 
 const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick }) => {
   const [isFlashing, setIsFlashing] = useState(false);
+  const [finishedGameState, setFinishedGameState] = useState<{
+    wpm: number;
+    leaderboardPosition: number | null;
+    isNewHighScore: boolean;
+  } | null>(null);
   // Create ref for cursor positioning
   const cursorRef = useRef<HTMLSpanElement>(null);
   
@@ -179,6 +184,16 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   } = useGameContext();
 
   useEffect(() => {
+    if (gameState === 'completed') {
+      setFinishedGameState({
+        wpm,
+        leaderboardPosition,
+        isNewHighScore,
+      });
+    }
+  }, [gameState, wpm, leaderboardPosition, isNewHighScore]);
+
+  useEffect(() => {
     if (gameState === 'completed' && isNewHighScore) {
       setIsFlashing(true);
       const timer = setTimeout(() => {
@@ -193,6 +208,11 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
 
   // Determine if cursor should be visible (during typing states)
   const isCursorVisible = gameState === 'playing' || gameState === 'waiting';
+
+  const statsForFinishedScreen =
+    gameState === 'completed'
+      ? { wpm, leaderboardPosition, isNewHighScore }
+      : finishedGameState;
 
   return (
     <div className="">
@@ -244,36 +264,38 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         </NewButton>
         <NewButton size="circle" className="absolute top-[112px] left-[777px] dark-text-shadow-sm" onClick={toggleHelp}>?</NewButton>
         <div className={`game-finished-screen absolute top-[306px] left-[243px] rounded-[2px] w-[464px] h-[200px] text-tpotracer-400 ${gameState === 'completed' ? 'tr-visible' : ''}`}>
-          <div className="relative w-full h-full">
-            <div className="game-finished-screen-bg absolute inset-0 z-0"></div>
-            <div className="absolute inset-0 z-10 flex flex-col justify-center px-[20px] gap-3 font-ptclean">
-              <h2 className="text-3xl text-tpotracer-100 glow-text-shadow-sm">
-                {isNewHighScore ? "NEW BEST WPM!" : "GAME COMPLETE!"}
-              </h2>
-              <div className="flex items-end gap-5">
-                <div className={`font-bold px-[18px] py-[8px] rounded-[8px] flex items-center justify-center w-[110px] ${isFlashing ? 'tr-flashing' : 'bg-tpotracer-300 text-tpotracer-100 tpotracer-300-shadow-sm glow-text-shadow-sm'}`}>
-                  <span className="text-6xl">
-                    {renderPaddedNumber(wpm)}
-                  </span>
-                </div>
-                <div className="flex flex-col text-3xl gap-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-tpotracer-100 glow-text-shadow-sm">RANK:</span>
-                    <span className={`h-[28px] leading-[31px] font-bold px-[10px] rounded-[4px] glow-shadow-sm text-center text-tpotracer-100 glow-text-shadow-sm ${getBadgeClass(leaderboardPosition ?? 99)}`}>
-                      {leaderboardPosition ?? '99'}
+          {statsForFinishedScreen && (
+            <div className="relative w-full h-full">
+              <div className="game-finished-screen-bg absolute inset-0 z-0"></div>
+              <div className="absolute inset-0 z-10 flex flex-col justify-center px-[20px] gap-3 font-ptclean">
+                <h2 className="text-3xl text-tpotracer-100 glow-text-shadow-sm">
+                  {statsForFinishedScreen.isNewHighScore ? "NEW BEST WPM!" : "GAME COMPLETE!"}
+                </h2>
+                <div className="flex items-end gap-5">
+                  <div className={`font-bold px-[18px] py-[8px] rounded-[8px] flex items-center justify-center w-[110px] ${isFlashing ? 'tr-flashing' : 'bg-tpotracer-300 text-tpotracer-100 tpotracer-300-shadow-sm glow-text-shadow-sm'}`}>
+                    <span className="text-6xl">
+                      {renderPaddedNumber(statsForFinishedScreen.wpm)}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-tpotracer-100 glow-text-shadow-sm">WPM TO BEAT:</span>
-                    <span className="bg-tpotracer-300 text-tpotracer-100 h-[28px] leading-[31px] font-bold px-[10px] rounded-[4px] dark-shadow-sm glow-text-shadow text-center">
-                      {renderPaddedNumber(wpm + 5)}
-                    </span>
+                  <div className="flex flex-col text-3xl gap-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-tpotracer-100 glow-text-shadow-sm">RANK:</span>
+                      <span className={`h-[28px] leading-[31px] font-bold px-[10px] rounded-[4px] glow-shadow-sm text-center text-tpotracer-100 glow-text-shadow-sm ${getBadgeClass(statsForFinishedScreen.leaderboardPosition ?? 99)}`}>
+                        {statsForFinishedScreen.leaderboardPosition ?? '99'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-tpotracer-100 glow-text-shadow-sm">WPM TO BEAT:</span>
+                      <span className="bg-tpotracer-300 text-tpotracer-100 h-[28px] leading-[31px] font-bold px-[10px] rounded-[4px] dark-shadow-sm glow-text-shadow text-center">
+                        {renderPaddedNumber(statsForFinishedScreen.wpm + 5)}
+                      </span>
+                    </div>
                   </div>
                 </div>
+                <p className="text-2xl mt-[10px] text-tpotracer-100 glow-text-shadow-sm">Press Tab, or click Retry, to try again.</p>
               </div>
-              <p className="text-2xl mt-[10px] text-tpotracer-100 glow-text-shadow-sm">Press Tab, or click Retry, to try again.</p>
             </div>
-          </div>
+          )}
         </div>
         <div className="inner-screen absolute top-[212px] left-[241px] w-[471px] h-[336px] rounded-[49px] flex flex-col p-[30px]">
           <div className="badge-row">
