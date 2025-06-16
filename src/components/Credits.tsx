@@ -17,9 +17,9 @@ const Credits: React.FC<CreditsProps> = ({ usernameModalVisible }) => {
         <div className="relative w-full h-full flex flex-col justify-end items-start">
           <img src={logo} alt="tpotracer logo" className="w-[200px]" />
           <div className="special-p-container">
-            <p className="absolute left-[190px] bottom-[34px] special-p">by <a href="https://x.com/marcusquest" target="_blank" rel="noopener noreferrer" className="underline">@marcusquest</a> & <a href="https://x.com/valofpszz" target="_blank" rel="noopener noreferrer" className="underline">@valofpszz</a></p>
-            <p className="absolute left-[155px] bottom-[18px] special-p">bg: <a href="https://www.youtube.com/watch?v=zyRSaVtEzZ4" target="_blank" rel="noopener noreferrer" className="underline">integra - 2alora</a></p>
-            <p className="absolute left-[120px] bottom-[2px] special-p">font: <a href="https://github.com/bluescan/proggyfonts" target="_blank" rel="noopener noreferrer" className="underline">proggy clean</a></p>
+            <p className={`absolute bottom-[34px] special-p ${usernameModalVisible ? 'left-[4px]' : 'left-[190px]'}`}>by <a href="https://x.com/marcusquest" target="_blank" rel="noopener noreferrer" className="underline">@marcusquest</a> & <a href="https://x.com/valofpszz" target="_blank" rel="noopener noreferrer" className="underline">@valofpszz</a></p>
+            <p className={`absolute bottom-[18px] special-p ${usernameModalVisible ? 'left-[4px]' : 'left-[155px]'}`}>bg: <a href="https://www.youtube.com/watch?v=zyRSaVtEzZ4" target="_blank" rel="noopener noreferrer" className="underline">integra - 2alora</a></p>
+            <p className={`absolute bottom-[2px] special-p ${usernameModalVisible ? 'left-[4px]' : 'left-[120px]'}`}>font: <a href="https://github.com/bluescan/proggyfonts" target="_blank" rel="noopener noreferrer" className="underline">proggy clean</a></p>
           </div>
         </div>
       </div>
