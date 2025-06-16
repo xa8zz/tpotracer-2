@@ -468,3 +468,12 @@ body {
   mask-image: linear-gradient(to bottom, transparent 0%, white 2%, white 98%, transparent 100%);
 }
 
+.scrollable-leaderboard::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; /* make scrollbar transparent */
+}
+
+.hide-logo img {
+  display: none;
+}
+

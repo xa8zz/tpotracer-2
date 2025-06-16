@@ -64,7 +64,7 @@ const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) =>
         visible={isHelpExpanded}
         onClose={toggleHelp}
       />
-      <Credits />
+      <Credits usernameModalVisible={isUsernameModalVisible} />
     </>
   );
 };

@@ -1,11 +1,15 @@
 import React from 'react';
 import logo from '../assets/logosm.png';
 
-const Credits: React.FC = () => {
+interface CreditsProps {
+  usernameModalVisible?: boolean;
+}
+
+const Credits: React.FC<CreditsProps> = ({ usernameModalVisible }) => {
   return (
     <>
       <div
-        className="absolute bottom-0 left-0 w-[600px] h-[100px] font-ptclean text-lg text-white leading-[14px] p-2"
+        className={`absolute bottom-0 left-0 w-[600px] h-[100px] font-ptclean text-lg text-white leading-[14px] p-2 ${usernameModalVisible ? 'hide-logo' : ''}`}
         style={{
           background: 'radial-gradient(ellipse at bottom left, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 70%)'
         }}
