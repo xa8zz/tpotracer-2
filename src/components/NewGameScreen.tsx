@@ -286,11 +286,11 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             </span>
           </>
         )}
-        {/* Rank in the lower circle */}
-        <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-2xl top-[230px] left-[89px]">
+        {/* Rank in the right circle (matching Best WPM style) */}
+        <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-2xl top-[83px] left-[284px]">
           Rank:
         </span>
-        <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold text-6xl top-[252px] left-[107px]">
+        <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold text-6xl top-[105px] left-[290px]">
           {leaderboardPosition ? `#${leaderboardPosition}` : '--'}
         </span>
         <a
