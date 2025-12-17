@@ -80,12 +80,12 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({ username, wpm, positi
             </a>
             {' '}and{' '}
             <a 
-              href="https://x.com/valofpszz" 
+              href="https://x.com/sensho" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-blue-400 hover:underline"
             >
-              @valofpszz
+              @sensho
             </a>
           </p>
         </div>
