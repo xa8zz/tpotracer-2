@@ -23,7 +23,7 @@ const defaultRateLimit = rateLimit({
 });
 const apiRateLimit = rateLimit({
   windowMs: 1 * 60 * 1000,  // 1 minute
-  max:      35              // limit to 20 API calls/minute
+  max:      60              // limit to 60 API calls/minute
 });
 
 app.use(defaultRateLimit);

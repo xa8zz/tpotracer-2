@@ -19,13 +19,15 @@ async function main() {
     };
     checkSkip();
   });
-  // Concurrently load assets and wait for the video to start playing
+  // Concurrently load assets and wait for the video to start playing (with 2s timeout)
+  const timeoutPromise = new Promise(resolve => setTimeout(() => resolve('timeout'), 2000));
   await Promise.race([
     Promise.all([
       preloadGameAssets(),
       whenVideoPlaying()
     ]),
-    skipLoadingPromise
+    skipLoadingPromise,
+    timeoutPromise
   ]);
 
   const onAppReady = () => {
