@@ -40,7 +40,7 @@ input:focus {
 }
 
 .game-container {
-  width: 853px; /* was 903px */
+  width: 853px;
   height: 806px;
   background-image: url('./assets/gamescreencropped.png');
   background-size: 853px 806px;
