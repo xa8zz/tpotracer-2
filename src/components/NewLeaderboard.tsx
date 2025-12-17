@@ -86,7 +86,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
           <img src={retryIcon} alt="Retry" className={`w-[13px] h-[13px] ${isSpinning ? 'spin-once' : ''}`} style={{ filter: 'drop-shadow(0 0 1px #A7F1FA)' }} />
         </button>
         <NewButton size="circle" className="absolute dark-text-shadow-sm top-[36px] left-[34px]" onClick={toggleSetVisible}>
-          &lt;
+          ✕
         </NewButton>
         <span className="absolute font-ptclean dark-text-shadow-sm text-tpotracer-400 text-4xl top-[125px] left-[162px]">
           {getRemainingTimeUntilEnd()}
@@ -158,8 +158,12 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
         </div>
       </div>
       <div className="leaderboard-condensed">
-        <NewButton size="circle" className="absolute dark-text-shadow-sm top-[29px] left-[29px]" onClick={toggleSetVisible}>
-          &gt;
+        <NewButton size="circle" className="absolute dark-text-shadow-sm top-[29px] left-[29px] flex items-center justify-center" onClick={toggleSetVisible}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="3" y="6" width="5" height="16" rx="1" />
+            <rect x="10" y="10" width="5" height="12" rx="1" />
+            <rect x="17" y="14" width="5" height="8" rx="1" />
+          </svg>
         </NewButton>
       </div>
     </div>
