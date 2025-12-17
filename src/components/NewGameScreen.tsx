@@ -267,6 +267,12 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     }
   };
 
+  const handleShareToX = () => {
+    const tweetText = `I just typed at ${Math.round(wpm)} WPM. Can you beat me? https://tpotracer.com`;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+    window.open(twitterUrl, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <div className="">
       <div className="game-container relative grow">
@@ -433,7 +439,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         <NewButton className="absolute top-[590px] left-[455px]" onClick={handleDownloadShareImage}>
           Share Image
         </NewButton>
-        <NewButton className="absolute top-[590px] left-[624px]">
+        <NewButton className="absolute top-[590px] left-[624px]" onClick={handleShareToX}>
           Share on X
         </NewButton>
         
