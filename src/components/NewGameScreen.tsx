@@ -376,7 +376,20 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           </div>
           </div>
         </div>
-        <div className="share-preview absolute top-[593px] left-[155px] w-[277px] h-[188px] rounded-[29px]">
+        <div className="share-preview absolute top-[593px] left-[155px] w-[277px] h-[188px] rounded-[29px] overflow-hidden bg-gray-800">
+          {/* Live preview of share card */}
+          <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center">
+            <p className="text-gray-400 text-[8px] mb-1">tpotracer.com</p>
+            <div className="text-3xl font-bold text-tpotracer-100 font-mono glow-text-shadow-sm">
+              {Math.round(wpm)} <span className="text-sm">WPM</span>
+            </div>
+            <div className="text-sm text-tpotracer-100 font-mono mt-1 glow-text-shadow-sm">@{username}</div>
+            {leaderboardPosition && (
+              <div className="px-2 py-1 bg-tpotracer-300 rounded-full text-[10px] text-tpotracer-100 mt-2">
+                #{leaderboardPosition} on leaderboard
+              </div>
+            )}
+          </div>
         </div>
         {/* Hidden share card for image generation */}
         <div 
