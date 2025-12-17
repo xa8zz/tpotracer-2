@@ -6,6 +6,7 @@ import { preloadGameAssets } from '../utils/preloadAssets';
 import { whenVideoPlaying } from '../utils/youtube';
 import UserAvatar from './UserAvatar';
 import { getBadgeClass } from '../utils/leaderboardUtils';
+import html2canvas from 'html2canvas';
 
 interface NewGameScreenProps {
   username: string | null;
@@ -154,6 +155,8 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   } | null>(null);
   // Create ref for cursor positioning
   const cursorRef = useRef<HTMLSpanElement>(null);
+  // Create ref for share card
+  const shareCardRef = useRef<HTMLDivElement>(null);
   
   // Destructure all values and functions from game context
   const {
@@ -213,6 +216,56 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     gameState === 'completed'
       ? { wpm, leaderboardPosition, isNewHighScore }
       : finishedGameState;
+
+  const handleDownloadShareImage = async () => {
+    if (!shareCardRef.current || !username) return;
+    
+    try {
+      // Temporarily make the element visible (but keep it off-screen) for html2canvas
+      const originalOpacity = shareCardRef.current.style.opacity;
+      const originalVisibility = shareCardRef.current.style.visibility;
+      shareCardRef.current.style.opacity = '1';
+      shareCardRef.current.style.visibility = 'visible';
+      
+      // Ensure all content is properly rendered
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      const canvas = await html2canvas(shareCardRef.current, {
+        scale: 2,
+        backgroundColor: '#1f2937',
+        logging: false,
+        useCORS: true,
+        allowTaint: true,
+        width: shareCardRef.current.offsetWidth,
+        height: shareCardRef.current.offsetHeight,
+        onclone: (_document, element) => {
+          const clone = element as HTMLElement;
+          clone.style.width = `${shareCardRef.current!.offsetWidth}px`;
+          clone.style.height = `${shareCardRef.current!.offsetHeight}px`;
+          clone.style.overflow = 'hidden';
+          clone.style.opacity = '1';
+          clone.style.visibility = 'visible';
+        }
+      });
+      
+      // Restore original styles
+      shareCardRef.current.style.opacity = originalOpacity;
+      shareCardRef.current.style.visibility = originalVisibility;
+      
+      const dataUrl = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `tpotracer-${username}-${Math.round(wpm)}wpm.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      console.error('Error generating image:', error);
+      // Make sure to restore styles even on error
+      if (shareCardRef.current) {
+        shareCardRef.current.style.opacity = '';
+        shareCardRef.current.style.visibility = '';
+      }
+    }
+  };
 
   return (
     <div className="">
@@ -322,7 +375,62 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         </div>
         <div className="share-preview absolute top-[593px] left-[155px] w-[277px] h-[188px] rounded-[29px]">
         </div>
-        <NewButton className="absolute top-[590px] left-[455px]">
+        {/* Hidden share card for image generation */}
+        <div 
+          ref={shareCardRef}
+          className="absolute -left-[9999px] pointer-events-none"
+          style={{ width: '500px', background: '#1f2937', opacity: 0, visibility: 'hidden' }}
+        >
+          <div className="p-6 flex flex-col items-center">
+            {/* Card header with attribution */}
+            <div className="w-full text-center mb-6">
+              <p className="text-gray-400 text-sm">
+                tpotracer.com made by{' '}
+                <a 
+                  href="https://x.com/marcusquest" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:underline"
+                >
+                  @marcusquest
+                </a>
+                {' '}and{' '}
+                <a 
+                  href="https://x.com/sensho" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:underline"
+                >
+                  @sensho
+                </a>
+              </p>
+            </div>
+            
+            {/* Card logo/placeholder */}
+            <div className="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mb-6">
+              <span className="text-xl font-bold text-gray-300">TPO</span>
+            </div>
+            
+            {/* User stats */}
+            <div className="flex flex-col items-center mb-6">
+              <div className="text-6xl font-bold text-blue-500 font-mono leading-none">
+                {Math.round(wpm)}
+              </div>
+              <div className="text-gray-400 text-sm mt-2">WPM</div>
+            </div>
+            
+            {/* Username and position */}
+            <div className="flex flex-col items-center mt-2 w-full">
+              <div className="text-xl font-bold text-gray-200 font-mono mb-3">@{username}</div>
+              {leaderboardPosition && (
+                <div className="px-4 py-2 bg-gray-700 rounded-full text-sm text-gray-300 inline-block">
+                  #{leaderboardPosition} on leaderboard
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        <NewButton className="absolute top-[590px] left-[455px]" onClick={handleDownloadShareImage}>
           Share Image
         </NewButton>
         <NewButton className="absolute top-[590px] left-[624px]">
