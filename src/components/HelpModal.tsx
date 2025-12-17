@@ -57,7 +57,7 @@ const HelpModal: React.FC<HelpModalProps> = ({
             Instructions
           </span>
           <div className="instructions-text absolute font-ptclean text-2xl dark-text-shadow text-tpotracer-400 left-[40px] right-[30px] top-[184px] leading-[1]">
-            <p>tpotracer is a 1-week speed typing challenge for X (Twitter) users. Your goal is to climb to the top of the leaderboard.</p>
+            <p>tpotracer is a 1-week speed typing competition for X (Twitter) users. Your goal is to climb to the top of the leaderboard.</p>
             <br />
             <p>Enter your X username, then type the 10 displayed words as quickly as possible.</p>
             <br />
@@ -78,11 +78,11 @@ const HelpModal: React.FC<HelpModalProps> = ({
               rel="noopener noreferrer"
               className="underline hover:no-underline"
             >@marcusquest</a> or <a
-              href="https://x.com/valofpszz"
+              href="https://x.com/sensho"
               target="_blank"
               rel="noopener noreferrer"
               className="underline hover:no-underline"
-            >@valofpszz</a> on X!
+            >@sensho</a> on X!
           </div>
         </div>
       </div>

@@ -61,7 +61,7 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
       <div className="absolute inset-0 w-screen h-screen bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_70%)]"></div>
       <div className={`username-modal ${className}`}>
         <div className="relative w-full h-full rounded-[51px] p-[30px]">
-          <img className="absolute top-[-30px] left-[-25px]" src={logo} alt="tpotracer logo" />
+          <img className="absolute top-[-30px] left-[-25px] h-[120px]" src={logo} alt="tpotracer logo" />
           <span
             className="absolute top-[121px] left-[40px] text-4xl font-ptclean text-white"
             style={{ textShadow: '0 0 1px #fff' }}
@@ -69,7 +69,7 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
             Instructions
           </span>
           <div className="instructions-text absolute font-ptclean text-2xl dark-text-shadow text-tpotracer-400 left-[40px] right-[30px] top-[178px] leading-[1]">
-          <p>tpotracer is a 1-week speed typing challenge for X (Twitter) users. Your goal is to climb to the top of the leaderboard.</p>
+          <p>tpotracer is a 1-week speed typing competition for X (Twitter) users. Your goal is to climb to the top of the leaderboard.</p>
           <br />
           <p>Enter your X username, then type the 10 displayed words as quickly as possible.</p>
           <br />
