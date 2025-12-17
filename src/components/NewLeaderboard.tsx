@@ -10,10 +10,6 @@ interface LeaderboardProps {
   currentUsername: string | null;
 }
 
-const allMockUsers = Array.from({ length: 100 }, (_, i) => ({
-  username: `user${i + 1}`,
-  wpm: 200.0 - (i * (0.5 + Math.random() * 0.5)),
-}));
 
 const INITIAL_USER_COUNT = 12;
 const USER_LOAD_INCREMENT = 12;
@@ -60,14 +56,13 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
     place: leaderboardPosition || userPosition || 999
   };
 
-  // Use actual leaderboard data or fallback to mock data
-  const displayLeaderboardData = leaderboardData.length > 0 ? leaderboardData : allMockUsers;
-  const visibleUsers = displayLeaderboardData.slice(0, loadedUsersCount);
+  // Use actual leaderboard data
+  const visibleUsers = leaderboardData.slice(0, loadedUsersCount);
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
     const isAtBottom = scrollHeight - scrollTop <= clientHeight + 1;
-    const totalUsers = leaderboardData.length > 0 ? leaderboardData.length : allMockUsers.length;
+    const totalUsers = leaderboardData.length;
 
     if (isAtBottom && !isLoadingMore && loadedUsersCount < totalUsers) {
       setIsLoadingMore(true);
