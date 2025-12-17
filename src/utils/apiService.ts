@@ -3,11 +3,13 @@
 import { LeaderboardEntry, GameResult } from '../types';
 
 // Use Vite environment variable for API base URL
- const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
- if (!API_BASE_URL) {
-   throw new Error("VITE_API_BASE_URL is not defined");
- }
-console.log("API URL:", API_BASE_URL);
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const API_ENABLED = !!API_BASE_URL;
+if (!API_ENABLED) {
+  console.warn("VITE_API_BASE_URL not set - API features disabled (local dev mode)");
+} else {
+  console.log("API URL:", API_BASE_URL);
+}
 
 // Types
 interface LeaderboardCache {
@@ -37,6 +39,10 @@ export const fetchLeaderboard = async (
   force = false,
   username: string | null
 ): Promise<LeaderboardCache> => {
+  if (!API_ENABLED) {
+    return leaderboardCache; // Return empty cache in dev mode
+  }
+
   if (!force && !isLeaderboardCacheStale()) {
     return leaderboardCache;
   }
@@ -84,6 +90,11 @@ export const submitScore = async (
   result: GameResult,
   forceSubmit = false
 ): Promise<boolean> => {
+  if (!API_ENABLED) {
+    console.warn("Score not submitted - API disabled in dev mode");
+    return true; // Pretend it worked
+  }
+
   if (submitScoreTimeout && !forceSubmit) {
     console.warn("Submit blocked due to cooldown");
     return false;
