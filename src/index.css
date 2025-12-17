@@ -40,11 +40,12 @@ input:focus {
 }
 
 .game-container {
-  width: 853px;
-  height: 806px;
+  width: 80vmin;
+  aspect-ratio: 853 / 806;
   background-image: url('./assets/gamescreencropped.png');
-  background-size: 853px 806px;
+  background-size: 100% 100%;
   background-repeat: no-repeat;
+  container-type: size;
 }
 
 .leaderboard {
@@ -75,7 +76,7 @@ body {
 
 .new-button {
   background-image: url('./assets/button.png');
-  background-size: 181px 63px;
+  background-size: 100% 100%;
   width: 181px;
   height: 63px;
   background-position: 0 0;
@@ -91,7 +92,7 @@ body {
 
 .new-button-md {
   background-image: url('./assets/mdbutton.png');
-  background-size: 117px 49px;
+  background-size: 100% 100%;
   width: 117px;
   height: 49px;
   background-repeat: no-repeat;
@@ -106,7 +107,7 @@ body {
 
 .new-button-lg {
   background-image: url('./assets/lgbutton.png');
-  background-size: 199px 49px;
+  background-size: 100% 100%;
   width: 199px;
   height: 49px;
   background-repeat: no-repeat;
@@ -121,7 +122,7 @@ body {
 
 .new-button-circle {
   background-image: url('./assets/smallbutton.png');
-  background-size: 49px 49px;
+  background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: center;
   background-color: transparent;
