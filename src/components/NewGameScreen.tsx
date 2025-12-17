@@ -286,16 +286,13 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             </span>
           </>
         )}
-        {leaderboardPosition && (
-          <>
-            <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-2xl top-[64px] left-[284px]">
-              Rank:
-            </span>
-            <span className="absolute text-center font-ptclean glow-text-shadow-sm w-[70px] text-tpotracer-100 font-bold text-5xl top-[88px] left-[290px]">
-              {leaderboardPosition}
-            </span>
-          </>
-        )}
+        {/* Rank in the lower circle */}
+        <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-2xl top-[230px] left-[89px]">
+          Rank:
+        </span>
+        <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold text-6xl top-[252px] left-[107px]">
+          {leaderboardPosition ? `#${leaderboardPosition}` : '--'}
+        </span>
         <a
           href={`https://x.com/${username}`}
           target="_blank"
