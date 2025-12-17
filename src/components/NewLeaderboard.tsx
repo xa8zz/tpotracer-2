@@ -19,6 +19,9 @@ const LB_HEIGHT = 820;
 const LB_CONTAINER_WIDTH = 474; // Match the original CSS width for layout
 const CONTENT_WIDTH = 380;
 const CONTENT_HEIGHT = 541;
+const HEADER_HEIGHT = 42;
+const CURRENT_USER_HEIGHT = 49;
+const LIST_HEIGHT = CONTENT_HEIGHT - HEADER_HEIGHT - CURRENT_USER_HEIGHT; // 450
 const COL_WIDTH = 75;
 const FLEX_COL_WIDTH = 230; // 380 - 75 - 75
 const CONDENSED_LB_WIDTH = 110;
@@ -172,7 +175,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
           <div 
             className="font-ptclean glow-text-shadow-sm text-tpotracer-100 flex items-center shrink-0"
             style={{
-                height: pct(42, CONTENT_HEIGHT),
+                height: pct(HEADER_HEIGHT, CONTENT_HEIGHT),
                 fontSize: `${(24 / LB_WIDTH) * 100}cqw`,
                 lineHeight: 1.33, // Matching text-2xl leading
             }}
@@ -186,7 +189,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
           <div 
             className="font-ptclean relative glow-text-shadow-sm text-tpotracer-100 flex items-center shrink-0 isolate"
             style={{
-                height: pct(49, CONTENT_HEIGHT),
+                height: pct(CURRENT_USER_HEIGHT, CONTENT_HEIGHT),
                 fontSize: `${(24 / LB_WIDTH) * 100}cqw`,
                 lineHeight: 1.33,
             }}
@@ -234,14 +237,14 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
             ref={scrollContainerRef} 
             onScroll={handleScroll} 
             className="overflow-y-auto flex-grow scrollable-leaderboard"
-            style={{ paddingTop: pct(5, CONTENT_HEIGHT) }}
+            style={{ paddingTop: pct(5, LIST_HEIGHT) }}
           >
             {visibleUsers.map((entry, index) => (
               <div 
                 key={index} 
                 className="font-ptclean text-tpotracer-100 flex items-center"
                 style={{
-                    height: pct(44, CONTENT_HEIGHT),
+                    height: pct(44, LIST_HEIGHT),
                     fontSize: `${(24 / LB_WIDTH) * 100}cqw`,
                     lineHeight: 1.33,
                 }}
