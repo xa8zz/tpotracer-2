@@ -3,9 +3,10 @@ import React, { useState, useEffect } from 'react';
 interface UserAvatarProps {
   username: string | null;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-const UserAvatar: React.FC<UserAvatarProps> = ({ username, className }) => {
+const UserAvatar: React.FC<UserAvatarProps> = ({ username, className, style }) => {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -24,9 +25,9 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ username, className }) => {
   return (
     <span
       className={`user-avatar ${className || ''} ${loaded ? 'avatar-loaded' : ''}`}
-      style={{ '--avatar-url': avatarUrl } as React.CSSProperties}
+      style={{ ...style, '--avatar-url': avatarUrl } as React.CSSProperties}
     ></span>
   );
 };
 
-export default UserAvatar; 
+export default UserAvatar;

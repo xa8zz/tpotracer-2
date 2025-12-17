@@ -10,9 +10,22 @@ interface LeaderboardProps {
   currentUsername: string | null;
 }
 
-
 const INITIAL_USER_COUNT = 12;
 const USER_LOAD_INCREMENT = 12;
+
+// Leaderboard dimensions constants
+const LB_WIDTH = 500;
+const LB_HEIGHT = 820;
+const LB_CONTAINER_WIDTH = 474; // Match the original CSS width for layout
+const CONTENT_WIDTH = 380;
+const CONTENT_HEIGHT = 541;
+const COL_WIDTH = 75;
+const FLEX_COL_WIDTH = 230; // 380 - 75 - 75
+const CONDENSED_LB_WIDTH = 110;
+const CONDENSED_LB_HEIGHT = 110;
+
+// Helper to calculate percentage
+const pct = (val: number, total: number) => `${(val / total) * 100}%`;
 
 const NewLeaderboard: React.FC<LeaderboardProps> = ({
   currentUsername
@@ -80,29 +93,113 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
   const toggleSetVisible = () => setVisible(!visible);
 
   return (
-    <div className={`leaderboard-container ${visible ? "tr-visible" : ""}`}>
-      <div className="leaderboard">
-        <button className="absolute top-[203px] left-[62px]" onClick={handleRetry}>
-          <img src={retryIcon} alt="Retry" className={`w-[13px] h-[13px] ${isSpinning ? 'spin-once' : ''}`} style={{ filter: 'drop-shadow(0 0 1px #A7F1FA)' }} />
+    <div 
+      className={`leaderboard-container ${visible ? "tr-visible" : ""}`}
+      style={{
+        width: visible ? LB_CONTAINER_WIDTH : CONDENSED_LB_WIDTH,
+      }}
+    >
+      <div 
+        className="leaderboard" 
+        style={{ 
+            width: `${(LB_WIDTH / LB_CONTAINER_WIDTH) * 100}%`,
+            height: 'auto',
+            aspectRatio: `${LB_WIDTH} / ${LB_HEIGHT}`,
+            backgroundSize: '100% 100%',
+            containerType: 'size',
+            marginLeft: 24,
+            marginTop: -6,
+            pointerEvents: visible ? 'auto' : 'none',
+            zIndex: 1,
+        }}
+      >
+        <button 
+            className="absolute" 
+            onClick={handleRetry}
+            style={{
+                top: pct(203, LB_HEIGHT),
+                left: pct(62, LB_WIDTH),
+                width: pct(13, LB_WIDTH),
+            }}
+        >
+          <img 
+            src={retryIcon} 
+            alt="Retry" 
+            className={`${isSpinning ? 'spin-once' : ''}`} 
+            style={{ 
+                filter: 'drop-shadow(0 0 1px #A7F1FA)',
+                width: '100%',
+                height: 'auto',
+                display: 'block'
+            }} 
+          />
         </button>
-        <NewButton size="circle" className="absolute dark-text-shadow-sm top-[36px] left-[34px]" onClick={toggleSetVisible}>
+        <NewButton 
+            size="circle" 
+            className="absolute dark-text-shadow-sm" 
+            onClick={toggleSetVisible}
+            style={{
+                top: pct(36, LB_HEIGHT),
+                left: pct(34, LB_WIDTH),
+                width: pct(49, LB_WIDTH),
+                height: pct(49, LB_HEIGHT),
+                fontSize: `${(24 / LB_WIDTH) * 100}cqw`
+            }}
+        >
           ✕
         </NewButton>
-        <span className="absolute font-ptclean dark-text-shadow-sm text-tpotracer-400 text-4xl top-[125px] left-[162px]">
+        <span 
+            className="absolute font-ptclean dark-text-shadow-sm text-tpotracer-400"
+            style={{
+                top: pct(125, LB_HEIGHT),
+                left: pct(162, LB_WIDTH),
+                fontSize: `${(36 / LB_WIDTH) * 100}cqw`,
+                lineHeight: 1.11, // Matching text-4xl leading
+            }}
+        >
           {getRemainingTimeUntilEnd()}
         </span>
-        <div className="absolute top-[190px] left-[75px] w-[380px] h-[541px] flex flex-col text-center">
+        <div 
+            className="absolute flex flex-col text-center"
+            style={{
+                top: pct(190, LB_HEIGHT),
+                left: pct(75, LB_WIDTH),
+                width: pct(CONTENT_WIDTH, LB_WIDTH),
+                height: pct(CONTENT_HEIGHT, LB_HEIGHT)
+            }}
+        >
           {/* Header */}
-          <div className="font-ptclean h-[42px] glow-text-shadow-sm text-tpotracer-100 text-2xl flex items-center shrink-0">
-            <div className="w-[75px]">#</div>
+          <div 
+            className="font-ptclean glow-text-shadow-sm text-tpotracer-100 flex items-center shrink-0"
+            style={{
+                height: pct(42, CONTENT_HEIGHT),
+                fontSize: `${(24 / LB_WIDTH) * 100}cqw`,
+                lineHeight: 1.33, // Matching text-2xl leading
+            }}
+          >
+            <div style={{ width: pct(COL_WIDTH, CONTENT_WIDTH) }}>#</div>
             <div className="flex-1 text-left">USERNAME</div>
-            <div className="w-[75px]">WPM</div>
+            <div style={{ width: pct(COL_WIDTH, CONTENT_WIDTH) }}>WPM</div>
           </div>
           
           {/* Current User */}
-          <div className="font-ptclean relative h-[49px] glow-text-shadow-sm text-tpotracer-100 text-2xl flex items-center shrink-0 isolate">
-            <div className="w-[75px]">
-              <span className={`inline-block text-tpotracer-100 font-bold w-[30px] h-[25px] leading-[28px] rounded-[4px] ${getBadgeClass(currentUserLeaderboardData.place)}`}>
+          <div 
+            className="font-ptclean relative glow-text-shadow-sm text-tpotracer-100 flex items-center shrink-0 isolate"
+            style={{
+                height: pct(49, CONTENT_HEIGHT),
+                fontSize: `${(24 / LB_WIDTH) * 100}cqw`,
+                lineHeight: 1.33,
+            }}
+          >
+            <div style={{ width: pct(COL_WIDTH, CONTENT_WIDTH) }}>
+              <span 
+                className={`inline-block text-tpotracer-100 font-bold rounded-[4px] ${getBadgeClass(currentUserLeaderboardData.place)}`}
+                style={{
+                    width: `${(30 / LB_WIDTH) * 100}cqw`,
+                    height: `${(25 / LB_WIDTH) * 100}cqw`,
+                    lineHeight: `${(28 / LB_WIDTH) * 100}cqw`,
+                }}
+              >
               {currentUserLeaderboardData.place}
               </span>
             </div>
@@ -111,27 +208,53 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                 href={`https://x.com/${currentUserLeaderboardData.username}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-[6px] group"
+                className="flex items-center group"
+                style={{ gap: pct(6, FLEX_COL_WIDTH) }}
               >
                 <UserAvatar
                   username={currentUserLeaderboardData.username}
-                  className="rounded-[400px] mt-[-3px] w-[32px] h-[32px]"
+                  className="rounded-[400px] mt-[-3px]"
+                  style={{
+                      width: pct(32, FLEX_COL_WIDTH),
+                      height: 'auto', 
+                      aspectRatio: '1/1'
+                  }}
                 />
                 <span className="group-hover:underline">
                   @{currentUserLeaderboardData.username}
                 </span>
               </a>
             </div>
-            <div className="w-[75px]" title={currentUserLeaderboardData.wpm.toFixed(3)}>{Math.round(currentUserLeaderboardData.wpm)}</div>
-            <div className="current-user-background"></div>
+            <div style={{ width: pct(COL_WIDTH, CONTENT_WIDTH) }} title={currentUserLeaderboardData.wpm.toFixed(3)}>{Math.round(currentUserLeaderboardData.wpm)}</div>
+            <div className="current-user-background" style={{ left: pct(-35, CONTENT_WIDTH) }}></div>
           </div>
           
           {/* Scrollable user list */}
-          <div ref={scrollContainerRef} onScroll={handleScroll} className="overflow-y-auto flex-grow scrollable-leaderboard pt-[5px]">
+          <div 
+            ref={scrollContainerRef} 
+            onScroll={handleScroll} 
+            className="overflow-y-auto flex-grow scrollable-leaderboard"
+            style={{ paddingTop: pct(5, CONTENT_HEIGHT) }}
+          >
             {visibleUsers.map((entry, index) => (
-              <div key={index} className="font-ptclean h-[44px] text-tpotracer-100 text-2xl flex items-center">
-                <div className="w-[75px]">
-                  <span className={`inline-block font-bold w-[30px] h-[25px] leading-[28px] rounded-[4px] ${getBadgeClass(index + 1)}`}>
+              <div 
+                key={index} 
+                className="font-ptclean text-tpotracer-100 flex items-center"
+                style={{
+                    height: pct(44, CONTENT_HEIGHT),
+                    fontSize: `${(24 / LB_WIDTH) * 100}cqw`,
+                    lineHeight: 1.33,
+                }}
+              >
+                <div style={{ width: pct(COL_WIDTH, CONTENT_WIDTH) }}>
+                  <span 
+                    className={`inline-block font-bold rounded-[4px] ${getBadgeClass(index + 1)}`}
+                    style={{
+                        width: `${(30 / LB_WIDTH) * 100}cqw`,
+                        height: `${(25 / LB_WIDTH) * 100}cqw`,
+                        lineHeight: `${(28 / LB_WIDTH) * 100}cqw`,
+                    }}
+                  >
                     {index + 1}
                   </span>
                 </div>
@@ -140,26 +263,55 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                     href={`https://x.com/${entry.username}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-[6px] group"
+                    className="flex items-center group"
+                    style={{ gap: pct(6, FLEX_COL_WIDTH) }}
                   >
                     <UserAvatar
                       username={entry.username}
-                      className="rounded-[400px] mt-[-3px] w-[32px] h-[32px]"
+                      className="rounded-[400px] mt-[-3px]"
+                      style={{
+                          width: pct(32, FLEX_COL_WIDTH),
+                          height: 'auto',
+                          aspectRatio: '1/1'
+                      }}
                     />
                     <span className="glow-text-shadow-sm group-hover:underline">
                       @{entry.username}
                     </span>
                   </a>
                 </div>
-                <div className="w-[75px] glow-text-shadow-sm" title={entry.wpm.toFixed(3)}>{Math.round(entry.wpm)}</div>
+                <div className="glow-text-shadow-sm" style={{ width: pct(COL_WIDTH, CONTENT_WIDTH) }} title={entry.wpm.toFixed(3)}>{Math.round(entry.wpm)}</div>
               </div>
             ))}
           </div>
         </div>
       </div>
-      <div className="leaderboard-condensed">
-        <NewButton size="circle" className="absolute dark-text-shadow-sm top-[29px] left-[29px] flex items-center justify-center" onClick={toggleSetVisible}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <div 
+        className="leaderboard-condensed"
+        style={{ 
+            width: visible ? pct(CONDENSED_LB_WIDTH, LB_CONTAINER_WIDTH) : '100%',
+            height: 'auto',
+            aspectRatio: `${CONDENSED_LB_WIDTH} / ${CONDENSED_LB_HEIGHT}`,
+            backgroundSize: '100% 100%',
+            containerType: 'size',
+            marginLeft: 24,
+            marginTop: -6,
+            pointerEvents: visible ? 'none' : 'auto',
+            opacity: visible ? 0 : 1,
+        }}
+      >
+        <NewButton 
+            size="circle" 
+            className="absolute dark-text-shadow-sm flex items-center justify-center" 
+            onClick={toggleSetVisible}
+            style={{
+                top: pct(29, CONDENSED_LB_HEIGHT),
+                left: pct(29, CONDENSED_LB_WIDTH),
+                width: pct(49, CONDENSED_LB_WIDTH),
+                height: pct(49, CONDENSED_LB_HEIGHT),
+            }}
+        >
+          <svg width="40%" height="40%" viewBox="0 0 24 24" fill="currentColor">
             <rect x="3" y="6" width="5" height="16" rx="1" />
             <rect x="10" y="10" width="5" height="12" rx="1" />
             <rect x="17" y="14" width="5" height="8" rx="1" />

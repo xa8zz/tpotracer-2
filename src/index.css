@@ -40,7 +40,7 @@ input:focus {
 }
 
 .game-container {
-  width: 80vmin;
+  height: 80vh;
   aspect-ratio: 853 / 806;
   background-image: url('./assets/gamescreencropped.png');
   background-size: 100% 100%;
@@ -214,7 +214,7 @@ body {
   position: absolute;
   top: 7px;
   left: 5px;
-  z-index: -1;
+  z-index: 1;
 }
 
 .leaderboard {
