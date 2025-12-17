@@ -1,7 +1,8 @@
 import { LeaderboardEntry } from '../types';
 
 const LEADERBOARD_KEY = 'tpotracer_leaderboard';
-const TIME_LIMIT = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // One week from now
+// December 24, 12 PM PST (UTC-8) = December 24, 8 PM UTC (20:00 UTC)
+const TIME_LIMIT = new Date('2025-12-24T20:00:00Z');
 
 /**
  * Get the remaining time until the time limit ends

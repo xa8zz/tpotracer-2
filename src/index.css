@@ -115,7 +115,7 @@ body {
 }
 
 .new-button-lg:active {
-  background-image: url('./assets/largebuttonpressed.png');
+  background-image: url('./assets/lgbuttonpressed.png');
   font-size: 25px;
 }
 
@@ -472,4 +472,3 @@ body {
   width: 0px;
   background: transparent; /* make scrollbar transparent */
 }
-
