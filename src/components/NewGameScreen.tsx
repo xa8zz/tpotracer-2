@@ -261,7 +261,12 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
       const link = document.createElement('a');
       link.download = `tpotracer-${username}-${Math.round(wpm)}wpm.png`;
       link.href = dataUrl;
+      link.style.display = 'none';
+      document.body.appendChild(link);
       link.click();
+      setTimeout(() => {
+        document.body.removeChild(link);
+      }, 100);
     } catch (error) {
       console.error('Error generating image:', error);
       // Make sure to restore styles even on error
@@ -669,7 +674,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             </div>
             {leaderboardPosition && (
               <div 
-                className="bg-tpotracer-300 rounded-full text-tpotracer-100 mt-2"
+                className="bg-tpotracer-300 rounded-full text-tpotracer-100 glow-text-shadow-sm mt-2"
                 style={{ 
                   paddingLeft: `${(8 / CONTAINER_WIDTH) * 100}cqw`,
                   paddingRight: `${(8 / CONTAINER_WIDTH) * 100}cqw`,
@@ -686,64 +691,33 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         {/* Hidden share card for image generation */}
         <div 
           ref={shareCardRef}
-          className="absolute -left-[9999px] pointer-events-none"
+          className="absolute -left-[9999px] pointer-events-none overflow-hidden"
           style={{ 
-            width: '500px',
+            width: '1035px',
+            height: '754px',
             backgroundImage: `url(${sharableBg})`,
-            backgroundSize: '120%',
+            backgroundSize: 'cover',
             backgroundPosition: 'center',
-            boxShadow: 'inset 0 0 3px 1px #03223F, 0 0 3px 2px #03223F',
+            borderRadius: '29px',
             opacity: 0, 
             visibility: 'hidden' 
           }}
         >
-          <div className="p-6 flex flex-col items-center">
-            {/* Card header with attribution */}
-            <div className="w-full text-center mb-6">
-              <p className="text-gray-400 text-sm">
-                tpotracer.com made by{' '}
-                <a 
-                  href="https://x.com/marcusquest" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:underline"
-                >
-                  @marcusquest
-                </a>
-                {' '}and{' '}
-                <a 
-                  href="https://x.com/sensho" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:underline"
-                >
-                  @sensho
-                </a>
-              </p>
+          <div className="w-full h-full flex flex-col items-center justify-center text-center p-12">
+            <p className="text-tpotracer-100 mb-2 glow-text-shadow-sm text-lg">
+              tpotracer.com
+            </p>
+            <div className="font-bold text-tpotracer-100 font-mono glow-text-shadow-sm text-7xl leading-tight">
+              {Math.round(wpm)} <span className="text-3xl">WPM</span>
             </div>
-            
-            {/* Card logo/placeholder */}
-            <div className="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mb-6">
-              <span className="text-xl font-bold text-gray-300">TPO</span>
+            <div className="text-tpotracer-100 font-mono mt-2 glow-text-shadow-sm text-3xl">
+              @{username}
             </div>
-            
-            {/* User stats */}
-            <div className="flex flex-col items-center mb-6">
-              <div className="text-6xl font-bold text-blue-500 font-mono leading-none">
-                {Math.round(wpm)}
+            {leaderboardPosition && (
+              <div className="bg-tpotracer-300 rounded-full text-tpotracer-100 glow-text-shadow-sm mt-4 px-6 py-3 text-xl">
+                #{leaderboardPosition} on leaderboard
               </div>
-              <div className="text-gray-400 text-sm mt-2">WPM</div>
-            </div>
-            
-            {/* Username and position */}
-            <div className="flex flex-col items-center mt-2 w-full">
-              <div className="text-xl font-bold text-gray-200 font-mono mb-3">@{username}</div>
-              {leaderboardPosition && (
-                <div className="px-4 py-2 bg-gray-700 rounded-full text-sm text-gray-300 inline-block">
-                  #{leaderboardPosition} on leaderboard
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
         <NewButton 
