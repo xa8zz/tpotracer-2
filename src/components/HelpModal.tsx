@@ -1,12 +1,23 @@
 import React, { useEffect } from 'react';
 import NewButton from './NewButton';
-import logo from '../assets/logosm.png';
 
 interface HelpModalProps {
   visible: boolean;
   className?: string;
   onClose: () => void;
 }
+
+// Dimensions constants
+const MODAL_WIDTH = 628;
+const MODAL_HEIGHT = 769;
+const GAME_CONTAINER_HEIGHT = 806;
+const GAME_CONTAINER_VH = 80;
+
+// Helper to calculate percentage
+const pct = (val: number, total: number) => `${(val / total) * 100}%`;
+const pctW = (val: number) => pct(val, MODAL_WIDTH);
+const pctH = (val: number) => pct(val, MODAL_HEIGHT);
+const cqw = (val: number) => `${(val / MODAL_WIDTH) * 100}cqw`;
 
 const HelpModal: React.FC<HelpModalProps> = ({
   visible,
@@ -41,22 +52,55 @@ const HelpModal: React.FC<HelpModalProps> = ({
       <div
         className={`help-modal ${className}`}
         onClick={(e) => e.stopPropagation()}
+        style={{
+          height: `calc(${GAME_CONTAINER_VH}vh * ${MODAL_HEIGHT} / ${GAME_CONTAINER_HEIGHT})`,
+          width: 'auto',
+          aspectRatio: `${MODAL_WIDTH} / ${MODAL_HEIGHT}`,
+          backgroundSize: '100% 100%',
+          containerType: 'size',
+        }}
       >
-        <div className="relative w-full h-full rounded-[51px] p-[30px]">
+        <div className="relative w-full h-full">
           <NewButton
             size="circle"
-            className="absolute top-[30px] left-[29px] dark-text-shadow-sm"
+            className="absolute dark-text-shadow-sm"
             onClick={onClose}
+            style={{
+              top: pctH(30),
+              left: pctW(29),
+              width: pctW(49),
+              height: pctH(49),
+              fontSize: cqw(24),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 1,
+            }}
           >
             x
           </NewButton>
           <span
-            className="absolute top-[121px] left-[40px] text-4xl font-ptclean text-white"
-            style={{ textShadow: '0 0 1px #fff' }}
+            className="absolute font-ptclean text-white"
+            style={{ 
+              top: pctH(121),
+              left: pctW(40),
+              fontSize: cqw(36), // text-4xl approx 36px
+              textShadow: '0 0 1px #fff',
+              lineHeight: 1,
+            }}
           >
             Instructions
           </span>
-          <div className="instructions-text absolute font-ptclean text-2xl dark-text-shadow text-tpotracer-400 left-[40px] right-[30px] top-[184px] leading-[1]">
+          <div 
+            className="instructions-text absolute font-ptclean dark-text-shadow text-tpotracer-400"
+            style={{
+              top: pctH(184),
+              left: pctW(40),
+              right: pctW(30),
+              fontSize: cqw(24), // text-2xl approx 24px
+              lineHeight: 1.1,
+            }}
+          >
             <p>tpotracer is a 1-week speed typing competition for X (Twitter) users. Your goal is to climb to the top of the leaderboard.</p>
             <br />
             <p>Enter your X username, then type the 10 displayed words as quickly as possible.</p>
@@ -66,12 +110,27 @@ const HelpModal: React.FC<HelpModalProps> = ({
             <p>Only your highest score is considered in the leaderboard.</p>
           </div>
           <span
-            className="absolute top-[558px] left-[40px] text-4xl font-ptclean text-white"
-            style={{ textShadow: '0 0 1px #fff' }}
+            className="absolute font-ptclean text-white"
+            style={{ 
+              top: pctH(558),
+              left: pctW(40),
+              fontSize: cqw(36), // text-4xl
+              textShadow: '0 0 1px #fff',
+              lineHeight: 1,
+            }}
           >
           Found a bug?
           </span>
-          <div className="instructions-text absolute font-ptclean text-2xl dark-text-shadow text-tpotracer-400 left-[40px] right-[30px] top-[620px] leading-[1]">
+          <div 
+            className="instructions-text absolute font-ptclean dark-text-shadow text-tpotracer-400"
+            style={{
+              top: pctH(620),
+              left: pctW(40),
+              right: pctW(30),
+              fontSize: cqw(24), // text-2xl
+              lineHeight: 1.1,
+            }}
+          >
             Reach out to <a
               href="https://x.com/marcusquest"
               target="_blank"
@@ -90,4 +149,4 @@ const HelpModal: React.FC<HelpModalProps> = ({
   );
 };
 
-export default HelpModal; 
+export default HelpModal;

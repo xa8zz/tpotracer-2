@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
 import NewButton from './NewButton';
 
 interface SettingsProps {
@@ -9,6 +8,18 @@ interface SettingsProps {
   onClose: () => void;
   onUsernameChange: (username: string) => void;
 }
+
+// Dimensions constants
+const MODAL_WIDTH = 509;
+const MODAL_HEIGHT = 403;
+const GAME_CONTAINER_HEIGHT = 806;
+const GAME_CONTAINER_VH = 80;
+
+// Helper to calculate percentage
+const pct = (val: number, total: number) => `${(val / total) * 100}%`;
+const pctW = (val: number) => pct(val, MODAL_WIDTH);
+const pctH = (val: number) => pct(val, MODAL_HEIGHT);
+const cqw = (val: number) => `${(val / MODAL_WIDTH) * 100}cqw`;
 
 const Settings: React.FC<SettingsProps> = ({
   currentUsername,
@@ -112,45 +123,124 @@ const Settings: React.FC<SettingsProps> = ({
       <div
         className={`new-settings-modal ${className}`}
         onClick={(e) => e.stopPropagation()}
+        style={{
+          // Calculate height proportional to the game container's 80vh
+          height: `calc(${GAME_CONTAINER_VH}vh * ${MODAL_HEIGHT} / ${GAME_CONTAINER_HEIGHT})`,
+          width: 'auto',
+          aspectRatio: `${MODAL_WIDTH} / ${MODAL_HEIGHT}`,
+          backgroundSize: '100% 100%',
+          containerType: 'size',
+        }}
       >
-        <div className="relative w-full h-full rounded-[51px] p-[30px]">
+        <div className="relative w-full h-full">
           <NewButton
             size="circle"
-            className="absolute top-[30px] left-[29px] dark-text-shadow-sm"
+            className="absolute dark-text-shadow-sm"
             onClick={onClose}
+            style={{
+              top: pctH(30),
+              left: pctW(29),
+              width: pctW(49),
+              height: pctH(49),
+              fontSize: cqw(24),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 1,
+            }}
           >
             x
           </NewButton>
           <span 
-            className="absolute top-[110px] left-[50px] font-ptclean dark-text-shadow text-tpotracer-400 text-2xl"
+            className="absolute font-ptclean dark-text-shadow text-tpotracer-400"
+            style={{
+              top: pctH(110),
+              left: pctW(50),
+              fontSize: cqw(24),
+              lineHeight: 1,
+            }}
           >
             What is your X username?
           </span>
           <span 
-            className="absolute top-[166px] left-[58px] font-ptclean dark-text-shadow text-tpotracer-400 text-3xl opacity-30"
+            className="absolute font-ptclean dark-text-shadow text-tpotracer-400 opacity-30"
+            style={{
+              top: pctH(169),
+              left: pctW(58),
+              fontSize: cqw(30),
+              lineHeight: 1,
+            }}
           >
             @
           </span>
           <input 
             type="text"
-            className="absolute top-[162px] left-[46px] h-[42px] w-[285px] p-0 pl-[30px] rounded-[500px] font-ptclean dark-text-shadow text-2xl bg-transparent text-tpotracer-400 text-2xl"
+            className="absolute p-0 rounded-[500px] font-ptclean dark-text-shadow bg-transparent text-tpotracer-400"
             maxLength={15}
             value={username}
             onChange={(e) => sanitizedSetUsername(e.target.value)}
             onKeyDown={handleKeyDown}
+            style={{
+              top: pctH(162),
+              left: pctW(46),
+              height: pctH(42),
+              width: pctW(285),
+              paddingLeft: pctW(30),
+              fontSize: cqw(24),
+              lineHeight: 1,
+            }}
           />
-          <NewButton size="md" className="absolute top-[158px] left-[353px]" onClick={handleSave}>Save</NewButton>
+          <NewButton 
+            size="md" 
+            className="absolute" 
+            onClick={handleSave}
+            style={{
+              top: pctH(158),
+              left: pctW(353),
+              width: pctW(117),
+              height: pctH(49),
+              fontSize: cqw(24),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 1,
+            }}
+          >
+            Save
+          </NewButton>
           <NewButton 
             size="lg" 
-            className="absolute top-[253px] left-[270px]"
+            className="absolute"
             onClick={toggleAudio}
+            style={{
+              top: pctH(253),
+              left: pctW(270),
+              width: pctW(199),
+              height: pctH(49),
+              fontSize: cqw(24),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 1,
+            }}
           >
             {isAudioMuted ? 'Unmute Audio' : 'Mute Audio'}
           </NewButton>
           <NewButton 
             size="lg" 
-            className="absolute top-[253px] left-[43px]"
+            className="absolute"
             onClick={toggleVideo}
+            style={{
+              top: pctH(253),
+              left: pctW(43),
+              width: pctW(199),
+              height: pctH(49),
+              fontSize: cqw(24),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 1,
+            }}
           >
             {isVideoPlaying ? 'Pause Video' : 'Play Video'}
           </NewButton>

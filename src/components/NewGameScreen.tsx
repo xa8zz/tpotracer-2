@@ -7,6 +7,7 @@ import { whenVideoPlaying } from '../utils/youtube';
 import UserAvatar from './UserAvatar';
 import { getBadgeClass } from '../utils/leaderboardUtils';
 import html2canvas from 'html2canvas';
+import sharableBg from '../assets/sharable.png';
 
 interface NewGameScreenProps {
   username: string | null;
@@ -147,6 +148,10 @@ const renderWordsWithProgress = (
 };
 
 const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick }) => {
+  // Game container dimensions (from src/index.css)
+  const CONTAINER_WIDTH = 853;
+  const CONTAINER_HEIGHT = 806;
+  
   const [isFlashing, setIsFlashing] = useState(false);
   const [finishedGameState, setFinishedGameState] = useState<{
     wpm: number;
@@ -232,7 +237,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
       
       const canvas = await html2canvas(shareCardRef.current, {
         scale: 2,
-        backgroundColor: '#1f2937',
+        backgroundColor: null,
         logging: false,
         useCORS: true,
         allowTaint: true,
@@ -256,7 +261,12 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
       const link = document.createElement('a');
       link.download = `tpotracer-${username}-${Math.round(wpm)}wpm.png`;
       link.href = dataUrl;
+      link.style.display = 'none';
+      document.body.appendChild(link);
       link.click();
+      setTimeout(() => {
+        document.body.removeChild(link);
+      }, 100);
     } catch (error) {
       console.error('Error generating image:', error);
       // Make sure to restore styles even on error
@@ -276,116 +286,403 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   return (
     <div className="">
       <div className="game-container relative grow">
-        {highScore && highScore > 0 && (
+        {(highScore && highScore > 0) ? (
           <>
-            <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-2xl top-[88px] left-[89px]">
+            <span 
+              className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100"
+              style={{ 
+                top: `${(88 / CONTAINER_HEIGHT) * 100}%`, 
+                left: `${(89 / CONTAINER_WIDTH) * 100}%`,
+                fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
+                lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
+              }}
+            >
               Best WPM:
             </span>
-            <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold text-6xl top-[110px] left-[107px]">
+            <span 
+              className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold"
+              style={{ 
+                top: `${(114 / CONTAINER_HEIGHT) * 100}%`, 
+                left: `${(107 / CONTAINER_WIDTH) * 100}%`,
+                fontSize: `${(60 / CONTAINER_HEIGHT) * 100}cqh`,
+                lineHeight: '1'
+              }}
+            >
               {renderPaddedNumber(highScore)}
             </span>
           </>
-        )}
+        ) : null}
         {/* Rank in the right circle (matching Best WPM style) */}
-        <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-2xl top-[83px] left-[284px]">
-          Rank:
-        </span>
-        <span className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold text-6xl top-[105px] left-[290px]">
-          {leaderboardPosition ? `#${leaderboardPosition}` : '--'}
-        </span>
+        {leaderboardPosition ? (
+          <>
+            <span 
+              className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100"
+              style={{ 
+                top: `${(66 / CONTAINER_HEIGHT) * 100}%`, 
+                left: `${(278 / CONTAINER_WIDTH) * 100}%`,
+                fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
+                lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
+              }}
+            >
+              Rank:
+            </span>
+            <span 
+              className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold"
+              style={{ 
+                top: `${(92 / CONTAINER_HEIGHT) * 100}%`, 
+                left: `${(300 / CONTAINER_WIDTH) * 100}%`,
+                fontSize: `${(
+                  (leaderboardPosition >= 100 ? 39 : 55) 
+                  / CONTAINER_HEIGHT
+                ) * 100}cqh`,
+                lineHeight: '1'
+              }}
+            >
+              {leaderboardPosition}
+            </span>
+          </>
+        ) : null}
         <a
           href={`https://x.com/${username}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute w-[40px] h-[40px] top-[21px] left-[460px]"
+          className="absolute"
+          style={{ 
+            width: `${(40 / CONTAINER_WIDTH) * 100}%`, 
+            height: `${(40 / CONTAINER_HEIGHT) * 100}%`,
+            top: `${(21 / CONTAINER_HEIGHT) * 100}%`, 
+            left: `${(460 / CONTAINER_WIDTH) * 100}%` 
+          }}
         >
           <UserAvatar 
             username={username}
-            className="rounded-[400px] w-[40px] h-[40px]"
+            className="rounded-[400px] w-full h-full"
           />
         </a>
         <a 
           href={`https://x.com/${username}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 text-3xl top-[25px] left-[510px] hover:underline"
+          className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 hover:underline"
+          style={{ 
+            top: `${(25 / CONTAINER_HEIGHT) * 100}%`, 
+            left: `${(510 / CONTAINER_WIDTH) * 100}%`,
+            fontSize: `${(30 / CONTAINER_HEIGHT) * 100}cqh`,
+            lineHeight: `${(36 / CONTAINER_HEIGHT) * 100}cqh`
+          }}
         >
           @{username}
         </a>
-        <NewButton className="absolute top-[105px] left-[410px]" onClick={handleStartNewGame}>
+        <NewButton 
+          className="absolute" 
+          style={{ 
+            top: `${(105 / CONTAINER_HEIGHT) * 100}%`, 
+            left: `${(410 / CONTAINER_WIDTH) * 100}%`,
+            width: `${(181 / CONTAINER_WIDTH) * 100}%`,
+            height: `${(63 / CONTAINER_HEIGHT) * 100}%`,
+            fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
+            lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
+          }}
+          onClick={handleStartNewGame}
+        >
           Retry (Tab)
         </NewButton>
-        <NewButton className="absolute top-[105px] left-[580px]" onClick={onSettingsClick}>
+        <NewButton 
+          className="absolute" 
+          style={{ 
+            top: `${(105 / CONTAINER_HEIGHT) * 100}%`, 
+            left: `${(580 / CONTAINER_WIDTH) * 100}%`,
+            width: `${(181 / CONTAINER_WIDTH) * 100}%`,
+            height: `${(63 / CONTAINER_HEIGHT) * 100}%`,
+            fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
+            lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
+          }}
+          onClick={onSettingsClick}
+        >
           Settings
         </NewButton>
-        <NewButton size="circle" className="absolute top-[112px] left-[777px] dark-text-shadow-sm" onClick={toggleHelp}>?</NewButton>
-        <div className={`game-finished-screen absolute top-[306px] left-[243px] rounded-[2px] w-[464px] h-[200px] text-tpotracer-400 ${gameState === 'completed' ? 'tr-visible' : ''}`}>
+        <NewButton 
+          size="circle" 
+          className="absolute dark-text-shadow-sm" 
+          style={{ 
+            top: `${(112 / CONTAINER_HEIGHT) * 100}%`, 
+            left: `${(777 / CONTAINER_WIDTH) * 100}%`,
+            width: `${(49 / CONTAINER_WIDTH) * 100}%`,
+            height: `${(49 / CONTAINER_HEIGHT) * 100}%`,
+            fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
+            lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
+          }}
+          onClick={toggleHelp}
+        >
+          ?
+        </NewButton>
+        <div 
+          className={`game-finished-screen absolute rounded-[2px] text-tpotracer-400 ${gameState === 'completed' ? 'tr-visible' : ''}`}
+          style={{ 
+            top: `${(306 / CONTAINER_HEIGHT) * 100}%`, 
+            left: `${(243 / CONTAINER_WIDTH) * 100}%`,
+            width: `${(464 / CONTAINER_WIDTH) * 100}%`, 
+            height: `${(200 / CONTAINER_HEIGHT) * 100}%` 
+          }}
+        >
           {statsForFinishedScreen && (
             <div className="relative w-full h-full">
               <div className="game-finished-screen-bg absolute inset-0 z-0"></div>
-              <div className="absolute inset-0 z-10 flex flex-col justify-center px-[20px] gap-3 font-ptclean">
-                <h2 className="text-3xl text-tpotracer-100 glow-text-shadow-sm">
+              <div 
+                className="absolute inset-0 z-10 flex flex-col justify-center font-ptclean"
+                style={{ 
+                  paddingLeft: `${(20 / CONTAINER_WIDTH) * 100}cqw`, 
+                  paddingRight: `${(20 / CONTAINER_WIDTH) * 100}cqw`,
+                  gap: `${(12 / CONTAINER_HEIGHT) * 100}cqh` 
+                }}
+              >
+                <h2 
+                  className="text-tpotracer-100 glow-text-shadow-sm"
+                  style={{ 
+                    fontSize: `${(30 / CONTAINER_HEIGHT) * 100}cqh`,
+                    lineHeight: `${(36 / CONTAINER_HEIGHT) * 100}cqh`
+                  }}
+                >
                   {statsForFinishedScreen.isNewHighScore ? "NEW BEST WPM!" : "GAME COMPLETE!"}
                 </h2>
-                <div className="flex items-end gap-5">
-                  <div className={`font-bold px-[18px] py-[8px] rounded-[8px] flex items-center justify-center w-[110px] ${isFlashing ? 'tr-flashing' : 'bg-tpotracer-300 text-tpotracer-100 tpotracer-300-shadow-sm glow-text-shadow-sm'}`}>
-                    <span className="text-6xl">
+                <div 
+                  className="flex items-end"
+                  style={{ gap: `${(20 / CONTAINER_WIDTH) * 100}cqw` }}
+                >
+                  <div 
+                    className={`font-bold flex items-center justify-center ${isFlashing ? 'tr-flashing' : 'bg-tpotracer-300 text-tpotracer-100 tpotracer-300-shadow-sm glow-text-shadow-sm'}`}
+                    style={{ 
+                      width: `${(110 / CONTAINER_WIDTH) * 100}cqw`, 
+                      paddingLeft: `${(18 / CONTAINER_WIDTH) * 100}cqw`, 
+                      paddingRight: `${(18 / CONTAINER_WIDTH) * 100}cqw`,
+                      paddingTop: `${(8 / CONTAINER_HEIGHT) * 100}cqh`,
+                      paddingBottom: `${(8 / CONTAINER_HEIGHT) * 100}cqh`,
+                      borderRadius: `${(8 / CONTAINER_HEIGHT) * 100}cqh`
+                    }}
+                  >
+                    <span style={{ 
+                      fontSize: `${(60 / CONTAINER_HEIGHT) * 100}cqh`,
+                      lineHeight: '1'
+                    }}>
                       {renderPaddedNumber(statsForFinishedScreen.wpm)}
                     </span>
                   </div>
-                  <div className="flex flex-col text-3xl gap-1">
-                    <div className="flex items-center gap-2">
+                  <div 
+                    className="flex flex-col"
+                    style={{ 
+                      fontSize: `${(30 / CONTAINER_HEIGHT) * 100}cqh`,
+                      lineHeight: `${(36 / CONTAINER_HEIGHT) * 100}cqh`,
+                      gap: `${(4 / CONTAINER_HEIGHT) * 100}cqh`
+                    }}
+                  >
+                    <div 
+                      className="flex items-center"
+                      style={{ gap: `${(8 / CONTAINER_WIDTH) * 100}cqw` }}
+                    >
                       <span className="text-tpotracer-100 glow-text-shadow-sm">RANK:</span>
-                      <span className={`h-[28px] leading-[31px] font-bold px-[10px] rounded-[4px] glow-shadow-sm text-center text-tpotracer-100 glow-text-shadow-sm ${getBadgeClass(statsForFinishedScreen.leaderboardPosition ?? 99)}`}>
+                      <span 
+                        className={`font-bold glow-shadow-sm text-center text-tpotracer-100 glow-text-shadow-sm ${getBadgeClass(statsForFinishedScreen.leaderboardPosition ?? 99)}`}
+                        style={{ 
+                          height: `${(28 / CONTAINER_HEIGHT) * 100}cqh`, 
+                          lineHeight: `${(31 / CONTAINER_HEIGHT) * 100}cqh`,
+                          paddingLeft: `${(10 / CONTAINER_WIDTH) * 100}cqw`, 
+                          paddingRight: `${(10 / CONTAINER_WIDTH) * 100}cqw`,
+                          borderRadius: `${(4 / CONTAINER_HEIGHT) * 100}cqh`
+                        }}
+                      >
                         {statsForFinishedScreen.leaderboardPosition ?? '99'}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div 
+                      className="flex items-center"
+                      style={{ gap: `${(8 / CONTAINER_WIDTH) * 100}cqw` }}
+                    >
                       <span className="text-tpotracer-100 glow-text-shadow-sm">WPM TO BEAT:</span>
-                      <span className="bg-tpotracer-300 text-tpotracer-100 h-[28px] leading-[31px] font-bold px-[10px] rounded-[4px] dark-shadow-sm glow-text-shadow text-center">
+                      <span 
+                        className="bg-tpotracer-300 text-tpotracer-100 font-bold dark-shadow-sm glow-text-shadow text-center"
+                        style={{ 
+                          height: `${(28 / CONTAINER_HEIGHT) * 100}cqh`, 
+                          lineHeight: `${(31 / CONTAINER_HEIGHT) * 100}cqh`,
+                          paddingLeft: `${(10 / CONTAINER_WIDTH) * 100}cqw`, 
+                          paddingRight: `${(10 / CONTAINER_WIDTH) * 100}cqw`,
+                          borderRadius: `${(4 / CONTAINER_HEIGHT) * 100}cqh`
+                        }}
+                      >
                         {renderPaddedNumber(statsForFinishedScreen.wpm + 5)}
                       </span>
                     </div>
                   </div>
                 </div>
-                <p className="text-2xl mt-[10px] text-tpotracer-100 glow-text-shadow-sm">Press Tab, or click Retry, to try again.</p>
+                <p 
+                  className="text-tpotracer-100 glow-text-shadow-sm"
+                  style={{ 
+                    fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
+                    lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`,
+                    marginTop: `${(10 / CONTAINER_HEIGHT) * 100}cqh`
+                  }}
+                >
+                  Press Tab, or click Retry, to try again.
+                </p>
               </div>
             </div>
           )}
         </div>
-        <div className="inner-screen absolute top-[212px] left-[241px] w-[471px] h-[336px] rounded-[49px] flex flex-col p-[30px]">
+        <div 
+          className="inner-screen absolute rounded-[49px] flex flex-col"
+          style={{ 
+            top: `${(212 / CONTAINER_HEIGHT) * 100}%`, 
+            left: `${(241 / CONTAINER_WIDTH) * 100}%`,
+            width: `${(471 / CONTAINER_WIDTH) * 100}%`, 
+            height: `${(336 / CONTAINER_HEIGHT) * 100}%`,
+            paddingTop: `${(30 / CONTAINER_HEIGHT) * 100}cqh`,
+            paddingBottom: `${(30 / CONTAINER_HEIGHT) * 100}cqh`,
+            paddingLeft: `${(30 / CONTAINER_WIDTH) * 100}cqw`,
+            paddingRight: `${(30 / CONTAINER_WIDTH) * 100}cqw`
+          }}
+        >
           <div className="badge-row">
-            <ul className="flex gap-[20px]">
-              <li className="font-ptclean glow-text-shadow-sm text-2xl text-tpotracer-100">
+            <ul 
+              className="flex"
+              style={{ gap: `${(20 / CONTAINER_WIDTH) * 100}cqw` }}
+            >
+              <li 
+                className="font-ptclean glow-text-shadow-sm text-tpotracer-100"
+                style={{ 
+                  fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
+                  lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
+                }}
+              >
                 {"WPM: "}
-                <span className="bg-tpotracer-100 text-tpotracer-400 font-bold px-[10px] pt-[2px] rounded-[4px] glow-shadow-sm dark-text-shadow">{renderPaddedNumber(wpm)}</span>
+                <span 
+                  className="bg-tpotracer-100 text-tpotracer-400 font-bold rounded-[4px] glow-shadow-sm dark-text-shadow"
+                  style={{ 
+                    paddingLeft: `${(10 / CONTAINER_WIDTH) * 100}cqw`, 
+                    paddingRight: `${(10 / CONTAINER_WIDTH) * 100}cqw`,
+                    paddingTop: `${(2 / CONTAINER_HEIGHT) * 100}cqh`
+                  }}
+                >
+                  {renderPaddedNumber(wpm)}
+                </span>
               </li>
-              <li className="font-ptclean glow-text-shadow-sm text-2xl text-tpotracer-100">
+              <li 
+                className="font-ptclean glow-text-shadow-sm text-tpotracer-100"
+                style={{ 
+                  fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
+                  lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
+                }}
+              >
                 {"RAW: "}
-                <span className="bg-tpotracer-100 text-tpotracer-400 font-bold px-[10px] pt-[2px] rounded-[4px] glow-shadow-sm dark-text-shadow">{renderPaddedNumber(rawWpm)}</span>
+                <span 
+                  className="bg-tpotracer-100 text-tpotracer-400 font-bold rounded-[4px] glow-shadow-sm dark-text-shadow"
+                  style={{ 
+                    paddingLeft: `${(10 / CONTAINER_WIDTH) * 100}cqw`, 
+                    paddingRight: `${(10 / CONTAINER_WIDTH) * 100}cqw`,
+                    paddingTop: `${(2 / CONTAINER_HEIGHT) * 100}cqh`
+                  }}
+                >
+                  {renderPaddedNumber(rawWpm)}
+                </span>
               </li>
-              <li className="font-ptclean glow-text-shadow-sm text-2xl text-tpotracer-100">
+              <li 
+                className="font-ptclean glow-text-shadow-sm text-tpotracer-100"
+                style={{ 
+                  fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
+                  lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
+                }}
+              >
                 {"ACC: "}
-                <span className="bg-tpotracer-100 text-tpotracer-400 font-bold px-[10px] pt-[2px] rounded-[4px] glow-shadow-sm dark-text-shadow">{Math.round(accuracy)}%</span>
+                <span 
+                  className="bg-tpotracer-100 text-tpotracer-400 font-bold rounded-[4px] glow-shadow-sm dark-text-shadow"
+                  style={{ 
+                    paddingLeft: `${(10 / CONTAINER_WIDTH) * 100}cqw`, 
+                    paddingRight: `${(10 / CONTAINER_WIDTH) * 100}cqw`,
+                    paddingTop: `${(2 / CONTAINER_HEIGHT) * 100}cqh`
+                  }}
+                >
+                  {Math.round(accuracy)}%
+                </span>
               </li>
             </ul>
           </div>
-          <div className="grow mt-[20px] flex justify-center">
-          <div className={`wordlist font-ptclean content-center glow-text-shadow-sm text-tpotracer-100 text-5xl mt-[20px] flex flex-wrap items-start gap-x-5${gameState !== 'completed' ? ' tr-visible' : ''}`}>
-            {renderWordsWithProgress(words, currentWordIndex, typedText, typedHistory, cursorRef)}
-          </div>
+          <div 
+            className="grow flex justify-center"
+            style={{ marginTop: `${(20 / CONTAINER_HEIGHT) * 100}cqh` }}
+          >
+            <div 
+              className={`wordlist font-ptclean content-center glow-text-shadow-sm text-tpotracer-100 flex flex-wrap items-start${gameState !== 'completed' ? ' tr-visible' : ''}`}
+              style={{ 
+                fontSize: `${(48 / CONTAINER_HEIGHT) * 100}cqh`,
+                lineHeight: '1',
+                marginTop: `${(20 / CONTAINER_HEIGHT) * 100}cqh`,
+                columnGap: `${(20 / CONTAINER_WIDTH) * 100}cqw`
+              }}
+            >
+              {renderWordsWithProgress(words, currentWordIndex, typedText, typedHistory, cursorRef)}
+            </div>
           </div>
         </div>
-        <div className="share-preview absolute top-[593px] left-[155px] w-[277px] h-[188px] rounded-[29px] overflow-hidden bg-gray-800">
+        <div 
+          className="share-preview absolute overflow-hidden"
+          style={{ 
+            top: `${(592 / CONTAINER_HEIGHT) * 100}%`, 
+            left: `${(155 / CONTAINER_WIDTH) * 100}%`,
+            width: `${(277 / CONTAINER_WIDTH) * 100}%`, 
+            height: `${(189 / CONTAINER_HEIGHT) * 100}%`,
+            borderRadius: `${(29 / CONTAINER_HEIGHT) * 100}cqh`,
+            backgroundImage: `url(${sharableBg})`,
+            backgroundSize: '120%',
+            backgroundPosition: 'center',
+            boxShadow: `inset 0 0 ${(3 / CONTAINER_HEIGHT) * 100}cqh ${(1 / CONTAINER_HEIGHT) * 100}cqh #03223F, 0 0 ${(3 / CONTAINER_HEIGHT) * 100}cqh ${(2 / CONTAINER_HEIGHT) * 100}cqh #03223F`
+          }}
+        >
           {/* Live preview of share card */}
-          <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center">
-            <p className="text-gray-400 text-[8px] mb-1">tpotracer.com</p>
-            <div className="text-3xl font-bold text-tpotracer-100 font-mono glow-text-shadow-sm">
-              {Math.round(wpm)} <span className="text-sm">WPM</span>
+          <div 
+            className="w-full h-full flex flex-col items-center justify-center text-center"
+            style={{ 
+              paddingTop: `${(12 / CONTAINER_HEIGHT) * 100}cqh`,
+              paddingBottom: `${(12 / CONTAINER_HEIGHT) * 100}cqh`,
+              paddingLeft: `${(12 / CONTAINER_WIDTH) * 100}cqw`,
+              paddingRight: `${(12 / CONTAINER_WIDTH) * 100}cqw`
+            }}
+          >
+            <p 
+              className="text-tpotracer-100 mb-1 glow-text-shadow-sm"
+              style={{ fontSize: `${(8 / CONTAINER_HEIGHT) * 100}cqh` }}
+            >
+              tpotracer.com
+            </p>
+            <div 
+              className="font-bold text-tpotracer-100 font-mono glow-text-shadow-sm"
+              style={{ 
+                fontSize: `${(30 / CONTAINER_HEIGHT) * 100}cqh`,
+                lineHeight: `${(36 / CONTAINER_HEIGHT) * 100}cqh`
+              }}
+            >
+              {Math.round(wpm)} <span style={{ 
+                fontSize: `${(14 / CONTAINER_HEIGHT) * 100}cqh`,
+                lineHeight: `${(20 / CONTAINER_HEIGHT) * 100}cqh`
+              }}>WPM</span>
             </div>
-            <div className="text-sm text-tpotracer-100 font-mono mt-1 glow-text-shadow-sm">@{username}</div>
+            <div 
+              className="text-tpotracer-100 font-mono mt-1 glow-text-shadow-sm"
+              style={{ 
+                fontSize: `${(14 / CONTAINER_HEIGHT) * 100}cqh`,
+                lineHeight: `${(20 / CONTAINER_HEIGHT) * 100}cqh`
+              }}
+            >
+              @{username}
+            </div>
             {leaderboardPosition && (
-              <div className="px-2 py-1 bg-tpotracer-300 rounded-full text-[10px] text-tpotracer-100 mt-2">
+              <div 
+                className="bg-tpotracer-300 rounded-full text-tpotracer-100 glow-text-shadow-sm mt-2"
+                style={{ 
+                  paddingLeft: `${(8 / CONTAINER_WIDTH) * 100}cqw`,
+                  paddingRight: `${(8 / CONTAINER_WIDTH) * 100}cqw`,
+                  paddingTop: `${(4 / CONTAINER_HEIGHT) * 100}cqh`,
+                  paddingBottom: `${(4 / CONTAINER_HEIGHT) * 100}cqh`,
+                  fontSize: `${(10 / CONTAINER_HEIGHT) * 100}cqh`
+                }}
+              >
                 #{leaderboardPosition} on leaderboard
               </div>
             )}
@@ -394,62 +691,59 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         {/* Hidden share card for image generation */}
         <div 
           ref={shareCardRef}
-          className="absolute -left-[9999px] pointer-events-none"
-          style={{ width: '500px', background: '#1f2937', opacity: 0, visibility: 'hidden' }}
+          className="absolute -left-[9999px] pointer-events-none overflow-hidden"
+          style={{ 
+            width: '1035px',
+            height: '754px',
+            backgroundImage: `url(${sharableBg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            borderRadius: '29px',
+            opacity: 0, 
+            visibility: 'hidden' 
+          }}
         >
-          <div className="p-6 flex flex-col items-center">
-            {/* Card header with attribution */}
-            <div className="w-full text-center mb-6">
-              <p className="text-gray-400 text-sm">
-                tpotracer.com made by{' '}
-                <a 
-                  href="https://x.com/marcusquest" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:underline"
-                >
-                  @marcusquest
-                </a>
-                {' '}and{' '}
-                <a 
-                  href="https://x.com/sensho" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:underline"
-                >
-                  @sensho
-                </a>
-              </p>
+          <div className="w-full h-full flex flex-col items-center justify-center text-center p-12">
+            <p className="text-tpotracer-100 mb-2 glow-text-shadow-sm text-lg">
+              tpotracer.com
+            </p>
+            <div className="font-bold text-tpotracer-100 font-mono glow-text-shadow-sm text-7xl leading-tight">
+              {Math.round(wpm)} <span className="text-3xl">WPM</span>
             </div>
-            
-            {/* Card logo/placeholder */}
-            <div className="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mb-6">
-              <span className="text-xl font-bold text-gray-300">TPO</span>
+            <div className="text-tpotracer-100 font-mono mt-2 glow-text-shadow-sm text-3xl">
+              @{username}
             </div>
-            
-            {/* User stats */}
-            <div className="flex flex-col items-center mb-6">
-              <div className="text-6xl font-bold text-blue-500 font-mono leading-none">
-                {Math.round(wpm)}
+            {leaderboardPosition && (
+              <div className="bg-tpotracer-300 rounded-full text-tpotracer-100 glow-text-shadow-sm mt-4 px-6 py-3 text-xl">
+                #{leaderboardPosition} on leaderboard
               </div>
-              <div className="text-gray-400 text-sm mt-2">WPM</div>
-            </div>
-            
-            {/* Username and position */}
-            <div className="flex flex-col items-center mt-2 w-full">
-              <div className="text-xl font-bold text-gray-200 font-mono mb-3">@{username}</div>
-              {leaderboardPosition && (
-                <div className="px-4 py-2 bg-gray-700 rounded-full text-sm text-gray-300 inline-block">
-                  #{leaderboardPosition} on leaderboard
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
-        <NewButton className="absolute top-[590px] left-[455px]" onClick={handleDownloadShareImage}>
+        <NewButton 
+          className="absolute" 
+          style={{ 
+            top: `${(590 / CONTAINER_HEIGHT) * 100}%`, 
+            left: `${(455 / CONTAINER_WIDTH) * 100}%`,
+            width: `${(181 / CONTAINER_WIDTH) * 100}%`,
+            height: `${(63 / CONTAINER_HEIGHT) * 100}%`,
+            fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`
+          }}
+          onClick={handleDownloadShareImage}
+        >
           Share Image
         </NewButton>
-        <NewButton className="absolute top-[590px] left-[624px]" onClick={handleShareToX}>
+        <NewButton 
+          className="absolute" 
+          style={{ 
+            top: `${(590 / CONTAINER_HEIGHT) * 100}%`, 
+            left: `${(624 / CONTAINER_WIDTH) * 100}%`,
+            width: `${(181 / CONTAINER_WIDTH) * 100}%`,
+            height: `${(63 / CONTAINER_HEIGHT) * 100}%`,
+            fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`
+          }}
+          onClick={handleShareToX}
+        >
           Share on X
         </NewButton>
         
