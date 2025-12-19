@@ -297,7 +297,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             <span 
               className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold"
               style={{ 
-                top: `${(110 / CONTAINER_HEIGHT) * 100}%`, 
+                top: `${(114 / CONTAINER_HEIGHT) * 100}%`, 
                 left: `${(107 / CONTAINER_WIDTH) * 100}%`,
                 fontSize: `${(60 / CONTAINER_HEIGHT) * 100}cqh`,
                 lineHeight: '1'
@@ -313,7 +313,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             <span 
               className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100"
               style={{ 
-                top: `${(70 / CONTAINER_HEIGHT) * 100}%`, 
+                top: `${(66 / CONTAINER_HEIGHT) * 100}%`, 
                 left: `${(278 / CONTAINER_WIDTH) * 100}%`,
                 fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
                 lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
@@ -327,13 +327,13 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                 top: `${(92 / CONTAINER_HEIGHT) * 100}%`, 
                 left: `${(300 / CONTAINER_WIDTH) * 100}%`,
                 fontSize: `${(
-                  (leaderboardPosition >= 100 ? 44 : 60) 
+                  (leaderboardPosition >= 100 ? 39 : 55) 
                   / CONTAINER_HEIGHT
                 ) * 100}cqh`,
                 lineHeight: '1'
               }}
             >
-              #{leaderboardPosition}
+              {leaderboardPosition}
             </span>
           </>
         ) : null}
@@ -641,7 +641,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             }}
           >
             <p 
-              className="text-gray-400 mb-1"
+              className="text-tpotracer-100 mb-1 glow-text-shadow-sm"
               style={{ fontSize: `${(8 / CONTAINER_HEIGHT) * 100}cqh` }}
             >
               tpotracer.com
