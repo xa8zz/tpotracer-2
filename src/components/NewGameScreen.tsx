@@ -280,7 +280,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   return (
     <div className="">
       <div className="game-container relative grow">
-        {highScore && highScore > 0 && (
+        {(highScore && highScore > 0) ? (
           <>
             <span 
               className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100"
@@ -305,7 +305,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
               {renderPaddedNumber(highScore)}
             </span>
           </>
-        )}
+        ) : null}
         {/* Rank in the right circle (matching Best WPM style) */}
         <span 
           className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100"
