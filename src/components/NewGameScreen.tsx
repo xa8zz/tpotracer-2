@@ -7,6 +7,7 @@ import { whenVideoPlaying } from '../utils/youtube';
 import UserAvatar from './UserAvatar';
 import { getBadgeClass } from '../utils/leaderboardUtils';
 import html2canvas from 'html2canvas';
+import sharableBg from '../assets/sharable.png';
 
 interface NewGameScreenProps {
   username: string | null;
@@ -236,7 +237,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
       
       const canvas = await html2canvas(shareCardRef.current, {
         scale: 2,
-        backgroundColor: '#1f2937',
+        backgroundColor: null,
         logging: false,
         useCORS: true,
         allowTaint: true,
@@ -307,31 +308,35 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           </>
         ) : null}
         {/* Rank in the right circle (matching Best WPM style) */}
-        <span 
-          className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100"
-          style={{ 
-            top: `${(70 / CONTAINER_HEIGHT) * 100}%`, 
-            left: `${(278 / CONTAINER_WIDTH) * 100}%`,
-            fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
-            lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
-          }}
-        >
-          Rank:
-        </span>
-        <span 
-          className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold"
-          style={{ 
-            top: `${(92 / CONTAINER_HEIGHT) * 100}%`, 
-            left: `${(300 / CONTAINER_WIDTH) * 100}%`,
-            fontSize: `${(
-              ((leaderboardPosition && leaderboardPosition >= 100) ? 44 : 60) 
-              / CONTAINER_HEIGHT
-            ) * 100}cqh`,
-            lineHeight: '1'
-          }}
-        >
-          {leaderboardPosition ? `#${leaderboardPosition}` : '-'}
-        </span>
+        {leaderboardPosition ? (
+          <>
+            <span 
+              className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100"
+              style={{ 
+                top: `${(70 / CONTAINER_HEIGHT) * 100}%`, 
+                left: `${(278 / CONTAINER_WIDTH) * 100}%`,
+                fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
+                lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
+              }}
+            >
+              Rank:
+            </span>
+            <span 
+              className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold"
+              style={{ 
+                top: `${(92 / CONTAINER_HEIGHT) * 100}%`, 
+                left: `${(300 / CONTAINER_WIDTH) * 100}%`,
+                fontSize: `${(
+                  (leaderboardPosition >= 100 ? 44 : 60) 
+                  / CONTAINER_HEIGHT
+                ) * 100}cqh`,
+                lineHeight: '1'
+              }}
+            >
+              #{leaderboardPosition}
+            </span>
+          </>
+        ) : null}
         <a
           href={`https://x.com/${username}`}
           target="_blank"
@@ -612,12 +617,17 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           </div>
         </div>
         <div 
-          className="share-preview absolute rounded-[29px] overflow-hidden bg-gray-800"
+          className="share-preview absolute overflow-hidden"
           style={{ 
-            top: `${(593 / CONTAINER_HEIGHT) * 100}%`, 
+            top: `${(592 / CONTAINER_HEIGHT) * 100}%`, 
             left: `${(155 / CONTAINER_WIDTH) * 100}%`,
             width: `${(277 / CONTAINER_WIDTH) * 100}%`, 
-            height: `${(188 / CONTAINER_HEIGHT) * 100}%` 
+            height: `${(189 / CONTAINER_HEIGHT) * 100}%`,
+            borderRadius: `${(29 / CONTAINER_HEIGHT) * 100}cqh`,
+            backgroundImage: `url(${sharableBg})`,
+            backgroundSize: '120%',
+            backgroundPosition: 'center',
+            boxShadow: `inset 0 0 ${(3 / CONTAINER_HEIGHT) * 100}cqh ${(1 / CONTAINER_HEIGHT) * 100}cqh #03223F, 0 0 ${(3 / CONTAINER_HEIGHT) * 100}cqh ${(2 / CONTAINER_HEIGHT) * 100}cqh #03223F`
           }}
         >
           {/* Live preview of share card */}
@@ -677,7 +687,15 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         <div 
           ref={shareCardRef}
           className="absolute -left-[9999px] pointer-events-none"
-          style={{ width: '500px', background: '#1f2937', opacity: 0, visibility: 'hidden' }}
+          style={{ 
+            width: '500px',
+            backgroundImage: `url(${sharableBg})`,
+            backgroundSize: '120%',
+            backgroundPosition: 'center',
+            boxShadow: 'inset 0 0 3px 1px #03223F, 0 0 3px 2px #03223F',
+            opacity: 0, 
+            visibility: 'hidden' 
+          }}
         >
           <div className="p-6 flex flex-col items-center">
             {/* Card header with attribution */}
