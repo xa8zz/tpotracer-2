@@ -16,7 +16,7 @@ const USER_LOAD_INCREMENT = 12;
 // Leaderboard dimensions constants
 const LB_WIDTH = 500;
 const LB_HEIGHT = 820;
-const LB_CONTAINER_WIDTH = 474; // Match the original CSS width for layout
+const LB_CONTAINER_WIDTH = 474;
 const CONTENT_WIDTH = 380;
 const CONTENT_HEIGHT = 541;
 const HEADER_HEIGHT = 42;
@@ -99,21 +99,26 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
     <div 
       className={`leaderboard-container ${visible ? "tr-visible" : ""}`}
       style={{
-        width: visible ? LB_CONTAINER_WIDTH : CONDENSED_LB_WIDTH,
+        height: visible ? '80vh' : `calc(80vh * ${CONDENSED_LB_HEIGHT} / ${LB_HEIGHT})`,
+        aspectRatio: visible ? `${LB_CONTAINER_WIDTH} / ${LB_HEIGHT}` : `${CONDENSED_LB_WIDTH} / ${CONDENSED_LB_HEIGHT}`,
+        width: 'auto', // Width determined by height + aspect-ratio
+        transition: 'height 0.2s ease, aspect-ratio 0.2s ease',
       }}
     >
       <div 
         className="leaderboard" 
         style={{ 
             width: `${(LB_WIDTH / LB_CONTAINER_WIDTH) * 100}%`,
-            height: 'auto',
-            aspectRatio: `${LB_WIDTH} / ${LB_HEIGHT}`,
+            height: '100%',
             backgroundSize: '100% 100%',
             containerType: 'size',
-            marginLeft: 24,
-            marginTop: -6,
+            marginLeft: `${(24 / LB_CONTAINER_WIDTH) * 100}%`,
+            marginTop: `${(-6 / LB_HEIGHT) * 100}%`,
+            position: 'absolute',
             pointerEvents: visible ? 'auto' : 'none',
+            opacity: visible ? 1 : 0,
             zIndex: 1,
+            transition: 'opacity 0.2s ease',
         }}
       >
         <button 
@@ -292,15 +297,16 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
       <div 
         className="leaderboard-condensed"
         style={{ 
-            width: visible ? pct(CONDENSED_LB_WIDTH, LB_CONTAINER_WIDTH) : '100%',
-            height: 'auto',
-            aspectRatio: `${CONDENSED_LB_WIDTH} / ${CONDENSED_LB_HEIGHT}`,
+            width: '100%',
+            height: '100%',
             backgroundSize: '100% 100%',
             containerType: 'size',
-            marginLeft: 24,
-            marginTop: -6,
+            marginLeft: `${(24 / CONDENSED_LB_WIDTH) * 100}%`,
+            marginTop: `${(-6 / CONDENSED_LB_HEIGHT) * 100}%`,
+            position: 'absolute',
             pointerEvents: visible ? 'none' : 'auto',
             opacity: visible ? 0 : 1,
+            transition: 'opacity 0.2s ease',
         }}
       >
         <NewButton 

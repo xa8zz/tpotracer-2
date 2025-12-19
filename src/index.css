@@ -48,6 +48,7 @@ input:focus {
   container-type: size;
 }
 
+/* being overriden somewhere in NewLeaderboard.tsx */
 .leaderboard {
   width: 500px;
   height: 820px;
