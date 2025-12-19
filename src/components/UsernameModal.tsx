@@ -9,6 +9,18 @@ interface UsernameModalProps {
   onUsernameChange: (username: string) => void;
 }
 
+// Dimensions constants
+const MODAL_WIDTH = 628;
+const MODAL_HEIGHT = 781;
+const GAME_CONTAINER_HEIGHT = 806;
+const GAME_CONTAINER_VH = 80;
+
+// Helper to calculate percentage
+const pct = (val: number, total: number) => `${(val / total) * 100}%`;
+const pctW = (val: number) => pct(val, MODAL_WIDTH);
+const pctH = (val: number) => pct(val, MODAL_HEIGHT);
+const cqw = (val: number) => `${(val / MODAL_WIDTH) * 100}cqw`;
+
 const UsernameModal: React.FC<UsernameModalProps> = ({
   currentUsername,
   visible,
@@ -59,16 +71,50 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
       `}
     >
       <div className="absolute inset-0 w-screen h-screen bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_70%)]"></div>
-      <div className={`username-modal ${className}`}>
-        <div className="relative w-full h-full rounded-[51px] p-[30px]">
-          <img className="absolute top-[-30px] left-[-25px] h-[120px]" src={logo} alt="tpotracer logo" />
+      <div 
+        className={`username-modal ${className}`}
+        style={{
+          height: `calc(${GAME_CONTAINER_VH}vh * ${MODAL_HEIGHT} / ${GAME_CONTAINER_HEIGHT})`,
+          width: 'auto',
+          aspectRatio: `${MODAL_WIDTH} / ${MODAL_HEIGHT}`,
+          backgroundSize: '100% 100%',
+          containerType: 'size',
+        }}
+      >
+        <div className="relative w-full h-full">
+          <img 
+            src={logo} 
+            alt="tpotracer logo"
+            className="absolute"
+            style={{
+              top: pctH(-30),
+              left: pctW(-25),
+              height: pctH(120),
+              width: 'auto',
+            }}
+          />
           <span
-            className="absolute top-[121px] left-[40px] text-4xl font-ptclean text-white"
-            style={{ textShadow: '0 0 1px #fff' }}
+            className="absolute font-ptclean text-white"
+            style={{ 
+              top: pctH(121),
+              left: pctW(40),
+              fontSize: cqw(36), // text-4xl
+              textShadow: '0 0 1px #fff',
+              lineHeight: 1,
+            }}
           >
             Instructions
           </span>
-          <div className="instructions-text absolute font-ptclean text-2xl dark-text-shadow text-tpotracer-400 left-[40px] right-[30px] top-[178px] leading-[1]">
+          <div 
+            className="instructions-text absolute font-ptclean dark-text-shadow text-tpotracer-400"
+            style={{
+              top: pctH(178),
+              left: pctW(40),
+              right: pctW(30),
+              fontSize: cqw(24), // text-2xl
+              lineHeight: 1.1,
+            }}
+          >
           <p>tpotracer is a 1-week speed typing competition for X (Twitter) users. Your goal is to climb to the top of the leaderboard.</p>
           <br />
           <p>Enter your X username, then type the 10 displayed words as quickly as possible.</p>
@@ -78,30 +124,74 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
           <p>Only your highest score is considered in the leaderboard.</p>
           </div>
           <span
-            className="absolute top-[522px] left-[40px] text-4xl font-ptclean text-white"
-            style={{ textShadow: '0 0 1px #fff' }}
+            className="absolute font-ptclean text-white"
+            style={{ 
+              top: pctH(522),
+              left: pctW(40),
+              fontSize: cqw(36), // text-4xl
+              textShadow: '0 0 1px #fff',
+              lineHeight: 1,
+            }}
           >
             Ready to play?
           </span>
           <span 
-            className="absolute top-[581px] left-[40px] font-ptclean dark-text-shadow text-tpotracer-400 text-2xl"
+            className="absolute font-ptclean dark-text-shadow text-tpotracer-400"
+            style={{
+              top: pctH(581),
+              left: pctW(40),
+              fontSize: cqw(24), // text-2xl
+              lineHeight: 1,
+            }}
           >
             Enter your X username below.
           </span>
           <span 
-            className="absolute top-[639px] left-[53px] font-ptclean dark-text-shadow text-tpotracer-400 text-3xl opacity-30"
+            className="absolute font-ptclean dark-text-shadow text-tpotracer-400 opacity-30"
+            style={{
+              top: pctH(642), // 635 + 7 offset as requested
+              left: pctW(53),
+              fontSize: cqw(30), // text-3xl
+              lineHeight: 1,
+            }}
           >
             @
           </span>
           <input 
             type="text"
-            className="absolute top-[635px] left-[41px] h-[42px] w-[285px] p-0 pl-[30px] rounded-[500px] font-ptclean dark-text-shadow text-2xl bg-transparent text-tpotracer-400 text-2xl"
+            className="absolute p-0 rounded-[500px] font-ptclean dark-text-shadow bg-transparent text-tpotracer-400"
             value={username}
             onChange={(e) => sanitizedSetUsername(e.target.value)}
             onKeyDown={handleKeyDown}
             maxLength={15}
+            style={{
+              top: pctH(635),
+              left: pctW(41),
+              height: pctH(42),
+              width: pctW(285),
+              paddingLeft: pctW(30),
+              fontSize: cqw(24),
+              lineHeight: 1,
+            }}
           />
-          <NewButton size="md" className="absolute top-[631px] left-[347px]" onClick={handleSave}>Save</NewButton>
+          <NewButton 
+            size="md" 
+            className="absolute" 
+            onClick={handleSave}
+            style={{
+              top: pctH(631),
+              left: pctW(347),
+              width: pctW(117), // Using pctW(117) to scale proportionally with container width
+              height: pctH(49),
+              fontSize: cqw(24),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 1,
+            }}
+          >
+            Save
+          </NewButton>
         </div>
       </div>
     </div>
