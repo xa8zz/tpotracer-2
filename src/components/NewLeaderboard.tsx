@@ -92,7 +92,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
     }
   }, [isLoadingMore, loadedUsersCount, leaderboardData.length]);
 
-  const [visible, setVisible] = useState(window.innerWidth >= 1600);
+  const [visible, setVisible] = useState(window.innerWidth >= 1020);
   const toggleSetVisible = () => setVisible(!visible);
 
   return (
