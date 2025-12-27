@@ -121,7 +121,7 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
       // Submit score to backend only if it's better than current known best 
       // OR if there is no current known best (highScore is 0)
       if (isNewRecord || highScore === 0) {
-        await submitScore({
+        const result = await submitScore({
           username,
           wpm: finalScores.wpm,
           rawWpm: finalScores.rawWpm, 
@@ -129,6 +129,10 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
           keystrokes,
           words
         });
+        
+        if (result && result.success && result.rank) {
+             setLeaderboardPosition(result.rank);
+        }
       }
       
       // Fetch updated leaderboard to get real rank
@@ -154,18 +158,28 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
     setIsHelpExpanded(!isHelpExpanded);
   };
 
-  // Load high score on mount
+  // Load high score and rank on username change
   useEffect(() => {
+    // Reset state for new user
+    setLeaderboardPosition(null);
+    setIsNewHighScore(false);
+    initializeGame();
+
+    if (!username) {
+      setHighScore(0);
+      return;
+    }
+
+    // Load local high score
     const storedHighScore = localStorage.getItem(`${HIGH_SCORE_KEY}_${username}`);
     if (storedHighScore) {
       setHighScore(parseFloat(storedHighScore));
+    } else {
+      setHighScore(0);
     }
-  }, [username]);
 
-  // Fetch initial rank on mount/username change
-  useEffect(() => {
+    // Fetch initial rank
     const fetchInitialRank = async () => {
-      if (!username) return;
       try {
         const cache = await fetchLeaderboard(false, username); 
         if (cache.userPosition) {

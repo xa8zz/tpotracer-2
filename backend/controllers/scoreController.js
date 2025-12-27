@@ -43,18 +43,51 @@ export const submitScore = async (req, res) => {
 
     // --- Cache Invalidation ---
     // Clear the general leaderboard cache
-    const defaultLeaderboardKey = 'leaderboard:default'; // Consider making limit part of the key if applicable
+    const defaultLeaderboardKey = 'leaderboard:default:20'; // Matching the key used in getLeaderboard
     const deletedLeaderboardCount = cacheService.del(defaultLeaderboardKey);
     console.log(`[Backend] Cleared default leaderboard cache ('${defaultLeaderboardKey}'). Deleted count: ${deletedLeaderboardCount}`);
 
-    // !!! ADDED: Clear the specific user's rank cache !!!
+    // Clear the specific user's rank cache
     const userRankKey = `rank:${username}`;
     const deletedRankCount = cacheService.del(userRankKey);
     console.log(`[Backend] Cleared user rank cache ('${userRankKey}'). Deleted count: ${deletedRankCount}`);
     // -------------------------
 
-    // Respond with the inserted data
-    res.status(201).json(result.rows[0]);
+    // Get the new rank to return immediately
+    const rankQuery = `
+      WITH distinct_user_scores AS (
+        SELECT DISTINCT ON (username) username, wpm, timestamp 
+        FROM scores 
+        ORDER BY username, wpm DESC, timestamp ASC
+      ), ranked_users AS (
+        SELECT username, RANK() OVER (ORDER BY wpm DESC, timestamp ASC) as rank
+        FROM distinct_user_scores
+      )
+      SELECT rank FROM ranked_users WHERE username = $1;
+    `;
+    const rankResult = await db.query(rankQuery, [username]);
+    const newRank = rankResult.rows[0]?.rank ? parseInt(rankResult.rows[0].rank, 10) : null;
+
+    // Get the fresh top 20 leaderboard
+    const leaderboardQuery = `
+      WITH distinct_user_scores AS (
+        SELECT DISTINCT ON (username) username, wpm, timestamp 
+        FROM scores 
+        ORDER BY username, wpm DESC, timestamp ASC
+      )
+      SELECT username, wpm, timestamp 
+      FROM distinct_user_scores 
+      ORDER BY wpm DESC, timestamp ASC
+      LIMIT 20;
+    `;
+    const leaderboardResult = await db.query(leaderboardQuery);
+
+    // Respond with the inserted data, the new rank, and the updated leaderboard
+    res.status(201).json({ 
+      ...result.rows[0], 
+      rank: newRank,
+      leaderboard: leaderboardResult.rows
+    });
 
   } catch (error) {
     console.error('[Backend] Error submitting score:', error); // Log the full error

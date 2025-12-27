@@ -3,7 +3,8 @@ import { LeaderboardEntry } from '../types';
 import {
   fetchLeaderboard,
   getTimeUntilNextRefresh,
-  LEADERBOARD_REFRESH_INTERVAL
+  LEADERBOARD_REFRESH_INTERVAL,
+  subscribe
 } from '../utils/apiService'; // Removed isLeaderboardCacheStale import as it's not directly used here now
 
 interface UseLeaderboardProps {
@@ -58,6 +59,11 @@ export const useLeaderboard = ({ username }: UseLeaderboardProps = { username: n
     // Initial load
     loadLeaderboard();
 
+    // Subscribe to service updates (e.g. from score submission)
+    const unsubscribe = subscribe(() => {
+      loadLeaderboard(false); // Fetch from (now fresh) cache
+    });
+
     // Interval to update the countdown timer display every second
     const timerId = setInterval(() => {
       setState(prev => ({
@@ -73,6 +79,7 @@ export const useLeaderboard = ({ username }: UseLeaderboardProps = { username: n
 
     // Cleanup function to clear intervals when the component unmounts or dependencies change
     return () => {
+      unsubscribe();
       clearInterval(timerId);
       clearInterval(refreshId);
     };
