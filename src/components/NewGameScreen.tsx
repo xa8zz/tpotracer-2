@@ -327,15 +327,17 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
               Rank:
             </span>
             <span 
-              className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold"
+              className="absolute font-ptclean text-right glow-text-shadow-sm text-tpotracer-100 font-bold"
               style={{ 
                 top: `${(92 / CONTAINER_HEIGHT) * 100}%`, 
-                left: `${(300 / CONTAINER_WIDTH) * 100}%`,
+                left: `${(235 / CONTAINER_WIDTH) * 100}%`,
                 fontSize: `${(
                   (leaderboardPosition >= 100 ? 39 : 55) 
                   / CONTAINER_HEIGHT
                 ) * 100}cqh`,
-                lineHeight: '1'
+                lineHeight: '1',
+                display: 'inline-block',
+                width: `${(120 / CONTAINER_WIDTH) * 100}%`,
               }}
             >
               {leaderboardPosition}
