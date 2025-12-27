@@ -48,7 +48,11 @@ export const fetchLeaderboard = async (
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/leaderboard?limit=20`);
+    const headers = {
+      'x-api-key': import.meta.env.VITE_API_KEY
+    };
+
+    const response = await fetch(`${API_BASE_URL}/api/leaderboard?limit=20`, { headers });
     if (!response.ok) throw new Error('Failed to fetch leaderboard');
 
     const data: LeaderboardEntry[] = await response.json();
@@ -60,10 +64,10 @@ export const fetchLeaderboard = async (
         userPosition = index + 1;
       } else {
         try {
-          const userResponse = await fetch(`${API_BASE_URL}/api/leaderboard?search=${encodeURIComponent(username)}&limit=1`);
+          const userResponse = await fetch(`${API_BASE_URL}/api/leaderboard?search=${encodeURIComponent(username)}&limit=1`, { headers });
           if (userResponse.ok) {
-            const userData = await userResponse.json();
-            const countResponse = await fetch(`${API_BASE_URL}/api/rank/${encodeURIComponent(username)}`);
+            await userResponse.json(); // Consume body
+            const countResponse = await fetch(`${API_BASE_URL}/api/rank/${encodeURIComponent(username)}`, { headers });
             if (countResponse.ok) {
               const { rank } = await countResponse.json();
               userPosition = rank;
