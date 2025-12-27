@@ -180,6 +180,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     totalChars,
     highScore,
     isNewHighScore,
+    isRetryingScore,
     showConfetti,
     isHelpExpanded,
     leaderboardPosition,
@@ -523,7 +524,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                     marginTop: `${(10 / CONTAINER_HEIGHT) * 100}cqh`
                   }}
                 >
-                  Press Tab, or click Retry, to try again.
+                  {isRetryingScore ? "Submitting score..." : "Press Tab, or click Retry, to try again."}
                 </p>
               </div>
             </div>

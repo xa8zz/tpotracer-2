@@ -161,7 +161,7 @@ export const submitScore = async (
     if (submitScoreTimeout) clearTimeout(submitScoreTimeout);
     submitScoreTimeout = setTimeout(() => {
       submitScoreTimeout = null;
-    }, 30000); // 30s cooldown
+    }, 2000); // 2s cooldown
 
     await fetchLeaderboard(true, result.username); // refresh with latest result (or use cache if we just updated it)
     return { success: true, rank: data.rank };
