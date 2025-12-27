@@ -73,49 +73,46 @@
         width: 120px;
       }
 
-      #video-container {
+      #video-fallback {
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -2;
-        background-image: url('/background.png');
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+        background-image: url('/background840.png');
         background-size: cover;
         background-position: center;
-        filter: blur(10px) brightness(1.25) contrast(1.25);
-        transition: transform 0.5s ease-in-out;
+        opacity: 1;
+        transition: opacity 1s ease-in-out;
+      }
+      
+      @media (min-width: 1200px) {
+        #video-fallback {
+          background-image: url('/background1680.png');
+        }
+      }
+      
+      @media (max-width: 2400px) {
+        #video-fallback {
+          background-image: url('/background3360.png');
+        }
       }
 
-      #video-container.is-loading {
-        transform: scale(1.1);
+      #video-fallback.is-hidden {
+        opacity: 0;
       }
 
       #video {
         position: fixed;
-        top: -25%;
-        left: -25%;
-        width: 150%;
-        height: 150%;
-        z-index: -1;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        z-index: -2;
+        opacity: 1;
         pointer-events: none;
-        transition: opacity 0.5s ease-in-out;
-      }
-
-      #video.is-hidden {
-        opacity: 0;
-      }
-
-      #video-overlay {
-        position: fixed;
-        top: -25%;
-        left: -25%;
-        width: 150%;
-        height: 150%;
-        z-index: -1;
-        pointer-events: none;
-        background-color: #03223F;
-        mix-blend-mode: hue;
       }
 
       /* Mobile Warning Screen */
@@ -186,20 +183,15 @@
     </style>
   </head>
   <body>
-    <div id="video-container" class="is-loading"></div>
-    <iframe
-      id="video"
-      class="is-hidden"
-      width="560"
-      height="315"
-      src="https://www.youtube.com/embed/zyRSaVtEzZ4?si=4wvkfRYB-qTeM6Rx&controls=0&autoplay=1&muted=1&enablejsapi=1&start=74"
-      title="YouTube video player"
-      frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      referrerpolicy="strict-origin-when-cross-origin"
-      allowfullscreen>
-    </iframe>
-    <div id="video-overlay"></div>
+    <div id="video-fallback"></div>
+    <video 
+      id="video" 
+      src="/tr2.mp4" 
+      autoplay 
+      loop 
+      muted 
+      playsinline
+    ></video>
     <div id="mobile-warning">
       <div class="warning-container">
         <div class="warning-icon">⚠</div>
