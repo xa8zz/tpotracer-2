@@ -173,11 +173,11 @@ export const getUserRank = async (req, res) => {
         GROUP BY username
       ), ranked_users AS (
         SELECT
-          username,
-          RANK() OVER (ORDER BY max_wpm DESC, MIN(timestamp) ASC) as rank -- Add timestamp tie-breaker
+          user_max_wpm.username,
+          RANK() OVER (ORDER BY max_wpm DESC, MIN(scores.timestamp) ASC) as rank
         FROM user_max_wpm
         JOIN scores ON user_max_wpm.username = scores.username AND user_max_wpm.max_wpm = scores.wpm
-        GROUP BY user_max_wpm.username, user_max_wpm.max_wpm -- Ensure grouping if MAX appears multiple times
+        GROUP BY user_max_wpm.username, user_max_wpm.max_wpm
       )
       SELECT rank FROM ranked_users
       WHERE username = $1;
