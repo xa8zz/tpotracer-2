@@ -12,15 +12,11 @@ interface NewAppProps {
 }
 
 function NewApp({ onReady }: NewAppProps) {
-  const [username, setUsernameSt] = useState<string | null>(null);
+  const [username, setUsernameSt] = useState<string | null>(() => getUsername());
 
   useEffect(() => {
     // Signal that the app is mounted and ready
     onReady();
-
-    // Load username from local storage
-    const storedUsername = getUsername();
-    setUsernameSt(storedUsername);
 
     (window as any)._debugRemoveUsername = function() {
       setUsernameSt(null);

@@ -3,7 +3,6 @@ import NewButton from './NewButton';
 import Cursor from './Cursor';
 import { useGameContext } from '../contexts/GameContext';
 import { preloadGameAssets } from '../utils/preloadAssets';
-import { whenVideoPlaying } from '../utils/youtube';
 import UserAvatar from './UserAvatar';
 import { getBadgeClass } from '../utils/leaderboardUtils';
 import html2canvas from 'html2canvas';

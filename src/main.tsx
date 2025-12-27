@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import NewApp from './NewApp.tsx';
 import './index.css';
 import { preloadGameAssets } from './utils/preloadAssets.ts';
-import { whenVideoPlaying } from './utils/youtube.ts';
+import { whenVideoPlaying } from './utils/videoUtils.ts';
 
 const rootElement = document.getElementById('root')!;
 const root = createRoot(rootElement);

@@ -79,25 +79,21 @@ const Settings: React.FC<SettingsProps> = ({
   };
 
   const toggleVideo = () => {
-    const videoIframe = document.getElementById('video') as HTMLIFrameElement;
-    if (videoIframe && videoIframe.contentWindow) {
+    const videoElement = document.getElementById('video') as HTMLVideoElement;
+    if (videoElement) {
       if (isVideoPlaying) {
-        videoIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+        videoElement.pause();
       } else {
-        videoIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        videoElement.play();
       }
       setIsVideoPlaying(!isVideoPlaying);
     }
   };
 
   const toggleAudio = () => {
-    const videoIframe = document.getElementById('video') as HTMLIFrameElement;
-    if (videoIframe && videoIframe.contentWindow) {
-      if (isAudioMuted) {
-        videoIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-      } else {
-        videoIframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
-      }
+    const videoElement = document.getElementById('video') as HTMLVideoElement;
+    if (videoElement) {
+      videoElement.muted = !videoElement.muted;
       setIsAudioMuted(!isAudioMuted);
     }
   };

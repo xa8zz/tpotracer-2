@@ -91,13 +91,13 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
   };
 
   // Handle game completion
-  const handleGameComplete = async () => {
+  const handleGameComplete = async (finalCorrect?: number, finalIncorrect?: number, finalTotal?: number) => {
     if (startTime) {
       const elapsedTimeInMinutes = (Date.now() - startTime) / 1000 / 60;
       const finalScores = calculateScores(
-        correctChars,
-        incorrectChars,
-        totalChars,
+        finalCorrect ?? correctChars,
+        finalIncorrect ?? incorrectChars,
+        finalTotal ?? totalChars,
         elapsedTimeInMinutes
       );
 
@@ -318,20 +318,27 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
         const currentWord = words[currentWordIndex];
         const newTypedText = typedText + e.key;
         
+        // Calculate new stats locally to pass to handleGameComplete if needed
+        let newCorrectChars = correctChars;
+        let newIncorrectChars = incorrectChars;
+        const newTotalChars = totalChars + 1;
+
         // Update character count statistics
         setTotalChars(prev => prev + 1);
         if (newTypedText.length <= currentWord.length && 
             currentWord[newTypedText.length - 1] === e.key) {
           setCorrectChars(prev => prev + 1);
+          newCorrectChars++;
         } else {
           setIncorrectChars(prev => prev + 1);
+          newIncorrectChars++;
         }
 
         setTypedText(newTypedText);
 
-        // Check if word is completed
-        if (newTypedText === currentWord && currentWordIndex === words.length - 1) {
-          handleGameComplete();
+        // Check if word is completed (auto-complete if reached end of word on last word)
+        if (currentWordIndex === words.length - 1 && newTypedText.length === currentWord.length) {
+          handleGameComplete(newCorrectChars, newIncorrectChars, newTotalChars);
         }
       }
     };
