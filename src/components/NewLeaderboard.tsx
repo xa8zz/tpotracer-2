@@ -92,35 +92,19 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
     }
   }, [isLoadingMore, loadedUsersCount, leaderboardData.length]);
 
-  const [visible, setVisible] = useState(window.innerWidth >= 1600);
+  const [visible, setVisible] = useState(window.innerWidth >= 1020);
   const toggleSetVisible = () => setVisible(!visible);
 
   return (
     <div 
       className={`leaderboard-container ${visible ? "tr-visible" : ""}`}
       style={{
+        /* Container size for layout purposes - children use viewport units */
         height: visible ? '80vh' : `calc(80vh * ${CONDENSED_LB_HEIGHT} / ${LB_HEIGHT})`,
-        aspectRatio: visible ? `${LB_CONTAINER_WIDTH} / ${LB_HEIGHT}` : `${CONDENSED_LB_WIDTH} / ${CONDENSED_LB_HEIGHT}`,
-        width: 'auto', // Width determined by height + aspect-ratio
-        transition: 'height 0.2s ease, aspect-ratio 0.2s ease',
+        width: visible ? `calc(80vh * ${LB_CONTAINER_WIDTH} / ${LB_HEIGHT})` : `calc(80vh * ${CONDENSED_LB_WIDTH} / ${LB_HEIGHT})`,
       }}
     >
-      <div 
-        className="leaderboard" 
-        style={{ 
-            width: `${(LB_WIDTH / LB_CONTAINER_WIDTH) * 100}%`,
-            height: '100%',
-            backgroundSize: '100% 100%',
-            containerType: 'size',
-            marginLeft: `${(24 / LB_CONTAINER_WIDTH) * 100}%`,
-            marginTop: `${(-6 / LB_HEIGHT) * 100}%`,
-            position: 'absolute',
-            pointerEvents: visible ? 'auto' : 'none',
-            opacity: visible ? 1 : 0,
-            zIndex: 1,
-            transition: 'opacity 0.2s ease',
-        }}
-      >
+      <div className="leaderboard">
         <button 
             className="absolute" 
             onClick={handleRetry}
@@ -294,21 +278,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
           </div>
         </div>
       </div>
-      <div 
-        className="leaderboard-condensed"
-        style={{ 
-            width: '100%',
-            height: '100%',
-            backgroundSize: '100% 100%',
-            containerType: 'size',
-            marginLeft: `${(24 / CONDENSED_LB_WIDTH) * 100}%`,
-            marginTop: `${(-6 / CONDENSED_LB_HEIGHT) * 100}%`,
-            position: 'absolute',
-            pointerEvents: visible ? 'none' : 'auto',
-            opacity: visible ? 0 : 1,
-            transition: 'opacity 0.2s ease',
-        }}
-      >
+      <div className="leaderboard-condensed">
         <NewButton 
             size="circle" 
             className="absolute dark-text-shadow-sm flex items-center justify-center" 

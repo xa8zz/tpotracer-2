@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { getRandomWords } from '../utils/wordUtils';
 import { calculateScores } from '../utils/scoreUtils';
-import { submitScore } from '../utils/apiService';
+import { submitScore, fetchLeaderboard } from '../utils/apiService';
 import { Keystroke, GameState } from '../types';
 import { useWindowSize } from '../hooks/useWindowSize';
 
@@ -22,6 +22,8 @@ interface GameContextType {
   totalChars: number;
   highScore: number;
   isNewHighScore: boolean;
+  isSubmittingScore: boolean;
+  isRetryingScore: boolean;
   showConfetti: boolean;
   isHelpExpanded: boolean;
   leaderboardPosition: number | null;
@@ -60,6 +62,8 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
   const [totalChars, setTotalChars] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [isNewHighScore, setIsNewHighScore] = useState(false);
+  const [isSubmittingScore, setIsSubmittingScore] = useState(false);
+  const [isRetryingScore, setIsRetryingScore] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [isHelpExpanded, setIsHelpExpanded] = useState(false);
   const [leaderboardPosition, setLeaderboardPosition] = useState<number | null>(null);
@@ -106,8 +110,7 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
       const isNewRecord = finalScores.wpm > highScore;
       
       if (isNewRecord) {
-        // Save new high score
-        localStorage.setItem(`${HIGH_SCORE_KEY}_${username}`, finalScores.wpm.toString());
+        // Optimistically update state (but not localStorage yet)
         setHighScore(finalScores.wpm);
         setIsNewHighScore(true);
         setShowConfetti(true);
@@ -116,41 +119,108 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
         setTimeout(() => {
           setShowConfetti(false);
         }, 5000);
-        
-        // Submit score to backend only if it's a new high score
-        const result = await submitScore({
-          username,
-          wpm: finalScores.wpm,
-          rawWpm: finalScores.rawWpm, 
-          accuracy: finalScores.accuracy,
-          keystrokes,
-          words
-        });
-        
-        // Get leaderboard position after submission
-        // This could be improved by getting the position directly from the API response
-        // For now, we'll just set a fake position as a placeholder
-        setLeaderboardPosition(Math.floor(Math.random() * 50) + 1); // Replace with actual position
       }
+
+      // Submit score to backend only if it's better than current known best 
+      // OR if there is no current known best (highScore is 0)
+      if (isNewRecord || highScore === 0) {
+        setIsSubmittingScore(true);
+        setIsRetryingScore(false);
+        
+        let success = false;
+        let attempts = 0;
+        const maxAttempts = 3; // Initial + 2 retries
+
+        while (!success && attempts < maxAttempts) {
+          attempts++;
+          // Wait a bit before retrying if this isn't the first attempt
+          if (attempts > 1) {
+            setIsRetryingScore(true);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+
+          const result = await submitScore({
+            username,
+            wpm: finalScores.wpm,
+            rawWpm: finalScores.rawWpm, 
+            accuracy: finalScores.accuracy,
+            keystrokes,
+            words
+          });
+          
+          if (result && result.success) {
+            success = true;
+            if (result.rank) {
+                 setLeaderboardPosition(result.rank);
+            }
+            
+            // Save new high score to local storage ONLY on success
+            if (isNewRecord) {
+              localStorage.setItem(`${HIGH_SCORE_KEY}_${username}`, finalScores.wpm.toString());
+            }
+          }
+        }
+        
+        setIsSubmittingScore(false);
+        setIsRetryingScore(false);
+      }
+      
+      // Fetch updated leaderboard to get real rank
+      try {
+        const cache = await fetchLeaderboard(true, username);
+        if (cache.userPosition) {
+           setLeaderboardPosition(cache.userPosition);
+        }
+      } catch (e) {
+        console.error("Failed to update rank after game", e);
+      }
+
     }
   };
 
   // Start a new game
-  const handleStartNewGame = () => {
+  const handleStartNewGame = useCallback(() => {
+    if (isSubmittingScore) return;
     initializeGame();
-  };
+  }, [isSubmittingScore]);
 
   // Toggle help section
   const toggleHelp = () => {
     setIsHelpExpanded(!isHelpExpanded);
   };
 
-  // Load high score on mount
+  // Load high score and rank on username change
   useEffect(() => {
+    // Reset state for new user
+    setLeaderboardPosition(null);
+    setIsNewHighScore(false);
+    initializeGame();
+
+    if (!username) {
+      setHighScore(0);
+      return;
+    }
+
+    // Load local high score
     const storedHighScore = localStorage.getItem(`${HIGH_SCORE_KEY}_${username}`);
     if (storedHighScore) {
       setHighScore(parseFloat(storedHighScore));
+    } else {
+      setHighScore(0);
     }
+
+    // Fetch initial rank
+    const fetchInitialRank = async () => {
+      try {
+        const cache = await fetchLeaderboard(false, username); 
+        if (cache.userPosition) {
+          setLeaderboardPosition(cache.userPosition);
+        }
+      } catch (e) {
+        console.error("Failed to fetch initial rank", e);
+      }
+    };
+    fetchInitialRank();
   }, [username]);
 
   // Initialize on component mount
@@ -271,7 +341,7 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
     return () => {
       window.removeEventListener('keydown', handleGlobalKeyDown);
     };
-  }, [gameState, currentWordIndex, typedText, words]);
+  }, [gameState, currentWordIndex, typedText, words, handleStartNewGame]);
 
   // Calculate WPM in real-time
   useEffect(() => {
@@ -329,6 +399,8 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
     totalChars,
     highScore,
     isNewHighScore,
+    isSubmittingScore,
+    isRetryingScore,
     showConfetti,
     isHelpExpanded,
     leaderboardPosition,

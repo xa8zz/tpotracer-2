@@ -117,6 +117,72 @@
         background-color: #03223F;
         mix-blend-mode: hue;
       }
+
+      /* Mobile Warning Screen */
+      #mobile-warning {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color: #02182D;
+        z-index: 100;
+        font-family: 'ProggyCleanTT', monospace;
+        opacity: 1;
+        transition: opacity 0.2s ease-in-out;
+      }
+
+      #mobile-warning.is-fading {
+        opacity: 0;
+      }
+
+      #mobile-warning .warning-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 1rem;
+        text-align: center;
+      }
+
+      #mobile-warning .warning-icon {
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
+        color: #A7F1FA;
+        text-shadow: 0 0 8px #A7F1FA;
+      }
+
+      #mobile-warning .warning-title {
+        font-size: 1.75rem;
+        color: #A7F1FA;
+        text-shadow: 0 0 2px #A7F1FA;
+        font-weight: 700;
+        margin-bottom: 1rem;
+      }
+
+      #mobile-warning .warning-message {
+        font-size: 1.2rem;
+        color: #A7F1FA;
+        text-shadow: 0 0 2px #A7F1FA;
+        line-height: 1.2;
+        max-width: 320px;
+        margin-bottom: 2rem;
+        opacity: 0.85;
+      }
+
+      #mobile-warning .warning-link {
+        font-size: 1.25rem;
+        color: #A7F1FA;
+        text-shadow: 0 0 4px #A7F1FA;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+      }
+
+      #mobile-warning .warning-link:hover {
+        opacity: 0.7;
+      }
     </style>
   </head>
   <body>
@@ -134,6 +200,16 @@
       allowfullscreen>
     </iframe>
     <div id="video-overlay"></div>
+    <div id="mobile-warning">
+      <div class="warning-container">
+        <div class="warning-icon">⚠</div>
+        <h1 class="warning-title">Mobile Device Detected</h1>
+        <p class="warning-message">
+          tpotracer is only designed for desktop devices. You won't be able to play.
+        </p>
+        <a class="warning-link" onclick="dismissMobileWarning(); return false;">Tap to continue &gt;</a>
+      </div>
+    </div>
     <div id="loader">
       <div class="loader-container">
         <div class="loader-content">
@@ -150,6 +226,30 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
+      // Mobile detection and warning
+      function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+               (window.innerWidth <= 768 && 'ontouchstart' in window);
+      }
+
+      function dismissMobileWarning() {
+        const warning = document.getElementById('mobile-warning');
+        if (warning) {
+          warning.classList.add('is-fading');
+          setTimeout(() => {
+            warning.style.display = 'none';
+          }, 200);
+        }
+      }
+
+      // Show mobile warning if on mobile device
+      if (isMobileDevice()) {
+        const warning = document.getElementById('mobile-warning');
+        if (warning) {
+          warning.style.display = 'block';
+        }
+      }
+
       window._skipLoading = false;
 
       const loaderText = document.getElementById('loader-text');

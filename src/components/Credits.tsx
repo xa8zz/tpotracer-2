@@ -41,29 +41,11 @@ const Credits: React.FC<CreditsProps> = ({ usernameModalVisible }) => {
             <p 
               className={`absolute special-p transition-all duration-300 ease-in-out`}
               style={{
-                bottom: vh(34),
-                left: usernameModalVisible ? vh(4) : vh(190)
-              }}
-            >
-              by <a href="https://x.com/marcusquest" target="_blank" rel="noopener noreferrer" className="underline">@marcusquest</a> & <a href="https://x.com/sensho" target="_blank" rel="noopener noreferrer" className="underline">@sensho</a>
-            </p>
-            <p 
-              className={`absolute special-p transition-all duration-300 ease-in-out`}
-              style={{
-                bottom: vh(18),
-                left: usernameModalVisible ? vh(4) : vh(155)
-              }}
-            >
-              bg: <a href="https://www.youtube.com/watch?v=zyRSaVtEzZ4" target="_blank" rel="noopener noreferrer" className="underline">integra - 2alora</a>
-            </p>
-            <p 
-              className={`absolute special-p transition-all duration-300 ease-in-out`}
-              style={{
                 bottom: vh(2),
                 left: usernameModalVisible ? vh(4) : vh(120)
               }}
             >
-              font: <a href="https://github.com/bluescan/proggyfonts" target="_blank" rel="noopener noreferrer" className="underline">proggy clean</a>
+              by <a href="https://x.com/marcusquest" target="_blank" rel="noopener noreferrer" className="underline">@marcusquest</a>, <a href="https://x.com/sensho" target="_blank" rel="noopener noreferrer" className="underline">@sensho</a> - <a href="/credits.html" target="_blank" rel="noopener noreferrer" className="underline">more info</a>
             </p>
           </div>
         </div>
