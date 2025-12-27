@@ -162,6 +162,22 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
     }
   }, [username]);
 
+  // Fetch initial rank on mount/username change
+  useEffect(() => {
+    const fetchInitialRank = async () => {
+      if (!username) return;
+      try {
+        const cache = await fetchLeaderboard(false, username); 
+        if (cache.userPosition) {
+          setLeaderboardPosition(cache.userPosition);
+        }
+      } catch (e) {
+        console.error("Failed to fetch initial rank", e);
+      }
+    };
+    fetchInitialRank();
+  }, [username]);
+
   // Initialize on component mount
   useEffect(() => {
     initializeGame();
