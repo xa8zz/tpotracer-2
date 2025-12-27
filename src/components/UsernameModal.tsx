@@ -112,7 +112,7 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
               left: pctW(40),
               right: pctW(30),
               fontSize: cqw(24), // text-2xl
-              lineHeight: 1.1,
+              lineHeight: 1,
             }}
           >
           <p>tpotracer is a 1-week speed typing competition for X (Twitter) users. Your goal is to climb to the top of the leaderboard.</p>
