@@ -48,25 +48,13 @@ input:focus {
   container-type: size;
 }
 
-/* being overriden somewhere in NewLeaderboard.tsx */
+/* Leaderboard background images - dimensions controlled in main definitions below */
 .leaderboard {
-  width: 500px;
-  height: 820px;
   background-image: url('./assets/leaderboardfinal.png');
-  background-size: 500px 820px;
-  background-repeat: no-repeat;
-  margin-top: -6px;
-  margin-left: 24px;
 }
 
 .leaderboard-condensed {
-  width: 110px;
-  height: 110px;
   background-image: url('./assets/leaderboardcondensednobuttonfull.png');
-  background-size: 110px 110px;
-  background-repeat: no-repeat;
-  margin-top: -6px;
-  margin-left: 24px;
 }
 
 body {
@@ -204,38 +192,52 @@ body {
   box-shadow: 0 0 4px 1px #03223F;
 }
 
+.stupid-big-ass-container {
+  gap: calc(80vh * 24 / 820);
+}
+
 .leaderboard-container {
   position: relative;
-  width: 110px; /* condensed leaderboard width */
-  transition: opacity 0.2s ease, width 0.2s ease;
+  /* Container animates to reserve layout space, children use viewport units */
+  transition: width 0.2s ease, height 0.2s ease;
 }
 
 .leaderboard-condensed {
-  transition: inherit;
-  position: absolute;
-  top: 7px;
-  left: 5px;
-  z-index: 1;
-}
-
-.leaderboard {
-  opacity: 0;
-  transition: inherit;
+  /* Fixed viewport-relative size - doesn't change with container */
+  width: calc(80vh * 110 / 820);
+  height: calc(80vh * 110 / 820);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  container-type: size;
+  
   position: absolute;
   top: 0;
   left: 0;
+  
+  transition: opacity 0.2s ease;
 }
 
-.leaderboard-container.tr-visible {
-  width: 474px;
-}
-
-.leaderboard-container.tr-visible .leaderboard-condensed {
-  opacity: 1;
+.leaderboard {
+  /* Fixed viewport-relative size - doesn't change with container */
+  width: calc(80vh * 500 / 820);
+  height: 80vh;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  container-type: size;
+  
+  position: absolute;
+  top: calc(80vh * -6 / 820);
+  left: calc(80vh * -6 / 820);
+  z-index: 2; /* Above condensed */
+  
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
 }
 
 .leaderboard-container.tr-visible .leaderboard {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .leaderbaord-table-separator {
