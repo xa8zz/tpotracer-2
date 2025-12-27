@@ -1,8 +1,10 @@
 import { LeaderboardEntry } from '../types';
 
 const LEADERBOARD_KEY = 'tpotracer_leaderboard';
-// December 26, 4 AM PST (UTC-8) = December 27, 12 AM UTC (12:00 UTC)
-const TIME_LIMIT = new Date('2025-12-27T00:00:00Z');
+// Set the leaderboard time limit to 7 days after Dec 28, 2025 at 12PM PST
+// Dec 28, 2025 at 12:00 PM PST is 2025-12-28T20:00:00Z in UTC.
+// Adding 7 days (7 * 24 * 60 * 60 * 1000 ms) = 2026-01-04T20:00:00Z.
+const TIME_LIMIT = new Date('2026-01-04T20:00:00Z');
 
 /**
  * Get the remaining time until the time limit ends
