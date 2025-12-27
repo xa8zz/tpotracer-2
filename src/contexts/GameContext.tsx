@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { getRandomWords } from '../utils/wordUtils';
 import { calculateScores } from '../utils/scoreUtils';
-import { submitScore } from '../utils/apiService';
+import { submitScore, fetchLeaderboard } from '../utils/apiService';
 import { Keystroke, GameState } from '../types';
 import { useWindowSize } from '../hooks/useWindowSize';
 
@@ -116,9 +116,12 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
         setTimeout(() => {
           setShowConfetti(false);
         }, 5000);
-        
-        // Submit score to backend only if it's a new high score
-        const result = await submitScore({
+      }
+
+      // Submit score to backend only if it's better than current known best 
+      // OR if there is no current known best (highScore is 0)
+      if (isNewRecord || highScore === 0) {
+        await submitScore({
           username,
           wpm: finalScores.wpm,
           rawWpm: finalScores.rawWpm, 
@@ -126,12 +129,18 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
           keystrokes,
           words
         });
-        
-        // Get leaderboard position after submission
-        // This could be improved by getting the position directly from the API response
-        // For now, we'll just set a fake position as a placeholder
-        setLeaderboardPosition(Math.floor(Math.random() * 50) + 1); // Replace with actual position
       }
+      
+      // Fetch updated leaderboard to get real rank
+      try {
+        const cache = await fetchLeaderboard(true, username);
+        if (cache.userPosition) {
+           setLeaderboardPosition(cache.userPosition);
+        }
+      } catch (e) {
+        console.error("Failed to update rank after game", e);
+      }
+
     }
   };
 
