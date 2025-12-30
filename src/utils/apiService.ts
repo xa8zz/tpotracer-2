@@ -12,18 +12,26 @@ if (!API_ENABLED) {
 }
 
 // Types
+export interface LeaderboardResult {
+  data: LeaderboardEntry[];
+  hasMore: boolean;
+  userPosition?: number;
+}
+
+// Cache for first page + user position
 interface LeaderboardCache {
   data: LeaderboardEntry[];
   timestamp: number;
   userPosition?: number;
 }
 
-// Cache + Constants
 let leaderboardCache: LeaderboardCache = {
   data: [],
   timestamp: 0,
 };
+
 export const LEADERBOARD_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 mins
+const PAGE_SIZE = 20;
 
 // Helper to check if cache is stale
 export const isLeaderboardCacheStale = (): boolean => {
@@ -47,13 +55,35 @@ export const getTimeUntilNextRefresh = (): number => {
   return Math.max(0, LEADERBOARD_REFRESH_INTERVAL - (Date.now() - leaderboardCache.timestamp));
 };
 
-// Fetch leaderboard (with optional force or username lookup)
+// Fetch a page of leaderboard data
+export const fetchLeaderboardPage = async (
+  offset = 0,
+  limit = PAGE_SIZE
+): Promise<LeaderboardEntry[]> => {
+  if (!API_ENABLED) {
+    return [];
+  }
+
+  const headers = {
+    'x-api-key': import.meta.env.VITE_API_KEY
+  };
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/leaderboard?limit=${limit}&offset=${offset}`, 
+    { headers }
+  );
+  
+  if (!response.ok) throw new Error('Failed to fetch leaderboard');
+  return response.json();
+};
+
+// Fetch initial leaderboard (first page + user position)
 export const fetchLeaderboard = async (
   force = false,
   username: string | null
-): Promise<LeaderboardCache> => {
+): Promise<LeaderboardResult> => {
   if (!API_ENABLED) {
-    return leaderboardCache; // Return empty cache in dev mode
+    return { data: [], hasMore: false };
   }
 
   let data = leaderboardCache.data;
@@ -62,17 +92,10 @@ export const fetchLeaderboard = async (
   // Fetch new data if forced or stale
   if (force || isLeaderboardCacheStale()) {
     try {
-      const headers = {
-        'x-api-key': import.meta.env.VITE_API_KEY
-      };
-
-      const response = await fetch(`${API_BASE_URL}/api/leaderboard?limit=20`, { headers });
-      if (!response.ok) throw new Error('Failed to fetch leaderboard');
-
-      data = await response.json();
+      data = await fetchLeaderboardPage(0, PAGE_SIZE);
       timestamp = Date.now();
       
-      // Update basic cache immediately
+      // Update cache
       leaderboardCache.data = data;
       leaderboardCache.timestamp = timestamp;
     } catch (error) {
@@ -81,7 +104,7 @@ export const fetchLeaderboard = async (
     }
   }
 
-  // Calculate user position for the requested username (always, even if using cached list)
+  // Calculate user position for the requested username
   let userPosition: number | undefined = undefined;
 
   if (username) {
@@ -93,8 +116,6 @@ export const fetchLeaderboard = async (
         const headers = {
           'x-api-key': import.meta.env.VITE_API_KEY
         };
-        // Check if user exists first (optional but helps avoid 404s in logs if we want)
-        // Actually, just fetch rank directly.
         const countResponse = await fetch(`${API_BASE_URL}/api/rank/${encodeURIComponent(username)}`, { headers });
         if (countResponse.ok) {
           const { rank } = await countResponse.json();
@@ -106,14 +127,45 @@ export const fetchLeaderboard = async (
     }
   }
 
-  // Update the cache object with the specific userPosition for this request
+  // Update cache with user position
   leaderboardCache = { 
     data, 
     timestamp, 
     userPosition 
   };
   
-  return leaderboardCache;
+  return {
+    data,
+    hasMore: data.length === PAGE_SIZE,
+    userPosition
+  };
+};
+
+// Fetch more leaderboard entries (for pagination)
+export const fetchMoreLeaderboard = async (
+  currentData: LeaderboardEntry[]
+): Promise<LeaderboardResult> => {
+  if (!API_ENABLED) {
+    return { data: currentData, hasMore: false };
+  }
+
+  try {
+    const newPage = await fetchLeaderboardPage(currentData.length, PAGE_SIZE);
+    const combinedData = [...currentData, ...newPage];
+    
+    // Update cache with combined data
+    leaderboardCache.data = combinedData;
+    leaderboardCache.timestamp = Date.now();
+    
+    return {
+      data: combinedData,
+      hasMore: newPage.length === PAGE_SIZE,
+      userPosition: leaderboardCache.userPosition
+    };
+  } catch (error) {
+    console.error("Failed to fetch more leaderboard data", error);
+    return { data: currentData, hasMore: false };
+  }
 };
 
 // Submit score (with anti-spam throttle)
@@ -125,7 +177,7 @@ export const submitScore = async (
 ): Promise<{ success: boolean; rank?: number }> => {
   if (!API_ENABLED) {
     console.warn("Score not submitted - API disabled in dev mode");
-    return { success: true }; // Pretend it worked
+    return { success: true };
   }
 
   if (submitScoreTimeout && !forceSubmit) {
@@ -153,7 +205,7 @@ export const submitScore = async (
       leaderboardCache = {
         data: data.leaderboard,
         timestamp: Date.now(),
-        userPosition: data.rank // update user position if we have it
+        userPosition: data.rank
       };
       notifyListeners();
     }
@@ -163,7 +215,7 @@ export const submitScore = async (
       submitScoreTimeout = null;
     }, 2000); // 2s cooldown
 
-    await fetchLeaderboard(true, result.username); // refresh with latest result (or use cache if we just updated it)
+    await fetchLeaderboard(true, result.username);
     return { success: true, rank: data.rank };
   } catch (error) {
     console.error("Submit score failed", error);

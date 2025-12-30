@@ -10,9 +10,6 @@ interface LeaderboardProps {
   currentUsername: string | null;
 }
 
-const INITIAL_USER_COUNT = 12;
-const USER_LOAD_INCREMENT = 12;
-
 // Leaderboard dimensions constants
 const LB_WIDTH = 500;
 const LB_HEIGHT = 820;
@@ -35,27 +32,23 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
 }) => {
   const { 
     leaderboardData, 
-    userPosition 
+    userPosition,
+    isLoadingMore,
+    hasMore,
+    loadMore,
+    forceRefresh
   } = useLeaderboard({ username: currentUsername });
 
   const { highScore, leaderboardPosition } = useGameContext();
-  const [loadedUsersCount, setLoadedUsersCount] = useState(INITIAL_USER_COUNT);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isSpinning, setIsSpinning] = useState(false);
-
-  const placeholderAPICall = () => {
-    // This is a placeholder for a future API call.
-  };
 
   const handleRetry = () => {
     if (isSpinning) return;
 
-    placeholderAPICall();
     setIsSpinning(true);
-
-    setLoadedUsersCount(INITIAL_USER_COUNT);
-    setIsLoadingMore(false);
+    forceRefresh();
+    
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = 0;
     }
@@ -72,25 +65,15 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
     place: leaderboardPosition || userPosition || 999
   };
 
-  // Use actual leaderboard data
-  const visibleUsers = leaderboardData.slice(0, loadedUsersCount);
-
+  // Handle scroll - load more when near bottom
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    const isAtBottom = scrollHeight - scrollTop <= clientHeight + 1;
-    const totalUsers = leaderboardData.length;
+    const isNearBottom = scrollHeight - scrollTop <= clientHeight + 50; // 50px threshold
 
-    if (isAtBottom && !isLoadingMore && loadedUsersCount < totalUsers) {
-      setIsLoadingMore(true);
-      setTimeout(() => {
-        setLoadedUsersCount(prev => {
-            const newCount = prev + USER_LOAD_INCREMENT;
-            return newCount > totalUsers ? totalUsers : newCount;
-        });
-        setIsLoadingMore(false);
-      }, 500);
+    if (isNearBottom && !isLoadingMore && hasMore) {
+      loadMore();
     }
-  }, [isLoadingMore, loadedUsersCount, leaderboardData.length]);
+  }, [isLoadingMore, hasMore, loadMore]);
 
   const [visible, setVisible] = useState(window.innerWidth >= 1020);
   const toggleSetVisible = () => setVisible(!visible);
@@ -228,9 +211,9 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
             className="overflow-y-auto flex-grow scrollable-leaderboard"
             style={{ paddingTop: pct(5, LIST_HEIGHT) }}
           >
-            {visibleUsers.map((entry, index) => (
+            {leaderboardData.map((entry, index) => (
               <div 
-                key={index} 
+                key={entry.username} 
                 className="font-ptclean text-tpotracer-100 flex items-center"
                 style={{
                     height: pct(44, LIST_HEIGHT),
@@ -275,6 +258,17 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                 <div className="glow-text-shadow-sm" style={{ width: pct(COL_WIDTH, CONTENT_WIDTH) }} title={entry.wpm.toFixed(3)}>{Math.round(entry.wpm)}</div>
               </div>
             ))}
+            {isLoadingMore && (
+              <div 
+                className="font-ptclean text-tpotracer-400 flex items-center justify-center"
+                style={{
+                    height: pct(44, LIST_HEIGHT),
+                    fontSize: `${(20 / LB_WIDTH) * 100}cqw`,
+                }}
+              >
+                Loading...
+              </div>
+            )}
           </div>
         </div>
       </div>

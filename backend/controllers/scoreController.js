@@ -42,10 +42,9 @@ export const submitScore = async (req, res) => {
     console.log(`[Backend] Score inserted successfully for user: ${username}, ID: ${result.rows[0]?.id}`);
 
     // --- Cache Invalidation ---
-    // Clear the general leaderboard cache
-    const defaultLeaderboardKey = 'leaderboard:default:20'; // Matching the key used in getLeaderboard
-    const deletedLeaderboardCount = cacheService.del(defaultLeaderboardKey);
-    console.log(`[Backend] Cleared default leaderboard cache ('${defaultLeaderboardKey}'). Deleted count: ${deletedLeaderboardCount}`);
+    // Clear all leaderboard cache pages (pagination creates multiple cache keys)
+    const deletedLeaderboardCount = cacheService.delByPrefix('leaderboard:');
+    console.log(`[Backend] Cleared all leaderboard caches. Deleted count: ${deletedLeaderboardCount}`);
 
     // Clear the specific user's rank cache
     const userRankKey = `rank:${username}`;
@@ -68,7 +67,7 @@ export const submitScore = async (req, res) => {
     const rankResult = await db.query(rankQuery, [username]);
     const newRank = rankResult.rows[0]?.rank ? parseInt(rankResult.rows[0].rank, 10) : null;
 
-    // Get the fresh top 20 leaderboard
+    // Get the fresh top 20 leaderboard (first page for immediate UI update)
     const leaderboardQuery = `
       WITH distinct_user_scores AS (
         SELECT DISTINCT ON (username) username, wpm, timestamp 
@@ -108,11 +107,12 @@ export const submitScore = async (req, res) => {
 export const getLeaderboard = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 20;
+    const offset = parseInt(req.query.offset) || 0;
     const search = req.query.search || '';
     const fresh = req.query.fresh === 'true';
 
-    // Construct cache key based on query parameters
-    const cacheKey = `leaderboard:${search ? search : 'default'}:${limit}`;
+    // Construct cache key based on query parameters (including offset for pagination)
+    const cacheKey = `leaderboard:${search ? search : 'default'}:${limit}:${offset}`;
 
     // Check cache first (if fresh flag is not set)
     if (!fresh) {
@@ -144,15 +144,17 @@ export const getLeaderboard = async (req, res) => {
     // DISTINCT ON requires ORDER BY username first, then the field determining distinctness (wpm DESC)
     baseQuery += ` ORDER BY username, wpm DESC`;
 
-    // Wrap to apply the overall WPM sorting and limit *after* getting distinct users
+    // Wrap to apply the overall WPM sorting, limit and offset *after* getting distinct users
     const finalQuery = `
       WITH distinct_user_scores AS (${baseQuery})
       SELECT username, wpm, timestamp
       FROM distinct_user_scores
       ORDER BY wpm DESC
-      LIMIT $${paramIndex};
+      LIMIT $${paramIndex}
+      OFFSET $${paramIndex + 1};
     `;
     queryParams.push(limit);
+    queryParams.push(offset);
 
 
     console.log('Executing leaderboard query:', finalQuery);

@@ -45,6 +45,17 @@ export const del = (key) => {
 };
 
 /**
+ * Delete all cache entries matching a prefix
+ * @param {string} prefix - The prefix to match
+ * @returns {number} Number of deleted entries
+ */
+export const delByPrefix = (prefix) => {
+  const keys = cache.keys();
+  const matchingKeys = keys.filter(k => k.startsWith(prefix));
+  return cache.del(matchingKeys);
+};
+
+/**
  * Flush the entire cache
  */
 export const flush = () => {
@@ -55,5 +66,6 @@ export default {
   get,
   set,
   del,
+  delByPrefix,
   flush,
 }; 
