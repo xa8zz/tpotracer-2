@@ -10,7 +10,7 @@ import sharableBg from '../assets/sharable.png';
 import logo from '../assets/logosm.png';
 
 // Flag to hide share preview card contents (keeps background visible)
-const HIDE_SHARE_PREVIEW_CONTENTS = false;
+const HIDE_SHARE_PREVIEW_CONTENTS = true;
 
 // Flag to force display "GAME INVALID :(" message (for testing)
 const FORCE_SHOW_INVALID = false;
