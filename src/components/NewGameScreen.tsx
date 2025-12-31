@@ -171,6 +171,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     wpm: number;
     leaderboardPosition: number | null;
     isNewHighScore: boolean;
+    wpmToBeat: number | null;
   } | null>(null);
   // Create ref for cursor positioning
   const cursorRef = useRef<HTMLSpanElement>(null);
@@ -198,6 +199,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     showConfetti,
     isHelpExpanded,
     leaderboardPosition,
+    wpmToBeat,
     width,
     height,
     initializeGame,
@@ -212,9 +214,10 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         wpm,
         leaderboardPosition,
         isNewHighScore,
+        wpmToBeat,
       });
     }
-  }, [gameState, wpm, leaderboardPosition, isNewHighScore]);
+  }, [gameState, wpm, leaderboardPosition, isNewHighScore, wpmToBeat]);
 
   useEffect(() => {
     if (gameState === 'completed' && isNewHighScore) {
@@ -234,7 +237,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
 
   const statsForFinishedScreen =
     gameState === 'completed'
-      ? { wpm, leaderboardPosition, isNewHighScore }
+      ? { wpm, leaderboardPosition, isNewHighScore, wpmToBeat }
       : finishedGameState;
 
   const handleDownloadShareImage = async () => {
@@ -526,29 +529,31 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                         {statsForFinishedScreen.leaderboardPosition ?? '99'}
                       </span>
                     </div>
-                    <div 
-                      className="flex items-center"
-                      style={{ gap: `${(8 / CONTAINER_WIDTH) * 100}cqw` }}
-                    >
-                      <span 
-                        className="text-tpotracer-100"
-                        style={{ textShadow: glowTextShadow(2, CONTAINER_HEIGHT) }}
-                      >WPM TO BEAT:</span>
-                      <span 
-                        className="bg-tpotracer-300 text-tpotracer-100 font-bold text-center"
-                        style={{ 
-                          height: `${(28 / CONTAINER_HEIGHT) * 100}cqh`, 
-                          lineHeight: `${(31 / CONTAINER_HEIGHT) * 100}cqh`,
-                          paddingLeft: `${(10 / CONTAINER_WIDTH) * 100}cqw`, 
-                          paddingRight: `${(10 / CONTAINER_WIDTH) * 100}cqw`,
-                          borderRadius: relBorderRadius(4),
-                          boxShadow: darkBoxShadow(2, 1, CONTAINER_HEIGHT),
-                          textShadow: glowTextShadow(1, CONTAINER_HEIGHT)
-                        }}
+                    {statsForFinishedScreen.wpmToBeat !== null && (
+                      <div 
+                        className="flex items-center"
+                        style={{ gap: `${(8 / CONTAINER_WIDTH) * 100}cqw` }}
                       >
-                        {renderPaddedNumber(statsForFinishedScreen.wpm + 5)}
-                      </span>
-                    </div>
+                        <span 
+                          className="text-tpotracer-100"
+                          style={{ textShadow: glowTextShadow(2, CONTAINER_HEIGHT) }}
+                        >WPM TO BEAT:</span>
+                        <span 
+                          className="bg-tpotracer-300 text-tpotracer-100 font-bold text-center"
+                          style={{ 
+                            height: `${(28 / CONTAINER_HEIGHT) * 100}cqh`, 
+                            lineHeight: `${(31 / CONTAINER_HEIGHT) * 100}cqh`,
+                            paddingLeft: `${(10 / CONTAINER_WIDTH) * 100}cqw`, 
+                            paddingRight: `${(10 / CONTAINER_WIDTH) * 100}cqw`,
+                            borderRadius: relBorderRadius(4),
+                            boxShadow: darkBoxShadow(2, 1, CONTAINER_HEIGHT),
+                            textShadow: glowTextShadow(1, CONTAINER_HEIGHT)
+                          }}
+                        >
+                          {renderPaddedNumber(statsForFinishedScreen.wpmToBeat)}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <p 

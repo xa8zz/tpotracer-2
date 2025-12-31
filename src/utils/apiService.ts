@@ -174,7 +174,7 @@ let submitScoreTimeout: ReturnType<typeof setTimeout> | null = null;
 export const submitScore = async (
   result: GameResult,
   forceSubmit = false
-): Promise<{ success: boolean; rank?: number }> => {
+): Promise<{ success: boolean; rank?: number; wpmToBeat?: number | null }> => {
   if (!API_ENABLED) {
     console.warn("Score not submitted - API disabled in dev mode");
     return { success: true };
@@ -216,7 +216,7 @@ export const submitScore = async (
     }, 2000); // 2s cooldown
 
     await fetchLeaderboard(true, result.username);
-    return { success: true, rank: data.rank };
+    return { success: true, rank: data.rank, wpmToBeat: data.wpmToBeat };
   } catch (error) {
     console.error("Submit score failed", error);
     return { success: false };

@@ -27,6 +27,7 @@ interface GameContextType {
   showConfetti: boolean;
   isHelpExpanded: boolean;
   leaderboardPosition: number | null;
+  wpmToBeat: number | null;
   width: number;
   height: number;
   
@@ -67,6 +68,7 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
   const [showConfetti, setShowConfetti] = useState(false);
   const [isHelpExpanded, setIsHelpExpanded] = useState(false);
   const [leaderboardPosition, setLeaderboardPosition] = useState<number | null>(null);
+  const [wpmToBeat, setWpmToBeat] = useState<number | null>(null);
   
   const { width, height } = useWindowSize();
 
@@ -153,6 +155,8 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
             if (result.rank) {
                  setLeaderboardPosition(result.rank);
             }
+            // Set wpmToBeat (null if user is #1)
+            setWpmToBeat(result.wpmToBeat ?? null);
             
             // Save new high score to local storage ONLY on success
             if (isNewRecord) {
@@ -411,6 +415,7 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
     showConfetti,
     isHelpExpanded,
     leaderboardPosition,
+    wpmToBeat,
     width,
     height,
     
