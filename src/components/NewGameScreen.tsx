@@ -7,6 +7,7 @@ import UserAvatar from './UserAvatar';
 import { getBadgeClass } from '../utils/leaderboardUtils';
 import html2canvas from 'html2canvas';
 import sharableBg from '../assets/sharable.png';
+import logo from '../assets/logosm.png';
 
 // Flag to hide share preview card contents (keeps background visible)
 const HIDE_SHARE_PREVIEW_CONTENTS = false;
@@ -18,6 +19,9 @@ interface NewGameScreenProps {
   username: string | null;
   onSettingsClick: () => void;
 }
+
+// DEBUG FLAG: Set to true to preview the share card in center of screen
+const DEBUG_SHOW_SHARE_CARD = false;
 
 // Helper function to get ordinal suffix (1st, 2nd, 3rd, 4th, etc.)
 const getOrdinalSuffix = (num: number): string => {
@@ -770,7 +774,10 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         {/* Hidden share card for image generation */}
         <div 
           ref={shareCardRef}
-          className="absolute -left-[9999px] pointer-events-none overflow-hidden"
+          className={DEBUG_SHOW_SHARE_CARD 
+            ? "fixed overflow-hidden z-[100000]" 
+            : "absolute -left-[9999px] pointer-events-none overflow-hidden"
+          }
           style={{ 
             width: '1035px',
             height: '754px',
@@ -778,25 +785,61 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             borderRadius: '29px',
-            opacity: 0, 
-            visibility: 'hidden' 
+            ...(DEBUG_SHOW_SHARE_CARD 
+              ? { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }
+              : { opacity: 0, visibility: 'hidden' }
+            )
           }}
         >
-          <div className="w-full h-full flex flex-col items-center justify-center text-center p-12">
-            <p className="text-tpotracer-100 mb-2 glow-text-shadow-sm text-lg">
-              tpotracer.com
+          <div 
+            className="w-full h-full flex flex-col items-center justify-center text-center"
+            style={{
+              paddingTop: '0px',
+              paddingBottom: '48px',
+              paddingLeft: '45px',
+              paddingRight: '45px'
+            }}
+          >
+            <img 
+              src={logo} 
+              alt="TPO Tracer Logo" 
+              style={{ width: '240px', height: 'auto', marginBottom: '16px' }}
+            />
+            <p 
+              className="text-tpotracer-100 glow-text-shadow-sm font-ptclean"
+              style={{ fontSize: '40px', marginTop: '-90px', marginRight: '-140px' }}
+            >
+              .com
             </p>
-            <div className="font-bold text-tpotracer-100 font-mono glow-text-shadow-sm text-7xl leading-tight">
-              {Math.round(wpm)} <span className="text-3xl">WPM</span>
+            <div 
+              className="font-bold text-tpotracer-100 font-mono glow-text-shadow-sm"
+              style={{ fontSize: '244px', lineHeight: '160px', marginTop: '0px' }}
+            >
+              {Math.round(wpm)}<span className="font-ptclean" style={{ fontSize: '108px', lineHeight: '90px' }}>WPM</span>
             </div>
-            <div className="text-tpotracer-100 font-mono mt-2 glow-text-shadow-sm text-3xl">
-              @{username}
+            <div 
+              className="flex items-center"
+              style={{ fontSize: '88px', lineHeight: '90px', marginTop: '90px', gap: '24px' }}
+            >
+              {(leaderboardPosition || DEBUG_SHOW_SHARE_CARD) && (
+                <div 
+                  className={`font-bold font-ptclean relative glow-shadow-sm text-tpotracer-100 glow-text-shadow-sm flex items-start`}
+                  style={{ 
+                    paddingLeft: '24px',
+                    paddingRight: '24px',
+                    borderRadius: '12px',
+                    color: (leaderboardPosition ?? 999) <= 3 ? '#fff' : undefined
+                  }}
+                >
+                  <div className={`absolute left-0 right-0 h-full top-[43px] z-[-44444] ${getBadgeClass(leaderboardPosition ?? 999)}`} style={{ borderRadius: '12px' }}></div>
+                  <span className="inline-block" style={{ fontSize: '48px', lineHeight: '1', marginTop: '22px', marginRight: '3px' }}>#</span>
+                  <span style={{ lineHeight: '1' }}>{leaderboardPosition || 999}</span>
+                </div>
+              )}
+              <span className="text-tpotracer-100 font-ptclean glow-text-shadow-sm">
+                @{username}
+              </span>
             </div>
-            {leaderboardPosition && (
-              <div className="bg-tpotracer-300 rounded-full text-tpotracer-100 glow-text-shadow-sm mt-4 px-6 py-3 text-xl">
-                #{leaderboardPosition} on leaderboard
-              </div>
-            )}
           </div>
         </div>
         <NewButton 
