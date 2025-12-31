@@ -305,7 +305,13 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                 textShadow: darkTextShadow(2)
             }}
         >
-          <svg width="40%" height="40%" viewBox="0 0 24 24" fill="currentColor">
+          <svg 
+            width="40%" 
+            height="40%" 
+            viewBox="0 0 24 24" 
+            fill="currentColor"
+            style={{ marginTop: '-3px', filter: `drop-shadow(${darkTextShadow(5)})` }}
+          >
             <rect x="3" y="6" width="5" height="16" rx="1" />
             <rect x="10" y="10" width="5" height="12" rx="1" />
             <rect x="17" y="14" width="5" height="8" rx="1" />
