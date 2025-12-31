@@ -52,20 +52,38 @@ export const submitScore = async (req, res) => {
     console.log(`[Backend] Cleared user rank cache ('${userRankKey}'). Deleted count: ${deletedRankCount}`);
     // -------------------------
 
-    // Get the new rank to return immediately
+    // Get the new rank and the WPM of the person above to return immediately
     const rankQuery = `
       WITH distinct_user_scores AS (
         SELECT DISTINCT ON (username) username, wpm, timestamp 
         FROM scores 
         ORDER BY username, wpm DESC, timestamp ASC
       ), ranked_users AS (
-        SELECT username, RANK() OVER (ORDER BY wpm DESC, timestamp ASC) as rank
+        SELECT username, wpm, RANK() OVER (ORDER BY wpm DESC, timestamp ASC) as rank
         FROM distinct_user_scores
       )
-      SELECT rank FROM ranked_users WHERE username = $1;
+      SELECT rank, wpm FROM ranked_users WHERE username = $1;
     `;
     const rankResult = await db.query(rankQuery, [username]);
     const newRank = rankResult.rows[0]?.rank ? parseInt(rankResult.rows[0].rank, 10) : null;
+
+    // Get the WPM of the person ranked just above the user (wpmToBeat)
+    let wpmToBeat = null;
+    if (newRank && newRank > 1) {
+      const wpmToBeatQuery = `
+        WITH distinct_user_scores AS (
+          SELECT DISTINCT ON (username) username, wpm, timestamp 
+          FROM scores 
+          ORDER BY username, wpm DESC, timestamp ASC
+        ), ranked_users AS (
+          SELECT username, wpm, RANK() OVER (ORDER BY wpm DESC, timestamp ASC) as rank
+          FROM distinct_user_scores
+        )
+        SELECT wpm FROM ranked_users WHERE rank = $1;
+      `;
+      const wpmToBeatResult = await db.query(wpmToBeatQuery, [newRank - 1]);
+      wpmToBeat = wpmToBeatResult.rows[0]?.wpm ? Math.round(wpmToBeatResult.rows[0].wpm) : null;
+    }
 
     // Get the fresh top 20 leaderboard (first page for immediate UI update)
     const leaderboardQuery = `
@@ -81,10 +99,11 @@ export const submitScore = async (req, res) => {
     `;
     const leaderboardResult = await db.query(leaderboardQuery);
 
-    // Respond with the inserted data, the new rank, and the updated leaderboard
+    // Respond with the inserted data, the new rank, wpmToBeat, and the updated leaderboard
     res.status(201).json({ 
       ...result.rows[0], 
       rank: newRank,
+      wpmToBeat,
       leaderboard: leaderboardResult.rows
     });
 

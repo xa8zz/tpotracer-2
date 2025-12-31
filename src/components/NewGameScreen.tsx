@@ -146,16 +146,32 @@ const renderWordsWithProgress = (
   );
 };
 
+// Shadow helper functions for relative units (with ~1.5x boost for more glow)
+const glowTextShadow = (size: number, height: number) => 
+  `0 0 ${(size * 1.5 / height) * 100}cqh #A7F1FA`;
+const darkTextShadow = (size: number, height: number) => 
+  `0 0 ${(size * 1.5 / height) * 100}cqh #02182D`;
+const glowBoxShadow = (blur: number, spread: number, height: number) => 
+  `0 0 ${(blur * 1.5 / height) * 100}cqh ${(spread * 1.2 / height) * 100}cqh #A7F1FA`;
+const darkBoxShadow = (blur: number, spread: number, height: number) => 
+  `0 0 ${(blur * 1.5 / height) * 100}cqh ${(spread * 1.2 / height) * 100}cqh #02182D`;
+const tpotracer300BoxShadow = (blur: number, spread: number, height: number) => 
+  `0 0 ${(blur * 1.5 / height) * 100}cqh ${(spread * 1.2 / height) * 100}cqh #03223F`;
+
 const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick }) => {
   // Game container dimensions (from src/index.css)
   const CONTAINER_WIDTH = 853;
   const CONTAINER_HEIGHT = 806;
+  
+  // Relative border radius helper
+  const relBorderRadius = (px: number) => `${(px / CONTAINER_HEIGHT) * 100}cqh`;
   
   const [isFlashing, setIsFlashing] = useState(false);
   const [finishedGameState, setFinishedGameState] = useState<{
     wpm: number;
     leaderboardPosition: number | null;
     isNewHighScore: boolean;
+    wpmToBeat: number | null;
   } | null>(null);
   // Create ref for cursor positioning
   const cursorRef = useRef<HTMLSpanElement>(null);
@@ -183,6 +199,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     showConfetti,
     isHelpExpanded,
     leaderboardPosition,
+    wpmToBeat,
     width,
     height,
     initializeGame,
@@ -197,9 +214,10 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         wpm,
         leaderboardPosition,
         isNewHighScore,
+        wpmToBeat,
       });
     }
-  }, [gameState, wpm, leaderboardPosition, isNewHighScore]);
+  }, [gameState, wpm, leaderboardPosition, isNewHighScore, wpmToBeat]);
 
   useEffect(() => {
     if (gameState === 'completed' && isNewHighScore) {
@@ -219,7 +237,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
 
   const statsForFinishedScreen =
     gameState === 'completed'
-      ? { wpm, leaderboardPosition, isNewHighScore }
+      ? { wpm, leaderboardPosition, isNewHighScore, wpmToBeat }
       : finishedGameState;
 
   const handleDownloadShareImage = async () => {
@@ -289,23 +307,25 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         {(highScore && highScore > 0) ? (
           <>
             <span 
-              className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100"
+              className="absolute font-ptclean text-tpotracer-100"
               style={{ 
                 top: `${(88 / CONTAINER_HEIGHT) * 100}%`, 
                 left: `${(89 / CONTAINER_WIDTH) * 100}%`,
                 fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
-                lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
+                lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`,
+                textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
               }}
             >
               Best WPM:
             </span>
             <span 
-              className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 font-bold"
+              className="absolute font-ptclean text-tpotracer-100 font-bold"
               style={{ 
                 top: `${(114 / CONTAINER_HEIGHT) * 100}%`, 
                 left: `${(107 / CONTAINER_WIDTH) * 100}%`,
                 fontSize: `${(60 / CONTAINER_HEIGHT) * 100}cqh`,
-                lineHeight: '1'
+                lineHeight: '1',
+                textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
               }}
             >
               {renderPaddedNumber(highScore)}
@@ -316,18 +336,19 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         {leaderboardPosition ? (
           <>
             <span 
-              className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100"
+              className="absolute font-ptclean text-tpotracer-100"
               style={{ 
                 top: `${(66 / CONTAINER_HEIGHT) * 100}%`, 
                 left: `${(278 / CONTAINER_WIDTH) * 100}%`,
                 fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
-                lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
+                lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`,
+                textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
               }}
             >
               Rank:
             </span>
             <span 
-              className="absolute font-ptclean text-right glow-text-shadow-sm text-tpotracer-100 font-bold"
+              className="absolute font-ptclean text-right text-tpotracer-100 font-bold"
               style={{ 
                 top: `${(92 / CONTAINER_HEIGHT) * 100}%`, 
                 left: `${(235 / CONTAINER_WIDTH) * 100}%`,
@@ -338,6 +359,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                 lineHeight: '1',
                 display: 'inline-block',
                 width: `${(120 / CONTAINER_WIDTH) * 100}%`,
+                textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
               }}
             >
               {leaderboardPosition}
@@ -358,19 +380,21 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         >
           <UserAvatar 
             username={username}
-            className="rounded-[400px] w-full h-full"
+            className="w-full h-full"
+            style={{ borderRadius: '50%' }}
           />
         </a>
         <a 
           href={`https://x.com/${username}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute font-ptclean glow-text-shadow-sm text-tpotracer-100 hover:underline"
+          className="absolute font-ptclean text-tpotracer-100 hover:underline"
           style={{ 
             top: `${(25 / CONTAINER_HEIGHT) * 100}%`, 
             left: `${(510 / CONTAINER_WIDTH) * 100}%`,
             fontSize: `${(30 / CONTAINER_HEIGHT) * 100}cqh`,
-            lineHeight: `${(36 / CONTAINER_HEIGHT) * 100}cqh`
+            lineHeight: `${(36 / CONTAINER_HEIGHT) * 100}cqh`,
+            textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
           }}
         >
           @{username}
@@ -405,26 +429,28 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         </NewButton>
         <NewButton 
           size="circle" 
-          className="absolute dark-text-shadow-sm" 
+          className="absolute" 
           style={{ 
             top: `${(112 / CONTAINER_HEIGHT) * 100}%`, 
             left: `${(777 / CONTAINER_WIDTH) * 100}%`,
             width: `${(49 / CONTAINER_WIDTH) * 100}%`,
             height: `${(49 / CONTAINER_HEIGHT) * 100}%`,
             fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
-            lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
+            lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`,
+            textShadow: darkTextShadow(2, CONTAINER_HEIGHT)
           }}
           onClick={toggleHelp}
         >
           ?
         </NewButton>
         <div 
-          className={`game-finished-screen absolute rounded-[2px] text-tpotracer-400 ${gameState === 'completed' ? 'tr-visible' : ''}`}
+          className={`game-finished-screen absolute text-tpotracer-400 ${gameState === 'completed' ? 'tr-visible' : ''}`}
           style={{ 
             top: `${(306 / CONTAINER_HEIGHT) * 100}%`, 
             left: `${(243 / CONTAINER_WIDTH) * 100}%`,
             width: `${(464 / CONTAINER_WIDTH) * 100}%`, 
-            height: `${(200 / CONTAINER_HEIGHT) * 100}%` 
+            height: `${(200 / CONTAINER_HEIGHT) * 100}%`,
+            borderRadius: relBorderRadius(2)
           }}
         >
           {statsForFinishedScreen && (
@@ -439,10 +465,11 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                 }}
               >
                 <h2 
-                  className="text-tpotracer-100 glow-text-shadow-sm"
+                  className="text-tpotracer-100"
                   style={{ 
                     fontSize: `${(30 / CONTAINER_HEIGHT) * 100}cqh`,
-                    lineHeight: `${(36 / CONTAINER_HEIGHT) * 100}cqh`
+                    lineHeight: `${(36 / CONTAINER_HEIGHT) * 100}cqh`,
+                    textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
                   }}
                 >
                   {statsForFinishedScreen.isNewHighScore ? "NEW BEST WPM!" : "GAME COMPLETE!"}
@@ -452,14 +479,18 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                   style={{ gap: `${(20 / CONTAINER_WIDTH) * 100}cqw` }}
                 >
                   <div 
-                    className={`font-bold flex items-center justify-center ${isFlashing ? 'tr-flashing' : 'bg-tpotracer-300 text-tpotracer-100 tpotracer-300-shadow-sm glow-text-shadow-sm'}`}
+                    className={`font-bold flex items-center justify-center ${isFlashing ? 'tr-flashing' : 'bg-tpotracer-300 text-tpotracer-100'}`}
                     style={{ 
                       width: `${(110 / CONTAINER_WIDTH) * 100}cqw`, 
                       paddingLeft: `${(18 / CONTAINER_WIDTH) * 100}cqw`, 
                       paddingRight: `${(18 / CONTAINER_WIDTH) * 100}cqw`,
                       paddingTop: `${(8 / CONTAINER_HEIGHT) * 100}cqh`,
                       paddingBottom: `${(8 / CONTAINER_HEIGHT) * 100}cqh`,
-                      borderRadius: `${(8 / CONTAINER_HEIGHT) * 100}cqh`
+                      borderRadius: relBorderRadius(8),
+                      ...(isFlashing ? {} : {
+                        boxShadow: tpotracer300BoxShadow(2, 1, CONTAINER_HEIGHT),
+                        textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
+                      })
                     }}
                   >
                     <span style={{ 
@@ -481,46 +512,57 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                       className="flex items-center"
                       style={{ gap: `${(8 / CONTAINER_WIDTH) * 100}cqw` }}
                     >
-                      <span className="text-tpotracer-100 glow-text-shadow-sm">RANK:</span>
                       <span 
-                        className={`font-bold glow-shadow-sm text-center text-tpotracer-100 glow-text-shadow-sm ${getBadgeClass(statsForFinishedScreen.leaderboardPosition ?? 99)}`}
+                        className="text-tpotracer-100"
+                        style={{ textShadow: glowTextShadow(2, CONTAINER_HEIGHT) }}
+                      >RANK:</span>
+                      <span 
+                        className={`font-bold text-center text-tpotracer-100 ${getBadgeClass(statsForFinishedScreen.leaderboardPosition ?? 99)}`}
                         style={{ 
                           height: `${(28 / CONTAINER_HEIGHT) * 100}cqh`, 
                           lineHeight: `${(31 / CONTAINER_HEIGHT) * 100}cqh`,
                           paddingLeft: `${(10 / CONTAINER_WIDTH) * 100}cqw`, 
                           paddingRight: `${(10 / CONTAINER_WIDTH) * 100}cqw`,
-                          borderRadius: `${(4 / CONTAINER_HEIGHT) * 100}cqh`
+                          borderRadius: relBorderRadius(4)
                         }}
                       >
                         {statsForFinishedScreen.leaderboardPosition ?? '99'}
                       </span>
                     </div>
-                    <div 
-                      className="flex items-center"
-                      style={{ gap: `${(8 / CONTAINER_WIDTH) * 100}cqw` }}
-                    >
-                      <span className="text-tpotracer-100 glow-text-shadow-sm">WPM TO BEAT:</span>
-                      <span 
-                        className="bg-tpotracer-300 text-tpotracer-100 font-bold dark-shadow-sm glow-text-shadow text-center"
-                        style={{ 
-                          height: `${(28 / CONTAINER_HEIGHT) * 100}cqh`, 
-                          lineHeight: `${(31 / CONTAINER_HEIGHT) * 100}cqh`,
-                          paddingLeft: `${(10 / CONTAINER_WIDTH) * 100}cqw`, 
-                          paddingRight: `${(10 / CONTAINER_WIDTH) * 100}cqw`,
-                          borderRadius: `${(4 / CONTAINER_HEIGHT) * 100}cqh`
-                        }}
+                    {statsForFinishedScreen.wpmToBeat !== null && (
+                      <div 
+                        className="flex items-center"
+                        style={{ gap: `${(8 / CONTAINER_WIDTH) * 100}cqw` }}
                       >
-                        {renderPaddedNumber(statsForFinishedScreen.wpm + 5)}
-                      </span>
-                    </div>
+                        <span 
+                          className="text-tpotracer-100"
+                          style={{ textShadow: glowTextShadow(2, CONTAINER_HEIGHT) }}
+                        >WPM TO BEAT:</span>
+                        <span 
+                          className="bg-tpotracer-300 text-tpotracer-100 font-bold text-center"
+                          style={{ 
+                            height: `${(28 / CONTAINER_HEIGHT) * 100}cqh`, 
+                            lineHeight: `${(31 / CONTAINER_HEIGHT) * 100}cqh`,
+                            paddingLeft: `${(10 / CONTAINER_WIDTH) * 100}cqw`, 
+                            paddingRight: `${(10 / CONTAINER_WIDTH) * 100}cqw`,
+                            borderRadius: relBorderRadius(4),
+                            boxShadow: darkBoxShadow(2, 1, CONTAINER_HEIGHT),
+                            textShadow: glowTextShadow(1, CONTAINER_HEIGHT)
+                          }}
+                        >
+                          {renderPaddedNumber(statsForFinishedScreen.wpmToBeat)}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <p 
-                  className="text-tpotracer-100 glow-text-shadow-sm"
+                  className="text-tpotracer-100"
                   style={{ 
                     fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
                     lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`,
-                    marginTop: `${(10 / CONTAINER_HEIGHT) * 100}cqh`
+                    marginTop: `${(10 / CONTAINER_HEIGHT) * 100}cqh`,
+                    textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
                   }}
                 >
                   {isRetryingScore ? "Submitting score..." : "Press Tab, or click Retry, to try again."}
@@ -530,7 +572,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           )}
         </div>
         <div 
-          className="inner-screen absolute rounded-[49px] flex flex-col"
+          className="inner-screen absolute flex flex-col"
           style={{ 
             top: `${(212 / CONTAINER_HEIGHT) * 100}%`, 
             left: `${(241 / CONTAINER_WIDTH) * 100}%`,
@@ -539,7 +581,8 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             paddingTop: `${(30 / CONTAINER_HEIGHT) * 100}cqh`,
             paddingBottom: `${(30 / CONTAINER_HEIGHT) * 100}cqh`,
             paddingLeft: `${(30 / CONTAINER_WIDTH) * 100}cqw`,
-            paddingRight: `${(30 / CONTAINER_WIDTH) * 100}cqw`
+            paddingRight: `${(30 / CONTAINER_WIDTH) * 100}cqw`,
+            borderRadius: relBorderRadius(49)
           }}
         >
           <div className="badge-row">
@@ -548,57 +591,69 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
               style={{ gap: `${(20 / CONTAINER_WIDTH) * 100}cqw` }}
             >
               <li 
-                className="font-ptclean glow-text-shadow-sm text-tpotracer-100"
+                className="font-ptclean text-tpotracer-100"
                 style={{ 
                   fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
-                  lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
+                  lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`,
+                  textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
                 }}
               >
                 {"WPM: "}
                 <span 
-                  className="bg-tpotracer-100 text-tpotracer-400 font-bold rounded-[4px] glow-shadow-sm dark-text-shadow"
+                  className="bg-tpotracer-100 text-tpotracer-400 font-bold"
                   style={{ 
                     paddingLeft: `${(10 / CONTAINER_WIDTH) * 100}cqw`, 
                     paddingRight: `${(10 / CONTAINER_WIDTH) * 100}cqw`,
-                    paddingTop: `${(2 / CONTAINER_HEIGHT) * 100}cqh`
+                    paddingTop: `${(2 / CONTAINER_HEIGHT) * 100}cqh`,
+                    borderRadius: relBorderRadius(4),
+                    boxShadow: glowBoxShadow(2, 1, CONTAINER_HEIGHT),
+                    textShadow: darkTextShadow(1, CONTAINER_HEIGHT)
                   }}
                 >
                   {renderPaddedNumber(wpm)}
                 </span>
               </li>
               <li 
-                className="font-ptclean glow-text-shadow-sm text-tpotracer-100"
+                className="font-ptclean text-tpotracer-100"
                 style={{ 
                   fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
-                  lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
+                  lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`,
+                  textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
                 }}
               >
                 {"RAW: "}
                 <span 
-                  className="bg-tpotracer-100 text-tpotracer-400 font-bold rounded-[4px] glow-shadow-sm dark-text-shadow"
+                  className="bg-tpotracer-100 text-tpotracer-400 font-bold"
                   style={{ 
                     paddingLeft: `${(10 / CONTAINER_WIDTH) * 100}cqw`, 
                     paddingRight: `${(10 / CONTAINER_WIDTH) * 100}cqw`,
-                    paddingTop: `${(2 / CONTAINER_HEIGHT) * 100}cqh`
+                    paddingTop: `${(2 / CONTAINER_HEIGHT) * 100}cqh`,
+                    borderRadius: relBorderRadius(4),
+                    boxShadow: glowBoxShadow(2, 1, CONTAINER_HEIGHT),
+                    textShadow: darkTextShadow(1, CONTAINER_HEIGHT)
                   }}
                 >
                   {renderPaddedNumber(rawWpm)}
                 </span>
               </li>
               <li 
-                className="font-ptclean glow-text-shadow-sm text-tpotracer-100"
+                className="font-ptclean text-tpotracer-100"
                 style={{ 
                   fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
-                  lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
+                  lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`,
+                  textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
                 }}
               >
                 {"ACC: "}
                 <span 
-                  className="bg-tpotracer-100 text-tpotracer-400 font-bold rounded-[4px] glow-shadow-sm dark-text-shadow"
+                  className="bg-tpotracer-100 text-tpotracer-400 font-bold"
                   style={{ 
                     paddingLeft: `${(10 / CONTAINER_WIDTH) * 100}cqw`, 
                     paddingRight: `${(10 / CONTAINER_WIDTH) * 100}cqw`,
-                    paddingTop: `${(2 / CONTAINER_HEIGHT) * 100}cqh`
+                    paddingTop: `${(2 / CONTAINER_HEIGHT) * 100}cqh`,
+                    borderRadius: relBorderRadius(4),
+                    boxShadow: glowBoxShadow(2, 1, CONTAINER_HEIGHT),
+                    textShadow: darkTextShadow(1, CONTAINER_HEIGHT)
                   }}
                 >
                   {Math.round(accuracy)}%
@@ -611,12 +666,13 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             style={{ marginTop: `${(20 / CONTAINER_HEIGHT) * 100}cqh` }}
           >
             <div 
-              className={`wordlist font-ptclean content-center glow-text-shadow-sm text-tpotracer-100 flex flex-wrap items-start${gameState !== 'completed' ? ' tr-visible' : ''}`}
+              className={`wordlist font-ptclean content-center text-tpotracer-100 flex flex-wrap items-start${gameState !== 'completed' ? ' tr-visible' : ''}`}
               style={{ 
                 fontSize: `${(48 / CONTAINER_HEIGHT) * 100}cqh`,
                 lineHeight: '1',
                 marginTop: `${(20 / CONTAINER_HEIGHT) * 100}cqh`,
-                columnGap: `${(20 / CONTAINER_WIDTH) * 100}cqw`
+                columnGap: `${(20 / CONTAINER_WIDTH) * 100}cqw`,
+                textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
               }}
             >
               {renderWordsWithProgress(words, currentWordIndex, typedText, typedHistory, cursorRef)}
@@ -648,16 +704,20 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             }}
           >
             <p 
-              className="text-tpotracer-100 mb-1 glow-text-shadow-sm"
-              style={{ fontSize: `${(8 / CONTAINER_HEIGHT) * 100}cqh` }}
+              className="text-tpotracer-100 mb-1"
+              style={{ 
+                fontSize: `${(8 / CONTAINER_HEIGHT) * 100}cqh`,
+                textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
+              }}
             >
               tpotracer.com
             </p>
             <div 
-              className="font-bold text-tpotracer-100 font-mono glow-text-shadow-sm"
+              className="font-bold text-tpotracer-100 font-mono"
               style={{ 
                 fontSize: `${(30 / CONTAINER_HEIGHT) * 100}cqh`,
-                lineHeight: `${(36 / CONTAINER_HEIGHT) * 100}cqh`
+                lineHeight: `${(36 / CONTAINER_HEIGHT) * 100}cqh`,
+                textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
               }}
             >
               {Math.round(wpm)} <span style={{ 
@@ -666,23 +726,26 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
               }}>WPM</span>
             </div>
             <div 
-              className="text-tpotracer-100 font-mono mt-1 glow-text-shadow-sm"
+              className="text-tpotracer-100 font-mono mt-1"
               style={{ 
                 fontSize: `${(14 / CONTAINER_HEIGHT) * 100}cqh`,
-                lineHeight: `${(20 / CONTAINER_HEIGHT) * 100}cqh`
+                lineHeight: `${(20 / CONTAINER_HEIGHT) * 100}cqh`,
+                textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
               }}
             >
               @{username}
             </div>
             {leaderboardPosition && (
               <div 
-                className="bg-tpotracer-300 rounded-full text-tpotracer-100 glow-text-shadow-sm mt-2"
+                className="bg-tpotracer-300 text-tpotracer-100 mt-2"
                 style={{ 
                   paddingLeft: `${(8 / CONTAINER_WIDTH) * 100}cqw`,
                   paddingRight: `${(8 / CONTAINER_WIDTH) * 100}cqw`,
                   paddingTop: `${(4 / CONTAINER_HEIGHT) * 100}cqh`,
                   paddingBottom: `${(4 / CONTAINER_HEIGHT) * 100}cqh`,
-                  fontSize: `${(10 / CONTAINER_HEIGHT) * 100}cqh`
+                  fontSize: `${(10 / CONTAINER_HEIGHT) * 100}cqh`,
+                  borderRadius: '9999px',
+                  textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
                 }}
               >
                 #{leaderboardPosition} on leaderboard

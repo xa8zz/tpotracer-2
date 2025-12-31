@@ -70,7 +70,7 @@ body {
   height: 63px;
   background-position: 0 0;
   background-repeat: no-repeat;
-  text-shadow: 0 0 1px #03223F;
+  text-shadow: 0 0 0.2cqh #03223F;
   font-size: 24px;
 }
 
@@ -85,7 +85,7 @@ body {
   width: 117px;
   height: 49px;
   background-repeat: no-repeat;
-  text-shadow: 0 0 1px #03223F;
+  text-shadow: 0 0 0.2cqh #03223F;
   font-size: 24px;
 }
 
@@ -100,7 +100,7 @@ body {
   width: 199px;
   height: 49px;
   background-repeat: no-repeat;
-  text-shadow: 0 0 1px #03223F;
+  text-shadow: 0 0 0.2cqh #03223F;
   font-size: 24px;
 }
 
@@ -125,71 +125,71 @@ body {
 }
 
 .glow-text-shadow {
-  text-shadow: 0 0 1px #A7F1FA;
+  text-shadow: 0 0 0.2cqh #A7F1FA;
 }
 
 .glow-text-shadow-sm {
-  text-shadow: 0 0 2px #A7F1FA;
+  text-shadow: 0 0 0.35cqh #A7F1FA;
 }
 
 .glow-text-shadow-md {
-  text-shadow: 0 0 4px #A7F1FA;
+  text-shadow: 0 0 0.6cqh #A7F1FA;
 }
 
 .glow-text-shadow-lg {
-  text-shadow: 0 0 8px #A7F1FA;
+  text-shadow: 0 0 1.2cqh #A7F1FA;
 }
 
 .dark-text-shadow {
-  text-shadow: 0 0 1px #02182D;
+  text-shadow: 0 0 0.2cqh #02182D;
 }
 
 .dark-text-shadow-sm {
-  text-shadow: 0 0 2px #02182D;
+  text-shadow: 0 0 0.35cqh #02182D;
 }
 
 .dark-text-shadow-md {
-  text-shadow: 0 0 4px #02182D;
+  text-shadow: 0 0 0.6cqh #02182D;
 }
 
 .dark-text-shadow-lg {
-  text-shadow: 0 0 8px #02182D;
+  text-shadow: 0 0 1.2cqh #02182D;
 }
 
 .glow-shadow {
-  box-shadow: 0 0 1px 1px #A7F1FA;
+  box-shadow: 0 0 0.2cqh 0.15cqh #A7F1FA;
 }
 
 .glow-shadow-sm {
-  box-shadow: 0 0 2px 1px #A7F1FA;
+  box-shadow: 0 0 0.35cqh 0.15cqh #A7F1FA;
 }
 
 .glow-shadow-md {
-  box-shadow: 0 0 4px 1px #A7F1FA;
+  box-shadow: 0 0 0.6cqh 0.15cqh #A7F1FA;
 }
 
 .dark-shadow {
-  box-shadow: 0 0 1px 1px #02182D;
+  box-shadow: 0 0 0.2cqh 0.15cqh #02182D;
 }
 
 .dark-shadow-sm {
-  box-shadow: 0 0 2px 1px #02182D;
+  box-shadow: 0 0 0.35cqh 0.15cqh #02182D;
 }
 
 .dark-shadow-md {
-  box-shadow: 0 0 4px 1px #02182D;
+  box-shadow: 0 0 0.6cqh 0.15cqh #02182D;
 }
 
 .tpotracer-300-shadow {
-  box-shadow: 0 0 1px 1px #03223F;
+  box-shadow: 0 0 0.2cqh 0.15cqh #03223F;
 }
 
 .tpotracer-300-shadow-sm {
-  box-shadow: 0 0 2px 1px #03223F;
+  box-shadow: 0 0 0.35cqh 0.15cqh #03223F;
 }
 
 .tpotracer-300-shadow-md {
-  box-shadow: 0 0 4px 1px #03223F;
+  box-shadow: 0 0 0.6cqh 0.15cqh #03223F;
 }
 
 .stupid-big-ass-container {
@@ -248,7 +248,7 @@ body {
 
 .leaderboard-badge-plain {
   background-color: rgba(167, 241, 250, 0.2);
-  box-shadow: 0 0 1px 1px rgba(167, 241, 250, 0.2);
+  box-shadow: 0 0 0.2cqh 0.15cqh rgba(167, 241, 250, 0.2);
 }
 
 .current-user-background {
@@ -258,29 +258,29 @@ body {
   right: 0;
   bottom: 0;
   background: linear-gradient(to right, rgba(167, 241, 250, 0) 0%, rgba(167, 241, 250, 0.2) 20%, rgba(167, 241, 250, 0.2) 80%, rgba(167, 241, 250, 0) 100%);
-  filter: blur(2px);
+  filter: blur(0.35cqh);
   z-index: -1;
 }
 
 .leaderboard-badge-1 {
   background: linear-gradient(to bottom, #ffd700 0%, #b8860b 90%, #ffd700 100%);
-  box-shadow: 0 0 1px 1px #ffd700;
+  box-shadow: 0 0 0.2cqh 0.15cqh #ffd700;
   color: #fff;
-  text-shadow: 0 0 1px #fff;
+  text-shadow: 0 0 0.2cqh #fff;
 }
 
 .leaderboard-badge-2 {
   background: linear-gradient(to bottom, #c0c0c0 0%, #808080 90%, #c0c0c0 100%);
-  box-shadow: 0 0 1px 1px #c0c0c0;
+  box-shadow: 0 0 0.2cqh 0.15cqh #c0c0c0;
   color: #fff;
-  text-shadow: 0 0 1px #fff;
+  text-shadow: 0 0 0.2cqh #fff;
 }
 
 .leaderboard-badge-3 {
   background: linear-gradient(to bottom, #cd7f32 0%, #8b4513 90%, #cd7f32 100%);
-  box-shadow: 0 0 1px 1px #cd7f32;
+  box-shadow: 0 0 0.2cqh 0.15cqh #cd7f32;
   color: #fff;
-  text-shadow: 0 0 1px #fff;
+  text-shadow: 0 0 0.2cqh #fff;
 }
 
 .new-settings-modal {
@@ -390,7 +390,7 @@ body {
 /* The ::before pseudo-element will be the blurred glow */
 .user-avatar::before {
   /* Create the glow effect */
-  filter: blur(1px);
+  filter: blur(0.2cqh);
 }
 
 /* The ::after pseudo-element will be the sharp foreground image */
@@ -405,7 +405,7 @@ body {
   width: 100%;
   height: 100%;
   z-index: 0;
-  filter: blur(2px);
+  filter: blur(0.35cqh);
   background-image: linear-gradient(to right, rgba(3,34,63,0) 0%, rgba(3,34,63,1.0) 1.5%, rgba(3,34,63,1.0) 30%, rgba(3,34,63,0) 100%);
   opacity: 0.4;
 }
@@ -433,20 +433,20 @@ body {
   0%, 49.9% {
     color: #A7F1FA; /* tpotracer-100 */
     background-color: #03223F; /* tpotracer-300 */
-    text-shadow: 0 0 2px #A7F1FA; /* glow-text-shadow-sm */
-    box-shadow: 0 0 2px 1px #03223F; /* tpotracer-300-shadow-sm */
+    text-shadow: 0 0 0.35cqh #A7F1FA; /* glow-text-shadow-sm */
+    box-shadow: 0 0 0.35cqh 0.15cqh #03223F; /* tpotracer-300-shadow-sm */
   }
   50%, 99.9% {
     color: #02182D; /* tpotracer-400 */
     background-color: #A7F1FA; /* tpotracer-100 */
-    text-shadow: 0 0 2px #02182D; /* dark-text-shadow-sm */
-    box-shadow: 0 0 2px 1px #A7F1FA; /* glow-shadow-sm */
+    text-shadow: 0 0 0.35cqh #02182D; /* dark-text-shadow-sm */
+    box-shadow: 0 0 0.35cqh 0.15cqh #A7F1FA; /* glow-shadow-sm */
   }
   100% {
     color: #A7F1FA; /* tpotracer-100 */
     background-color: #03223F; /* tpotracer-300 */
-    text-shadow: 0 0 2px #A7F1FA; /* glow-text-shadow-sm */
-    box-shadow: 0 0 2px 1px #03223F; /* tpotracer-300-shadow-sm */
+    text-shadow: 0 0 0.35cqh #A7F1FA; /* glow-text-shadow-sm */
+    box-shadow: 0 0 0.35cqh 0.15cqh #03223F; /* tpotracer-300-shadow-sm */
   }
 }
 

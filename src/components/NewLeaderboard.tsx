@@ -24,6 +24,15 @@ const FLEX_COL_WIDTH = 230; // 380 - 75 - 75
 const CONDENSED_LB_WIDTH = 110;
 const CONDENSED_LB_HEIGHT = 110;
 
+// Shadow helper functions for relative units (with ~1.5x boost for more glow)
+const glowTextShadow = (size: number) => 
+  `0 0 ${(size * 1.5 / LB_HEIGHT) * 100}cqh #A7F1FA`;
+const darkTextShadow = (size: number) => 
+  `0 0 ${(size * 1.5 / LB_HEIGHT) * 100}cqh #02182D`;
+
+// Border radius helper
+const relBorderRadius = (px: number) => `${(px / LB_HEIGHT) * 100}cqh`;
+
 // Helper to calculate percentage
 const pct = (val: number, total: number) => `${(val / total) * 100}%`;
 
@@ -111,25 +120,27 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
         </button>
         <NewButton 
             size="circle" 
-            className="absolute dark-text-shadow-sm" 
+            className="absolute" 
             onClick={toggleSetVisible}
             style={{
                 top: pct(36, LB_HEIGHT),
                 left: pct(34, LB_WIDTH),
                 width: pct(49, LB_WIDTH),
                 height: pct(49, LB_HEIGHT),
-                fontSize: `${(24 / LB_WIDTH) * 100}cqw`
+                fontSize: `${(24 / LB_WIDTH) * 100}cqw`,
+                textShadow: darkTextShadow(2)
             }}
         >
           ✕
         </NewButton>
         <span 
-            className="absolute font-ptclean dark-text-shadow-sm text-tpotracer-400"
+            className="absolute font-ptclean text-tpotracer-400"
             style={{
                 top: pct(125, LB_HEIGHT),
                 left: pct(162, LB_WIDTH),
                 fontSize: `${(36 / LB_WIDTH) * 100}cqw`,
                 lineHeight: 1.11, // Matching text-4xl leading
+                textShadow: darkTextShadow(2)
             }}
         >
           {getRemainingTimeUntilEnd()}
@@ -145,11 +156,12 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
         >
           {/* Header */}
           <div 
-            className="font-ptclean glow-text-shadow-sm text-tpotracer-100 flex items-center shrink-0"
+            className="font-ptclean text-tpotracer-100 flex items-center shrink-0"
             style={{
                 height: pct(HEADER_HEIGHT, CONTENT_HEIGHT),
                 fontSize: `${(24 / LB_WIDTH) * 100}cqw`,
                 lineHeight: 1.33, // Matching text-2xl leading
+                textShadow: glowTextShadow(2)
             }}
           >
             <div style={{ width: pct(COL_WIDTH, CONTENT_WIDTH) }}>#</div>
@@ -159,20 +171,22 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
           
           {/* Current User */}
           <div 
-            className="font-ptclean relative glow-text-shadow-sm text-tpotracer-100 flex items-center shrink-0 isolate"
+            className="font-ptclean relative text-tpotracer-100 flex items-center shrink-0 isolate"
             style={{
                 height: pct(CURRENT_USER_HEIGHT, CONTENT_HEIGHT),
                 fontSize: `${(24 / LB_WIDTH) * 100}cqw`,
                 lineHeight: 1.33,
+                textShadow: glowTextShadow(2)
             }}
           >
             <div style={{ width: pct(COL_WIDTH, CONTENT_WIDTH) }}>
               <span 
-                className={`inline-block text-tpotracer-100 font-bold rounded-[4px] ${getBadgeClass(currentUserLeaderboardData.place)}`}
+                className={`inline-block text-tpotracer-100 font-bold ${getBadgeClass(currentUserLeaderboardData.place)}`}
                 style={{
                     width: `${(30 / LB_WIDTH) * 100}cqw`,
                     height: `${(25 / LB_WIDTH) * 100}cqw`,
                     lineHeight: `${(28 / LB_WIDTH) * 100}cqw`,
+                    borderRadius: relBorderRadius(4)
                 }}
               >
               {currentUserLeaderboardData.place}
@@ -188,11 +202,12 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
               >
                 <UserAvatar
                   username={currentUserLeaderboardData.username}
-                  className="rounded-[400px] mt-[-3px]"
+                  className="mt-[-3px]"
                   style={{
                       width: pct(32, FLEX_COL_WIDTH),
                       height: 'auto', 
-                      aspectRatio: '1/1'
+                      aspectRatio: '1/1',
+                      borderRadius: '50%'
                   }}
                 />
                 <span className="group-hover:underline">
@@ -223,11 +238,12 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
               >
                 <div style={{ width: pct(COL_WIDTH, CONTENT_WIDTH) }}>
                   <span 
-                    className={`inline-block font-bold rounded-[4px] ${getBadgeClass(index + 1)}`}
+                    className={`inline-block font-bold ${getBadgeClass(index + 1)}`}
                     style={{
                         width: `${(30 / LB_WIDTH) * 100}cqw`,
                         height: `${(25 / LB_WIDTH) * 100}cqw`,
                         lineHeight: `${(28 / LB_WIDTH) * 100}cqw`,
+                        borderRadius: relBorderRadius(4)
                     }}
                   >
                     {index + 1}
@@ -243,19 +259,23 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                   >
                     <UserAvatar
                       username={entry.username}
-                      className="rounded-[400px] mt-[-3px]"
+                      className="mt-[-3px]"
                       style={{
                           width: pct(32, FLEX_COL_WIDTH),
                           height: 'auto',
-                          aspectRatio: '1/1'
+                          aspectRatio: '1/1',
+                          borderRadius: '50%'
                       }}
                     />
-                    <span className="glow-text-shadow-sm group-hover:underline">
+                    <span 
+                      className="group-hover:underline"
+                      style={{ textShadow: glowTextShadow(2) }}
+                    >
                       @{entry.username}
                     </span>
                   </a>
                 </div>
-                <div className="glow-text-shadow-sm" style={{ width: pct(COL_WIDTH, CONTENT_WIDTH) }} title={entry.wpm.toFixed(3)}>{Math.round(entry.wpm)}</div>
+                <div style={{ width: pct(COL_WIDTH, CONTENT_WIDTH), textShadow: glowTextShadow(2) }} title={entry.wpm.toFixed(3)}>{Math.round(entry.wpm)}</div>
               </div>
             ))}
             {isLoadingMore && (
@@ -275,13 +295,14 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
       <div className="leaderboard-condensed">
         <NewButton 
             size="circle" 
-            className="absolute dark-text-shadow-sm flex items-center justify-center" 
+            className="absolute flex items-center justify-center" 
             onClick={toggleSetVisible}
             style={{
                 top: pct(29, CONDENSED_LB_HEIGHT),
                 left: pct(29, CONDENSED_LB_WIDTH),
                 width: pct(49, CONDENSED_LB_WIDTH),
                 height: pct(49, CONDENSED_LB_HEIGHT),
+                textShadow: darkTextShadow(2)
             }}
         >
           <svg width="40%" height="40%" viewBox="0 0 24 24" fill="currentColor">
