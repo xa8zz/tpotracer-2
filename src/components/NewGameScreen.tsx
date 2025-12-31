@@ -11,6 +11,9 @@ import sharableBg from '../assets/sharable.png';
 // Flag to hide share preview card contents (keeps background visible)
 const HIDE_SHARE_PREVIEW_CONTENTS = false;
 
+// Flag to force display "GAME INVALID :(" message (for testing)
+const FORCE_SHOW_INVALID = false;
+
 interface NewGameScreenProps {
   username: string | null;
   onSettingsClick: () => void;
@@ -199,6 +202,8 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     highScore,
     isNewHighScore,
     isRetryingScore,
+    isScoreInvalid,
+    invalidErrorCode,
     showConfetti,
     isHelpExpanded,
     leaderboardPosition,
@@ -475,7 +480,11 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                     textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
                   }}
                 >
-                  {statsForFinishedScreen.isNewHighScore ? "NEW BEST WPM!" : "GAME COMPLETE!"}
+                  {(isScoreInvalid || FORCE_SHOW_INVALID)
+                    ? `GAME ERRORED :( code ${invalidErrorCode ?? '?'}` 
+                    : statsForFinishedScreen.isNewHighScore 
+                      ? "NEW BEST WPM!" 
+                      : "GAME COMPLETE!"}
                 </h2>
                 <div 
                   className="flex items-center"

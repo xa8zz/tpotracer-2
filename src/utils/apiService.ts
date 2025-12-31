@@ -174,7 +174,7 @@ let submitScoreTimeout: ReturnType<typeof setTimeout> | null = null;
 export const submitScore = async (
   result: GameResult,
   forceSubmit = false
-): Promise<{ success: boolean; rank?: number; wpmToBeat?: number | null }> => {
+): Promise<{ success: boolean; rank?: number; wpmToBeat?: number | null; invalid?: boolean; errorCode?: number }> => {
   if (!API_ENABLED) {
     console.warn("Score not submitted - API disabled in dev mode");
     return { success: true };
@@ -195,10 +195,17 @@ export const submitScore = async (
       body: JSON.stringify(result),
     });
     
-
-    if (!response.ok) throw new Error('Score submission failed');
-    
+    // Parse response body to check for validation errors
     const data = await response.json();
+
+    // Check for validation failure (score rejected as invalid/cheating)
+    if (!response.ok) {
+      if (data.invalid) {
+        console.warn("Score rejected as invalid:", data.error, "code:", data.errorCode);
+        return { success: false, invalid: true, errorCode: data.errorCode };
+      }
+      throw new Error(data.error || 'Score submission failed');
+    }
 
     // Update cache with fresh data from response if available
     if (data.leaderboard) {

@@ -128,9 +128,6 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                 width: pct(49, LB_WIDTH),
                 height: pct(49, LB_HEIGHT),
                 '--btn-font-size': `${(24 / LB_WIDTH) * 100}cqw`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
                 lineHeight: 1,
             } as React.CSSProperties}
         >
@@ -298,7 +295,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
       <div className="leaderboard-condensed">
         <NewButton 
             size="circle" 
-            className="absolute flex items-center justify-center" 
+            className="absolute" 
             onClick={toggleSetVisible}
             style={{
                 top: pct(29, CONDENSED_LB_HEIGHT),
@@ -313,7 +310,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
             height="40%" 
             viewBox="0 0 24 24" 
             fill="currentColor"
-            style={{ marginTop: '-3px', filter: `drop-shadow(${darkTextShadow(5)})` }}
+            style={{ marginTop: '-1px', filter: `drop-shadow(${darkTextShadow(5)})` }}
           >
             <rect x="3" y="6" width="5" height="16" rx="1" />
             <rect x="10" y="10" width="5" height="12" rx="1" />
