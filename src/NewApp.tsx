@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Layout from './components/Layout';
-import UsernameForm from './components/UsernameForm';
 import { getUsername, setUsername } from './utils/storageUtils';
-import NewGameScreen from './components/NewGameScreen';
 import NewLayout from './components/NewLayout';
-import NewSettings from './components/NewSettings';
 import { GameContextProvider } from './contexts/GameContext';
 
 interface NewAppProps {
@@ -23,11 +19,6 @@ function NewApp({ onReady }: NewAppProps) {
       setUsername(null);
     }
   }, [onReady]);
-
-  const handleUsernameSubmit = (newUsername: string) => {
-    setUsername(newUsername);
-    setUsernameSt(newUsername);
-  };
 
   const handleUsernameChange = (newUsername: string) => {
     setUsername(newUsername);
