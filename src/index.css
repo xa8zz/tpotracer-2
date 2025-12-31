@@ -76,6 +76,9 @@ body {
   background-repeat: no-repeat;
   text-shadow: 0 0 0.2cqh #03223F;
   font-size: var(--btn-font-size, 24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .new-button:active {
@@ -98,6 +101,9 @@ body {
   background-repeat: no-repeat;
   text-shadow: 0 0 0.2cqh #03223F;
   font-size: var(--btn-font-size, 24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .new-button-md:active {
@@ -113,6 +119,9 @@ body {
   background-repeat: no-repeat;
   text-shadow: 0 0 0.2cqh #03223F;
   font-size: var(--btn-font-size, 24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .new-button-lg:active {
@@ -129,6 +138,9 @@ body {
   width: 49px;
   height: 49px;
   font-size: var(--btn-font-size, 24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .new-button-circle:active {
