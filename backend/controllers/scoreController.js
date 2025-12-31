@@ -1,5 +1,6 @@
 import db from '../db/index.js';
 import cacheService from '../services/cacheService.js';
+import { validateScore } from '../services/scoreValidationService.js';
 
 /**
  * Submit a new score
@@ -24,6 +25,17 @@ export const submitScore = async (req, res) => {
       console.warn(`[Backend] Submission rejected: Invalid username format for "${username}".`);
       return res.status(400).json({ 
         error: 'Username must be 1-15 characters long and contain only alphanumeric characters and underscores.' 
+      });
+    }
+
+    // Validate score integrity (anti-cheat checks)
+    const validation = validateScore({ wpm, rawWpm, accuracy, keystrokes, words });
+    if (!validation.valid) {
+      console.warn(`[Backend] Score validation failed for user "${username}": code ${validation.errorCode}`);
+      return res.status(400).json({ 
+        error: 'Score validation failed',
+        invalid: true,
+        errorCode: validation.errorCode
       });
     }
 

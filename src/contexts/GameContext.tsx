@@ -24,6 +24,8 @@ interface GameContextType {
   isNewHighScore: boolean;
   isSubmittingScore: boolean;
   isRetryingScore: boolean;
+  isScoreInvalid: boolean;
+  invalidErrorCode: number | null;
   showConfetti: boolean;
   isHelpExpanded: boolean;
   leaderboardPosition: number | null;
@@ -65,6 +67,8 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
   const [isNewHighScore, setIsNewHighScore] = useState(false);
   const [isSubmittingScore, setIsSubmittingScore] = useState(false);
   const [isRetryingScore, setIsRetryingScore] = useState(false);
+  const [isScoreInvalid, setIsScoreInvalid] = useState(false);
+  const [invalidErrorCode, setInvalidErrorCode] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [isHelpExpanded, setIsHelpExpanded] = useState(false);
   const [leaderboardPosition, setLeaderboardPosition] = useState<number | null>(null);
@@ -89,6 +93,8 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
     setIncorrectChars(0);
     setTotalChars(0);
     setIsNewHighScore(false);
+    setIsScoreInvalid(false);
+    setInvalidErrorCode(null);
     setShowConfetti(false);
   };
 
@@ -162,6 +168,12 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
             if (isNewRecord) {
               localStorage.setItem(`${HIGH_SCORE_KEY}_${username}`, finalScores.wpm.toString());
             }
+          } else if (result && result.invalid) {
+            // Score was rejected as invalid (cheating detected)
+            setIsScoreInvalid(true);
+            setInvalidErrorCode(result.errorCode ?? null);
+            // Don't retry if the score is invalid
+            break;
           }
         }
         
@@ -412,6 +424,8 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
     isNewHighScore,
     isSubmittingScore,
     isRetryingScore,
+    isScoreInvalid,
+    invalidErrorCode,
     showConfetti,
     isHelpExpanded,
     leaderboardPosition,
