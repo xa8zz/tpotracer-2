@@ -475,7 +475,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                   {statsForFinishedScreen.isNewHighScore ? "NEW BEST WPM!" : "GAME COMPLETE!"}
                 </h2>
                 <div 
-                  className="flex items-end"
+                  className="flex items-center"
                   style={{ gap: `${(20 / CONTAINER_WIDTH) * 100}cqw` }}
                 >
                   <div 
