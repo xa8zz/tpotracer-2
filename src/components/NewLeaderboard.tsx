@@ -120,18 +120,21 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
         </button>
         <NewButton 
             size="circle" 
-            className="absolute" 
+            className="absolute dark-text-shadow-sm" 
             onClick={toggleSetVisible}
             style={{
                 top: pct(36, LB_HEIGHT),
                 left: pct(34, LB_WIDTH),
                 width: pct(49, LB_WIDTH),
                 height: pct(49, LB_HEIGHT),
-                fontSize: `${(24 / LB_WIDTH) * 100}cqw`,
-                textShadow: darkTextShadow(2)
-            }}
+                '--btn-font-size': `${(24 / LB_WIDTH) * 100}cqw`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                lineHeight: 1,
+            } as React.CSSProperties}
         >
-          ✕
+          x
         </NewButton>
         <span 
             className="absolute font-ptclean text-tpotracer-400"
@@ -302,10 +305,16 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                 left: pct(29, CONDENSED_LB_WIDTH),
                 width: pct(49, CONDENSED_LB_WIDTH),
                 height: pct(49, CONDENSED_LB_HEIGHT),
-                textShadow: darkTextShadow(2)
-            }}
+                '--btn-font-size': `${(24 / CONDENSED_LB_WIDTH) * 100}cqw`,
+            } as React.CSSProperties}
         >
-          <svg width="40%" height="40%" viewBox="0 0 24 24" fill="currentColor">
+          <svg 
+            width="40%" 
+            height="40%" 
+            viewBox="0 0 24 24" 
+            fill="currentColor"
+            style={{ marginTop: '-3px', filter: `drop-shadow(${darkTextShadow(5)})` }}
+          >
             <rect x="3" y="6" width="5" height="16" rx="1" />
             <rect x="10" y="10" width="5" height="12" rx="1" />
             <rect x="17" y="14" width="5" height="8" rx="1" />

@@ -138,12 +138,12 @@ const Settings: React.FC<SettingsProps> = ({
               left: pctW(29),
               width: pctW(49),
               height: pctH(49),
-              fontSize: cqw(24),
+              '--btn-font-size': cqw(24),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               lineHeight: 1,
-            }}
+            } as React.CSSProperties}
           >
             x
           </NewButton>
@@ -195,12 +195,12 @@ const Settings: React.FC<SettingsProps> = ({
               left: pctW(353),
               width: pctW(117),
               height: pctH(49),
-              fontSize: cqw(24),
+              '--btn-font-size': cqw(24),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               lineHeight: 1,
-            }}
+            } as React.CSSProperties}
           >
             Save
           </NewButton>
@@ -213,12 +213,12 @@ const Settings: React.FC<SettingsProps> = ({
               left: pctW(270),
               width: pctW(199),
               height: pctH(49),
-              fontSize: cqw(24),
+              '--btn-font-size': cqw(24),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               lineHeight: 1,
-            }}
+            } as React.CSSProperties}
           >
             {isAudioMuted ? 'Unmute Audio' : 'Mute Audio'}
           </NewButton>
@@ -231,12 +231,12 @@ const Settings: React.FC<SettingsProps> = ({
               left: pctW(43),
               width: pctW(199),
               height: pctH(49),
-              fontSize: cqw(24),
+              '--btn-font-size': cqw(24),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               lineHeight: 1,
-            }}
+            } as React.CSSProperties}
           >
             {isVideoPlaying ? 'Pause Video' : 'Play Video'}
           </NewButton>
