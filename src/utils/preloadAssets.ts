@@ -1,13 +1,36 @@
 
+// Keep a reference to loaded images so they aren't garbage collected
+// losing the decoded data.
+const imageCache: HTMLImageElement[] = [];
+
 const preloadImage = (src: string): Promise<void> => {
     return new Promise((resolve) => {
       const img = new Image();
       img.src = src;
-      img.onload = () => resolve();
-      img.onerror = () => {
-        console.warn(`Failed to load image: ${src}`);
-        resolve(); // Resolve even if an image fails to load, to not block the app
-      };
+      
+      // Keep in cache
+      imageCache.push(img);
+
+      // Cast to any to prevent TypeScript from narrowing the else branch to 'never'
+      // if it thinks decode is always present on HTMLImageElement.
+      if ('decode' in (img as any)) {
+        // img.decode() waits for the image to be downloaded AND decoded into a bitmap.
+        // This prevents the "first-paint flicker" and is the modern idiomatic solution.
+        img.decode()
+            .then(() => resolve())
+            .catch((err) => {
+                console.warn(`Failed to decode image: ${src}`, err);
+                // Resolve anyway to not block the app (it might just be a decoding error or format issue)
+                resolve();
+            });
+      } else {
+        // Fallback for older browsers
+        img.onload = () => resolve();
+        img.onerror = () => {
+          console.warn(`Failed to load image: ${src}`);
+          resolve(); 
+        };
+      }
     });
 };
   
