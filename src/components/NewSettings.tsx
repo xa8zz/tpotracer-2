@@ -21,6 +21,12 @@ const pctW = (val: number) => pct(val, MODAL_WIDTH);
 const pctH = (val: number) => pct(val, MODAL_HEIGHT);
 const cqw = (val: number) => `${(val / MODAL_WIDTH) * 100}cqw`;
 
+// Shadow helper functions for text (matching NewGameScreen.tsx)
+const darkTextShadow = (size: number, height: number) => 
+  `0 0 ${(size * 0.8 / height) * 100}cqh #02182D`;
+const darkTextShadowLight = (size: number, height: number) => 
+  `0 0 ${(size * 0.5 / height) * 100}cqh #02182D`;
+
 const Settings: React.FC<SettingsProps> = ({
   currentUsername,
   visible,
@@ -131,7 +137,7 @@ const Settings: React.FC<SettingsProps> = ({
         <div className="relative w-full h-full">
           <NewButton
             size="circle"
-            className="absolute dark-text-shadow-sm"
+            className="absolute"
             onClick={onClose}
             style={{
               top: pctH(30),
@@ -143,35 +149,38 @@ const Settings: React.FC<SettingsProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               lineHeight: 1,
+              textShadow: darkTextShadow(2, MODAL_HEIGHT),
             } as React.CSSProperties}
           >
             x
           </NewButton>
           <span 
-            className="absolute font-ptclean dark-text-shadow text-tpotracer-400"
+            className="absolute font-ptclean text-tpotracer-400"
             style={{
               top: pctH(110),
               left: pctW(50),
               fontSize: cqw(24),
               lineHeight: 1,
+              textShadow: darkTextShadowLight(2, MODAL_HEIGHT),
             }}
           >
             What is your X username?
           </span>
           <span 
-            className="absolute font-ptclean dark-text-shadow text-tpotracer-400 opacity-30"
+            className="absolute font-ptclean text-tpotracer-400 opacity-30"
             style={{
               top: pctH(169),
               left: pctW(58),
               fontSize: cqw(30),
               lineHeight: 1,
+              textShadow: darkTextShadowLight(2, MODAL_HEIGHT),
             }}
           >
             @
           </span>
           <input 
             type="text"
-            className="absolute p-0 rounded-[500px] font-ptclean dark-text-shadow bg-transparent text-tpotracer-400"
+            className="absolute p-0 rounded-[500px] font-ptclean bg-transparent text-tpotracer-400"
             maxLength={15}
             value={username}
             onChange={(e) => sanitizedSetUsername(e.target.value)}
@@ -184,6 +193,7 @@ const Settings: React.FC<SettingsProps> = ({
               paddingLeft: pctW(30),
               fontSize: cqw(24),
               lineHeight: 1,
+              textShadow: darkTextShadowLight(2, MODAL_HEIGHT),
             }}
           />
           <NewButton 
@@ -200,6 +210,7 @@ const Settings: React.FC<SettingsProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               lineHeight: 1,
+              textShadow: darkTextShadow(2, MODAL_HEIGHT),
             } as React.CSSProperties}
           >
             Save
@@ -218,6 +229,7 @@ const Settings: React.FC<SettingsProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               lineHeight: 1,
+              textShadow: darkTextShadow(2, MODAL_HEIGHT),
             } as React.CSSProperties}
           >
             {isAudioMuted ? 'Unmute Audio' : 'Mute Audio'}
@@ -236,6 +248,7 @@ const Settings: React.FC<SettingsProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               lineHeight: 1,
+              textShadow: darkTextShadow(2, MODAL_HEIGHT),
             } as React.CSSProperties}
           >
             {isVideoPlaying ? 'Pause Video' : 'Play Video'}
