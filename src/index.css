@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --btn-active-scale: 0.97;
+}
+
 @font-face {
   font-family: 'ProggyCleanTT';
   src: url('./assets/ProggyClean.ttf') format('truetype');
@@ -71,12 +75,19 @@ body {
   background-position: 0 0;
   background-repeat: no-repeat;
   text-shadow: 0 0 0.2cqh #03223F;
-  font-size: 24px;
+  font-size: var(--btn-font-size, 24px);
 }
 
 .new-button:active {
   background-image: url('./assets/buttondepressedalt.png');
-  font-size: 23px;
+  font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
+}
+
+.new-button:active > svg,
+.new-button-md:active > svg,
+.new-button-lg:active > svg,
+.new-button-circle:active > svg {
+  transform: scale(var(--btn-active-scale));
 }
 
 .new-button-md {
@@ -86,12 +97,12 @@ body {
   height: 49px;
   background-repeat: no-repeat;
   text-shadow: 0 0 0.2cqh #03223F;
-  font-size: 24px;
+  font-size: var(--btn-font-size, 24px);
 }
 
 .new-button-md:active {
   background-image: url('./assets/mdbuttonpressed.png');
-  font-size: 23px;
+  font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
 }
 
 .new-button-lg {
@@ -101,12 +112,12 @@ body {
   height: 49px;
   background-repeat: no-repeat;
   text-shadow: 0 0 0.2cqh #03223F;
-  font-size: 24px;
+  font-size: var(--btn-font-size, 24px);
 }
 
 .new-button-lg:active {
   background-image: url('./assets/lgbuttonpressed.png');
-  font-size: 25px;
+  font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
 }
 
 .new-button-circle {
@@ -117,11 +128,12 @@ body {
   background-color: transparent;
   width: 49px;
   height: 49px;
+  font-size: var(--btn-font-size, 24px);
 }
 
 .new-button-circle:active {
   background-image: url('./assets/smallbuttonpressed.png');
-  font-size: 23px;
+  font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
 }
 
 .glow-text-shadow {

@@ -9,7 +9,7 @@ import html2canvas from 'html2canvas';
 import sharableBg from '../assets/sharable.png';
 
 // Flag to hide share preview card contents (keeps background visible)
-const HIDE_SHARE_PREVIEW_CONTENTS = true;
+const HIDE_SHARE_PREVIEW_CONTENTS = false;
 
 interface NewGameScreenProps {
   username: string | null;
@@ -409,9 +409,9 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             left: `${(410 / CONTAINER_WIDTH) * 100}%`,
             width: `${(181 / CONTAINER_WIDTH) * 100}%`,
             height: `${(63 / CONTAINER_HEIGHT) * 100}%`,
-            fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
+            '--btn-font-size': `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
             lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
-          }}
+          } as React.CSSProperties}
           onClick={handleStartNewGame}
         >
           Retry (Tab)
@@ -423,9 +423,9 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             left: `${(580 / CONTAINER_WIDTH) * 100}%`,
             width: `${(181 / CONTAINER_WIDTH) * 100}%`,
             height: `${(63 / CONTAINER_HEIGHT) * 100}%`,
-            fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
+            '--btn-font-size': `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
             lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`
-          }}
+          } as React.CSSProperties}
           onClick={onSettingsClick}
         >
           Settings
@@ -438,10 +438,10 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             left: `${(777 / CONTAINER_WIDTH) * 100}%`,
             width: `${(49 / CONTAINER_WIDTH) * 100}%`,
             height: `${(49 / CONTAINER_HEIGHT) * 100}%`,
-            fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
+            '--btn-font-size': `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
             lineHeight: `${(32 / CONTAINER_HEIGHT) * 100}cqh`,
             textShadow: darkTextShadow(2, CONTAINER_HEIGHT)
-          }}
+          } as React.CSSProperties}
           onClick={toggleHelp}
         >
           ?
@@ -797,8 +797,8 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             left: `${(455 / CONTAINER_WIDTH) * 100}%`,
             width: `${(181 / CONTAINER_WIDTH) * 100}%`,
             height: `${(63 / CONTAINER_HEIGHT) * 100}%`,
-            fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`
-          }}
+            '--btn-font-size': `${(24 / CONTAINER_HEIGHT) * 100}cqh`
+          } as React.CSSProperties}
           onClick={handleDownloadShareImage}
         >
           Share Image
@@ -810,8 +810,8 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             left: `${(624 / CONTAINER_WIDTH) * 100}%`,
             width: `${(181 / CONTAINER_WIDTH) * 100}%`,
             height: `${(63 / CONTAINER_HEIGHT) * 100}%`,
-            fontSize: `${(24 / CONTAINER_HEIGHT) * 100}cqh`
-          }}
+            '--btn-font-size': `${(24 / CONTAINER_HEIGHT) * 100}cqh`
+          } as React.CSSProperties}
           onClick={handleShareToX}
         >
           Share on X

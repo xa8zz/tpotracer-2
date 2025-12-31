@@ -183,12 +183,12 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
               left: pctW(347),
               width: pctW(117), // Using pctW(117) to scale proportionally with container width
               height: pctH(49),
-              fontSize: cqw(24),
+              '--btn-font-size': cqw(24),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               lineHeight: 1,
-            }}
+            } as React.CSSProperties}
           >
             Save
           </NewButton>

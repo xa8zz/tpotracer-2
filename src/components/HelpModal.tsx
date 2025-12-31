@@ -70,12 +70,12 @@ const HelpModal: React.FC<HelpModalProps> = ({
               left: pctW(29),
               width: pctW(49),
               height: pctH(49),
-              fontSize: cqw(24),
+              '--btn-font-size': cqw(24),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               lineHeight: 1,
-            }}
+            } as React.CSSProperties}
           >
             x
           </NewButton>
