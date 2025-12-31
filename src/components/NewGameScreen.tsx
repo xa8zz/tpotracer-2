@@ -8,6 +8,9 @@ import { getBadgeClass } from '../utils/leaderboardUtils';
 import html2canvas from 'html2canvas';
 import sharableBg from '../assets/sharable.png';
 
+// Flag to hide share preview card contents (keeps background visible)
+const HIDE_SHARE_PREVIEW_CONTENTS = true;
+
 interface NewGameScreenProps {
   username: string | null;
   onSettingsClick: () => void;
@@ -694,64 +697,66 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           }}
         >
           {/* Live preview of share card */}
-          <div 
-            className="w-full h-full flex flex-col items-center justify-center text-center"
-            style={{ 
-              paddingTop: `${(12 / CONTAINER_HEIGHT) * 100}cqh`,
-              paddingBottom: `${(12 / CONTAINER_HEIGHT) * 100}cqh`,
-              paddingLeft: `${(12 / CONTAINER_WIDTH) * 100}cqw`,
-              paddingRight: `${(12 / CONTAINER_WIDTH) * 100}cqw`
-            }}
-          >
-            <p 
-              className="text-tpotracer-100 mb-1"
-              style={{ 
-                fontSize: `${(8 / CONTAINER_HEIGHT) * 100}cqh`,
-                textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
-              }}
-            >
-              tpotracer.com
-            </p>
+          {!HIDE_SHARE_PREVIEW_CONTENTS && (
             <div 
-              className="font-bold text-tpotracer-100 font-mono"
+              className="w-full h-full flex flex-col items-center justify-center text-center"
               style={{ 
-                fontSize: `${(30 / CONTAINER_HEIGHT) * 100}cqh`,
-                lineHeight: `${(36 / CONTAINER_HEIGHT) * 100}cqh`,
-                textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
+                paddingTop: `${(12 / CONTAINER_HEIGHT) * 100}cqh`,
+                paddingBottom: `${(12 / CONTAINER_HEIGHT) * 100}cqh`,
+                paddingLeft: `${(12 / CONTAINER_WIDTH) * 100}cqw`,
+                paddingRight: `${(12 / CONTAINER_WIDTH) * 100}cqw`
               }}
             >
-              {Math.round(wpm)} <span style={{ 
-                fontSize: `${(14 / CONTAINER_HEIGHT) * 100}cqh`,
-                lineHeight: `${(20 / CONTAINER_HEIGHT) * 100}cqh`
-              }}>WPM</span>
-            </div>
-            <div 
-              className="text-tpotracer-100 font-mono mt-1"
-              style={{ 
-                fontSize: `${(14 / CONTAINER_HEIGHT) * 100}cqh`,
-                lineHeight: `${(20 / CONTAINER_HEIGHT) * 100}cqh`,
-                textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
-              }}
-            >
-              @{username}
-            </div>
-            {leaderboardPosition && (
-              <div 
-                className="bg-tpotracer-300 text-tpotracer-100 mt-2"
+              <p 
+                className="text-tpotracer-100 mb-1"
                 style={{ 
-                  paddingLeft: `${(8 / CONTAINER_WIDTH) * 100}cqw`,
-                  paddingRight: `${(8 / CONTAINER_WIDTH) * 100}cqw`,
-                  paddingTop: `${(4 / CONTAINER_HEIGHT) * 100}cqh`,
-                  paddingBottom: `${(4 / CONTAINER_HEIGHT) * 100}cqh`,
-                  fontSize: `${(10 / CONTAINER_HEIGHT) * 100}cqh`,
-                  borderRadius: '9999px',
+                  fontSize: `${(8 / CONTAINER_HEIGHT) * 100}cqh`,
                   textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
                 }}
               >
-                #{leaderboardPosition} on leaderboard
+                tpotracer.com
+              </p>
+              <div 
+                className="font-bold text-tpotracer-100 font-mono"
+                style={{ 
+                  fontSize: `${(30 / CONTAINER_HEIGHT) * 100}cqh`,
+                  lineHeight: `${(36 / CONTAINER_HEIGHT) * 100}cqh`,
+                  textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
+                }}
+              >
+                {Math.round(wpm)} <span style={{ 
+                  fontSize: `${(14 / CONTAINER_HEIGHT) * 100}cqh`,
+                  lineHeight: `${(20 / CONTAINER_HEIGHT) * 100}cqh`
+                }}>WPM</span>
               </div>
-            )}
-          </div>
+              <div 
+                className="text-tpotracer-100 font-mono mt-1"
+                style={{ 
+                  fontSize: `${(14 / CONTAINER_HEIGHT) * 100}cqh`,
+                  lineHeight: `${(20 / CONTAINER_HEIGHT) * 100}cqh`,
+                  textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
+                }}
+              >
+                @{username}
+              </div>
+              {leaderboardPosition && (
+                <div 
+                  className="bg-tpotracer-300 text-tpotracer-100 mt-2"
+                  style={{ 
+                    paddingLeft: `${(8 / CONTAINER_WIDTH) * 100}cqw`,
+                    paddingRight: `${(8 / CONTAINER_WIDTH) * 100}cqw`,
+                    paddingTop: `${(4 / CONTAINER_HEIGHT) * 100}cqh`,
+                    paddingBottom: `${(4 / CONTAINER_HEIGHT) * 100}cqh`,
+                    fontSize: `${(10 / CONTAINER_HEIGHT) * 100}cqh`,
+                    borderRadius: '9999px',
+                    textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
+                  }}
+                >
+                  #{leaderboardPosition} on leaderboard
+                </div>
+              )}
+            </div>
+          )}
         </div>
         {/* Hidden share card for image generation */}
         <div 
