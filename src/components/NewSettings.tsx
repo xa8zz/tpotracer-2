@@ -48,11 +48,7 @@ const Settings: React.FC<SettingsProps> = ({
   // Handle Escape key to close modal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        e.key === 'Escape' &&
-        visible &&
-        document.activeElement?.tagName !== 'INPUT'
-      ) {
+      if (e.key === 'Escape' && visible) {
         onClose();
       }
     };
