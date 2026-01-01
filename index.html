@@ -114,6 +114,11 @@
         opacity: 1;
         pointer-events: none;
       }
+      
+      /* Prevent PiP button from appearing in video controls */
+      #video::-webkit-media-controls-picture-in-picture-button {
+        display: none !important;
+      }
 
       /* Mobile Warning Screen */
       #mobile-warning {
@@ -189,12 +194,81 @@
       src="/tr2.mp4" 
       autoplay 
       loop 
-      muted 
       playsinline
+      disablepictureinpicture
+      disableremoteplayback
+      preload="auto"
+      x-webkit-airplay="deny"
     ></video>
     <script>
-      // Set background video volume
-      document.getElementById('video').volume = 0.37;
+      // Set background video volume and prevent loop stuttering
+      const videoElement = document.getElementById('video');
+      videoElement.volume = 0.1;
+      
+      // AGGRESSIVE Picture-in-Picture Prevention (for Arc and other browsers)
+      // Set multiple properties to disable PiP
+      videoElement.disablePictureInPicture = true;
+      videoElement.disableRemotePlayback = true;
+      
+      // Monitor and force-exit PiP if it somehow gets triggered
+      videoElement.addEventListener('enterpictureinpicture', function(event) {
+        console.log('PiP attempted, exiting immediately');
+        event.preventDefault();
+        if (document.pictureInPictureElement) {
+          document.exitPictureInPicture().catch(err => console.log('Error exiting PiP:', err));
+        }
+      }, true); // Use capture phase
+      
+      videoElement.addEventListener('leavepictureinpicture', function() {
+        console.log('Left PiP mode');
+      });
+      
+      // Pause video when tab is hidden (prevents Arc auto-PiP trigger)
+      document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+          videoElement.pause();
+        } else {
+          videoElement.play().catch(err => console.log('Error resuming video:', err));
+        }
+      });
+      
+      // Additional PiP prevention: Monitor for any PiP requests
+      if ('pictureInPictureEnabled' in document) {
+        // Override requestPictureInPicture for this video element
+        const originalRequestPiP = videoElement.requestPictureInPicture;
+        videoElement.requestPictureInPicture = function() {
+          console.log('PiP request blocked');
+          return Promise.reject(new Error('Picture-in-Picture disabled for this video'));
+        };
+      }
+      
+      // Prevent re-downloading on loop by handling the ended event
+      videoElement.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.play();
+      }, false);
+      
+      // Ensure video stays loaded in memory
+      videoElement.addEventListener('emptied', function() {
+        this.load();
+      }, false);
+      
+      // Use MutationObserver to ensure disablePictureInPicture attribute stays set
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'disablepictureinpicture') {
+            if (!videoElement.hasAttribute('disablepictureinpicture')) {
+              videoElement.setAttribute('disablepictureinpicture', '');
+              videoElement.disablePictureInPicture = true;
+            }
+          }
+        });
+      });
+      
+      observer.observe(videoElement, {
+        attributes: true,
+        attributeFilter: ['disablepictureinpicture']
+      });
     </script>
     <div id="mobile-warning">
       <div class="warning-container">

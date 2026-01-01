@@ -49,7 +49,8 @@ const preloadVideo = (src: string): Promise<void> => {
         const video = document.createElement('video');
         video.src = src;
         video.preload = 'auto';
-        video.muted = true; // Autoplay policy
+        video.muted = true; // Autoplay policy for preload element
+        video.disablePictureInPicture = true; // Disable PiP
         
         // We consider it "preloaded" when we have enough data to start playing
         const onLoaded = () => {
@@ -64,11 +65,12 @@ const preloadVideo = (src: string): Promise<void> => {
         };
 
         const cleanup = () => {
-            video.removeEventListener('canplay', onLoaded);
+            video.removeEventListener('canplaythrough', onLoaded);
             video.removeEventListener('error', onError);
         };
 
-        video.addEventListener('canplay', onLoaded);
+        // Use 'canplaythrough' instead of 'canplay' to ensure more buffering
+        video.addEventListener('canplaythrough', onLoaded);
         video.addEventListener('error', onError);
         
         video.load();
