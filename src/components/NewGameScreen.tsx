@@ -934,7 +934,8 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                       marginTop: `${(0 / CONTAINER_HEIGHT) * 100}cqh`,
                       filter: `drop-shadow(${glowTextShadow(1, CONTAINER_HEIGHT)})`,
                       opacity: isGhostEnabled ? 1 : 0.3,
-                      transition: 'opacity 0.15s ease-out'
+                      transition: 'opacity 0.15s ease-out',
+                      cursor: 'pointer'
                     }}
                   />
                 </button>

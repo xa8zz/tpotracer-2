@@ -82,6 +82,7 @@ body {
   align-items: center;
   justify-content: center;
   isolation: isolate;
+  cursor: pointer;
 }
 
 .new-button::before {
@@ -113,6 +114,7 @@ body {
   align-items: center;
   justify-content: center;
   isolation: isolate;
+  cursor: pointer;
 }
 
 .new-button-md::before {
@@ -144,6 +146,7 @@ body {
   align-items: center;
   justify-content: center;
   isolation: isolate;
+  cursor: pointer;
 }
 
 .new-button-lg::before {
@@ -176,6 +179,7 @@ body {
   align-items: center;
   justify-content: center;
   isolation: isolate;
+  cursor: pointer;
 }
 
 .new-button-circle::before {
@@ -203,6 +207,7 @@ body {
   width: 100%;
   height: 100%;
   transition: transform var(--btn-transition-duration) var(--btn-transition-easing);
+  cursor: pointer;
 }
 
 .new-button > svg,
@@ -531,19 +536,23 @@ body {
   opacity: 0;
   transition: opacity 0.2s ease;
   z-index: 999;
+  pointer-events: none;
 }
 
 .game-finished-screen.tr-visible {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .wordlist {
   opacity: 0;
   transition: opacity 0.2s ease;
+  pointer-events: none;
 }
 
 .wordlist.tr-visible {
   opacity: 1;
+  pointer-events: auto;
 }
 
 @keyframes tr-flash {
