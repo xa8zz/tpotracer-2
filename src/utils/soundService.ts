@@ -21,8 +21,7 @@ import click6 from '../assets/sound/click4_6.wav';
 import click6b from '../assets/sound/click4_66.wav';
 
 // Import error sound files
-import error1 from '../assets/sound/error4_1.wav';
-import error2 from '../assets/sound/error4_2.wav';
+import error1 from '../assets/sound/error2_1.wav';
 
 // Each variation has TWO Howl instances and its own counter for rapid fire handling
 type SoundVariation = {
@@ -115,14 +114,10 @@ export const initSoundService = async (): Promise<void> => {
       },
     ];
     
-    // Two variations, each with dual instances for rapid fire
+    // One variation with dual instances for rapid fire
     errorSounds = [
       {
         sounds: [createHowl(error1), createHowl(error1)],
-        counter: 0,
-      },
-      {
-        sounds: [createHowl(error2), createHowl(error2)],
         counter: 0,
       },
     ];
