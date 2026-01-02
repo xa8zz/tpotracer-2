@@ -4,9 +4,15 @@ import { useSpring } from '@react-spring/web';
 // Flag to enable early settling (showing cursor before animation fully finishes)
 const USE_EARLY_SETTLE = false;
 
-function getBackgroundFilter(isActive: boolean, intent: 'modal' | 'startup'): string {
+export type BackgroundIntent = 'modal' | 'startup' | 'firstStartup';
+
+function getBackgroundFilter(isActive: boolean, intent: BackgroundIntent): string {
   if (!isActive) return 'blur(0px)';
   
+  if (intent === 'firstStartup') {
+    return 'blur(20px)';
+  }
+
   if (intent === 'modal') {
     return 'blur(10px)';
   }
@@ -14,9 +20,13 @@ function getBackgroundFilter(isActive: boolean, intent: 'modal' | 'startup'): st
   return 'blur(20px)';
 }
 
-function getBackgroundTransform(isActive: boolean, intent: 'modal' | 'startup'): string {
+function getBackgroundTransform(isActive: boolean, intent: BackgroundIntent): string {
   if (!isActive) return 'scale(1)';
   
+  if (intent === 'firstStartup') {
+    return 'scale(0.70)';
+  }
+
   if (intent === 'modal') {
     return 'scale(0.90)';
   }
@@ -24,11 +34,18 @@ function getBackgroundTransform(isActive: boolean, intent: 'modal' | 'startup'):
   return 'scale(0.80)';
 }
 
-function getSpringConfig(intent: 'modal' | 'startup') {
+export function getSpringConfig(intent: BackgroundIntent) {
   if (intent === 'modal') {
     return {
       tension: 300,
       friction: 30,
+    };
+  }
+
+  if (intent === 'firstStartup') {
+    return {
+      tension: 260,
+      friction: 50,
     };
   }
   
@@ -43,11 +60,14 @@ function getSpringConfig(intent: 'modal' | 'startup') {
  * Used for the main game container when modals are open or during loading.
  * 
  * @param isActive - Whether the background effect should be active (blurred and scaled down)
- * @param intent - The intent of the backgrounding ('modal' or 'startup')
+ * @param intent - The intent of the backgrounding ('modal', 'startup', or 'firstStartup')
+ * @param useFirstStartupConfig - Override to use firstStartup config (for slow transition out of firstStartup)
  * @returns Object containing the spring styles and the settled state
  */
-export const useBackgroundSpring = (isActive: boolean, intent: 'modal' | 'startup' = 'startup') => {
+export const useBackgroundSpring = (isActive: boolean, intent: BackgroundIntent = 'startup', useFirstStartupConfig = false) => {
   const [isSettled, setIsSettled] = useState(true);
+
+  const config = useFirstStartupConfig ? getSpringConfig('firstStartup') : getSpringConfig(intent);
 
   const styles = useSpring({
     to: {
@@ -73,10 +93,8 @@ export const useBackgroundSpring = (isActive: boolean, intent: 'modal' | 'startu
         }
       }
     },
-    config: getSpringConfig(intent),
+    config,
   });
 
   return { styles, isSettled };
 };
-
-
