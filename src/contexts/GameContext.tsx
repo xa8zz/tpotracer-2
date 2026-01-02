@@ -31,6 +31,7 @@ interface GameContextType {
   isHelpExpanded: boolean;
   leaderboardPosition: number | null;
   wpmToBeat: number | null;
+  wpmToBeatRaw: number | null;
   width: number;
   height: number;
   
@@ -74,6 +75,7 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
   const [isHelpExpanded, setIsHelpExpanded] = useState(false);
   const [leaderboardPosition, setLeaderboardPosition] = useState<number | null>(null);
   const [wpmToBeat, setWpmToBeat] = useState<number | null>(null);
+  const [wpmToBeatRaw, setWpmToBeatRaw] = useState<number | null>(null);
   
   const { width, height } = useWindowSize();
 
@@ -164,6 +166,7 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
             }
             // Set wpmToBeat (null if user is #1)
             setWpmToBeat(result.wpmToBeat ?? null);
+            setWpmToBeatRaw(result.wpmToBeatRaw ?? null);
             
             // Save new high score to local storage ONLY on success
             if (isNewRecord) {
@@ -188,6 +191,8 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
         if (cache.userPosition) {
            setLeaderboardPosition(cache.userPosition);
         }
+        setWpmToBeat(cache.wpmToBeat ?? null);
+        setWpmToBeatRaw(cache.wpmToBeatRaw ?? null);
       } catch (e) {
         console.error("Failed to update rank after game", e);
       }
@@ -233,6 +238,8 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
         if (cache.userPosition) {
           setLeaderboardPosition(cache.userPosition);
         }
+        setWpmToBeat(cache.wpmToBeat ?? null);
+        setWpmToBeatRaw(cache.wpmToBeatRaw ?? null);
       } catch (e) {
         console.error("Failed to fetch initial rank", e);
       }
@@ -440,6 +447,7 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
     isHelpExpanded,
     leaderboardPosition,
     wpmToBeat,
+    wpmToBeatRaw,
     width,
     height,
     

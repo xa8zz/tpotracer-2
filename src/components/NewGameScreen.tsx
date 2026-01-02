@@ -19,6 +19,10 @@ const HIDE_SHARE_PREVIEW_CONTENTS = true;
 // Flag to force display "GAME INVALID :(" message (for testing)
 const FORCE_SHOW_INVALID = false;
 
+// Ghost cursor configuration
+// Set to true to use regular WPM, false to use Raw WPM
+const GHOST_USE_REGULAR_WPM = true;
+
 interface NewGameScreenProps {
   username: string | null;
   onSettingsClick: () => void;
@@ -72,89 +76,133 @@ const renderWordsWithProgress = (
   currentWordIndex: number, 
   typedText: string, 
   typedHistory: string[],
-  cursorRef: React.RefObject<HTMLSpanElement>
+  cursorRef: React.RefObject<HTMLSpanElement>,
+  ghostCursorRef: React.RefObject<HTMLSpanElement>,
+  ghostIndex: number
 ): JSX.Element => {
   const incorrectCharClass = 'text-red-300 opacity-100 [text-shadow:0_0_2px_rgb(252,165,165)]';
+  let charCounter = 0;
+  
+  // Calculate total text length (words joined with spaces)
+  const totalTextLength = words.join(' ').length;
+  // Check if ghost has reached the end
+  const ghostAtEnd = ghostIndex >= totalTextLength;
 
   return (
     <>
       {words.map((word, wordIndex) => {
-        if (wordIndex < currentWordIndex) {
-          // Word has been completed - show typing history with correct/incorrect styling
-          const typedWord = typedHistory[wordIndex] || '';
-          return (
-            <span key={wordIndex} className="inline-block">
-              {word.split('').map((char, charIndex) => {
-                const typedChar = typedWord[charIndex];
-                const wasTyped = charIndex < typedWord.length;
-                const wasCorrect = wasTyped && typedChar === char;
-                
-                let className = '';
-                if (wasTyped) {
-                  className += wasCorrect ? 'text-tpotracer-100 opacity-100' : incorrectCharClass;
-                } else {
-                  // Character was never typed (word was shorter than expected)
-                  className += 'text-tpotracer-100 opacity-40';
-                }
-                
-                return (
-                  <span key={charIndex} className={className}>
-                    {char}
-                  </span>
-                );
-              })}
-            </span>
-          );
-        } else if (wordIndex === currentWordIndex) {
-          // Current word being typed
-          return (
-            <span key={wordIndex} className="inline-block relative">
-              {word.split('').map((char, charIndex) => {
-                const isTyped = charIndex < typedText.length;
-                const isCorrect = isTyped && typedText[charIndex] === char;
-                const isCursorPosition = charIndex === typedText.length && typedText.length < word.length;
-                
-                let className = '';
-                if (isTyped) {
-                  className += isCorrect ? 'text-tpotracer-100 opacity-100' : incorrectCharClass;
-                } else {
-                  className += 'text-tpotracer-100 opacity-40';
-                }
-                
-                return (
-                  <span key={charIndex} className="relative">
-                    <span className={className}>
+        const startIndex = charCounter;
+        charCounter += word.length;
+        // Add space to counter if not the last word, to match words.join(' ') indices
+        if (wordIndex < words.length - 1) {
+          charCounter++;
+        }
+        
+        const isLastWord = wordIndex === words.length - 1;
+
+        return (
+          <span key={wordIndex} className="inline-block relative">
+            {wordIndex < currentWordIndex ? (
+              // Word has been completed
+              (() => {
+                const typedWord = typedHistory[wordIndex] || '';
+                return word.split('').map((char, charIndex) => {
+                  const typedChar = typedWord[charIndex];
+                  const wasTyped = charIndex < typedWord.length;
+                  const wasCorrect = wasTyped && typedChar === char;
+                  const globalIndex = startIndex + charIndex;
+                  const isGhostPosition = globalIndex === ghostIndex;
+                  
+                  let className = '';
+                  if (wasTyped) {
+                    className += wasCorrect ? 'text-tpotracer-100 opacity-100' : incorrectCharClass;
+                  } else {
+                    className += 'text-tpotracer-100 opacity-40';
+                  }
+                  
+                  return (
+                    <span 
+                      key={charIndex} 
+                      className={className}
+                      ref={isGhostPosition ? ghostCursorRef : undefined}
+                    >
                       {char}
                     </span>
-                    {isCursorPosition && (
+                  );
+                });
+              })()
+            ) : wordIndex === currentWordIndex ? (
+              // Current word being typed
+              <>
+                {word.split('').map((char, charIndex) => {
+                  const isTyped = charIndex < typedText.length;
+                  const isCorrect = isTyped && typedText[charIndex] === char;
+                  const isCursorPosition = charIndex === typedText.length && typedText.length < word.length;
+                  const globalIndex = startIndex + charIndex;
+                  const isGhostPosition = globalIndex === ghostIndex;
+                  
+                  let className = '';
+                  if (isTyped) {
+                    className += isCorrect ? 'text-tpotracer-100 opacity-100' : incorrectCharClass;
+                  } else {
+                    className += 'text-tpotracer-100 opacity-40';
+                  }
+                  
+                  return (
+                    <span key={charIndex} className="relative">
                       <span 
-                        ref={cursorRef}
-                        className="absolute left-0 top-0 w-0 h-full opacity-0 pointer-events-none"
-                        aria-hidden="true"
-                      />
-                    )}
-                  </span>
-                );
-              })}
-              {/* Handle cursor at the end of completed current word - stays here until space is pressed */}
-              {typedText.length === word.length && (
-                <span 
-                  ref={cursorRef}
-                  className="absolute opacity-0 pointer-events-none top-0 h-full"
-                  style={{ left: '100%' }}
-                  aria-hidden="true"
-                />
-              )}
-            </span>
-          );
-        } else {
-          // Future words - tpotracer-100 with low opacity
-          return (
-            <span key={wordIndex} className="text-tpotracer-100 opacity-40 inline-block">
-              {word}
-            </span>
-          );
-        }
+                        className={className}
+                        ref={isGhostPosition ? ghostCursorRef : undefined}
+                      >
+                        {char}
+                      </span>
+                      {isCursorPosition && (
+                        <span 
+                          ref={cursorRef}
+                          className="absolute left-0 top-0 w-0 h-full opacity-0 pointer-events-none"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </span>
+                  );
+                })}
+                {/* Handle cursor at the end of completed current word */}
+                {typedText.length === word.length && (
+                  <span 
+                    ref={cursorRef}
+                    className="absolute opacity-0 pointer-events-none top-0 h-full"
+                    style={{ left: '100%' }}
+                    aria-hidden="true"
+                  />
+                )}
+              </>
+            ) : (
+              // Future words
+              word.split('').map((char, charIndex) => {
+                  const globalIndex = startIndex + charIndex;
+                  const isGhostPosition = globalIndex === ghostIndex;
+                  return (
+                    <span 
+                      key={charIndex} 
+                      className="text-tpotracer-100 opacity-40 inline-block"
+                      ref={isGhostPosition ? ghostCursorRef : undefined}
+                    >
+                      {char}
+                    </span>
+                  );
+              })
+            )}
+            {/* Ghost end marker - invisible element after last character of last word */}
+            {isLastWord && ghostAtEnd && (
+              <span 
+                ref={ghostCursorRef}
+                className="absolute opacity-0 pointer-events-none top-0 h-full"
+                style={{ left: '100%' }}
+                aria-hidden="true"
+              />
+            )}
+          </span>
+        );
       })}
     </>
   );
@@ -181,6 +229,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   const relBorderRadius = (px: number) => `${(px / CONTAINER_HEIGHT) * 100}cqh`;
   
   const [isFlashing, setIsFlashing] = useState(false);
+  const [ghostIndex, setGhostIndex] = useState(0);
   const [finishedGameState, setFinishedGameState] = useState<{
     wpm: number;
     leaderboardPosition: number | null;
@@ -189,6 +238,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   } | null>(null);
   // Create ref for cursor positioning
   const cursorRef = useRef<HTMLSpanElement>(null);
+  const ghostCursorRef = useRef<HTMLSpanElement>(null);
   // Create ref for share card
   const shareCardRef = useRef<HTMLDivElement>(null);
   // Retro confetti canvas ref
@@ -223,13 +273,58 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     isHelpExpanded,
     leaderboardPosition,
     wpmToBeat,
-    width,
-    height,
-    initializeGame,
-    handleGameComplete,
+    wpmToBeatRaw,
     handleStartNewGame,
     toggleHelp,
   } = useGameContext();
+
+  // Ghost Logic
+  // Calculate ghost target WPM based on configuration flag
+  const ghostTargetWpm = GHOST_USE_REGULAR_WPM ? wpmToBeat : wpmToBeatRaw;
+  
+  useEffect(() => {
+    if (gameState === 'waiting') {
+      setGhostIndex(0);
+      return;
+    }
+
+    if (gameState !== 'playing' || !ghostTargetWpm || !startTime) {
+       return;
+    }
+
+    let animationFrameId: number;
+
+    const updateGhost = () => {
+      const now = Date.now();
+      const elapsedSeconds = (now - startTime) / 1000;
+      // WPM = (chars / 5) / min -> chars/sec = (WPM * 5) / 60 = WPM / 12
+      const charsPerSecond = ghostTargetWpm / 12;
+      let rawIndex = Math.floor(elapsedSeconds * charsPerSecond);
+      
+      const fullText = words.join(' ');
+      const totalLen = fullText.length;
+      
+      // Allow ghost to reach position after last character (totalLen, not totalLen - 1)
+      if (rawIndex > totalLen) {
+        rawIndex = totalLen;
+      }
+      
+      // If on a space, skip to next char (start of next word)
+      // This makes the ghost appear to wait at the start of the next word
+      if (rawIndex < totalLen && fullText[rawIndex] === ' ') {
+         setGhostIndex(rawIndex + 1);
+      } else {
+         setGhostIndex(rawIndex);
+      }
+      
+      if (gameState === 'playing') {
+        animationFrameId = requestAnimationFrame(updateGhost);
+      }
+    };
+
+    animationFrameId = requestAnimationFrame(updateGhost);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [gameState, startTime, ghostTargetWpm, words]);
 
   // Spring animation for game completion
   const [{ z }, springApi] = useSpring(() => ({
@@ -264,8 +359,8 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   useEffect(() => {
     gameCompleteAudioRef.current = new Audio(gameCompleteSound);
     newBestWpmAudioRef.current = new Audio(newBestWpmSound);
-    if (gameCompleteAudioRef.current) gameCompleteAudioRef.current.volume = 0.5;
-    if (newBestWpmAudioRef.current) newBestWpmAudioRef.current.volume = 0.5;
+    if (gameCompleteAudioRef.current) gameCompleteAudioRef.current.volume = 0.1;
+    if (newBestWpmAudioRef.current) newBestWpmAudioRef.current.volume = 0.1;
   }, []);
 
   // Play sounds on completion
@@ -792,11 +887,11 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                 textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
               }}
             >
-              {renderWordsWithProgress(words, currentWordIndex, typedText, typedHistory, cursorRef)}
+              {renderWordsWithProgress(words, currentWordIndex, typedText, typedHistory, cursorRef, ghostCursorRef, ghostIndex)}
             </div>
           </div>
         </div>
-        <div 
+        <div  
           className="share-preview absolute overflow-hidden"
           style={{ 
             top: `${(592 / CONTAINER_HEIGHT) * 100}%`, 
@@ -993,6 +1088,13 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
       
       {/* Custom Cursor Component - Outside animated container to maintain correct positioning */}
       <Cursor targetRef={cursorRef} isVisible={isCursorVisible} />
+      {/* Ghost Cursor - Only visible when playing and we have a target WPM */}
+      <Cursor 
+        targetRef={ghostCursorRef} 
+        isVisible={gameState === 'playing' && !!ghostTargetWpm} 
+        className="bg-red-500 opacity-60"
+        glowColor="#ef4444"
+      />
     </div>
   );
 };

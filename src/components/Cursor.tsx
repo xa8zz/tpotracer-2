@@ -4,9 +4,11 @@ import { createPortal } from 'react-dom';
 interface CursorProps {
   targetRef: React.RefObject<HTMLSpanElement> | null;
   isVisible: boolean;
+  className?: string;
+  glowColor?: string;
 }
 
-const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible }) => {
+const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible, className, glowColor }) => {
   const [position, setPosition] = useState({ left: 0, top: 0, height: 0 });
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -65,7 +67,7 @@ const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible }) => {
 
   return createPortal(
     <div
-      className="fixed w-[2px] bg-tpotracer-100 transition-all duration-100 ease-out animate-blink glow-shadow-sm"
+      className={`fixed w-[2px] transition-all duration-100 ease-out animate-blink ${glowColor ? '' : 'glow-shadow-sm'} ${className || 'bg-tpotracer-100'}`}
       style={{
         left: `${position.left - 1}px`,
         top: `${position.top}px`,
@@ -73,6 +75,7 @@ const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible }) => {
         transform: 'translateX(0)',
         zIndex: 9999,
         pointerEvents: 'none',
+        ...(glowColor ? { boxShadow: `0 0 0.35cqh 0.15cqh ${glowColor}` } : {}),
       }}
     />,
     document.body

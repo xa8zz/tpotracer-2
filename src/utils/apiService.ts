@@ -16,6 +16,8 @@ export interface LeaderboardResult {
   data: LeaderboardEntry[];
   hasMore: boolean;
   userPosition?: number;
+  wpmToBeat?: number | null;
+  wpmToBeatRaw?: number | null;
 }
 
 // Cache for first page + user position
@@ -23,6 +25,8 @@ interface LeaderboardCache {
   data: LeaderboardEntry[];
   timestamp: number;
   userPosition?: number;
+  wpmToBeat?: number | null;
+  wpmToBeatRaw?: number | null;
 }
 
 let leaderboardCache: LeaderboardCache = {
@@ -106,24 +110,29 @@ export const fetchLeaderboard = async (
 
   // Calculate user position for the requested username
   let userPosition: number | undefined = undefined;
+  let wpmToBeat: number | undefined | null = undefined;
+  let wpmToBeatRaw: number | undefined | null = undefined;
 
   if (username) {
     const index = data.findIndex(entry => entry.username === username);
     if (index !== -1) {
       userPosition = index + 1;
-    } else {
-      try {
-        const headers = {
-          'x-api-key': import.meta.env.VITE_API_KEY
-        };
-        const countResponse = await fetch(`${API_BASE_URL}/api/rank/${encodeURIComponent(username)}`, { headers });
-        if (countResponse.ok) {
-          const { rank } = await countResponse.json();
-          userPosition = rank;
-        }
-      } catch (err) {
-        console.error("Failed to fetch user position", err);
+    } 
+    
+    // Always fetch from rank endpoint to get wpmToBeat and wpmToBeatRaw
+    try {
+      const headers = {
+        'x-api-key': import.meta.env.VITE_API_KEY
+      };
+      const countResponse = await fetch(`${API_BASE_URL}/api/rank/${encodeURIComponent(username)}`, { headers });
+      if (countResponse.ok) {
+        const result = await countResponse.json();
+        userPosition = result.rank;
+        wpmToBeat = result.wpmToBeat;
+        wpmToBeatRaw = result.wpmToBeatRaw;
       }
+    } catch (err) {
+      console.error("Failed to fetch user position", err);
     }
   }
 
@@ -131,13 +140,17 @@ export const fetchLeaderboard = async (
   leaderboardCache = { 
     data, 
     timestamp, 
-    userPosition 
+    userPosition,
+    wpmToBeat,
+    wpmToBeatRaw
   };
   
   return {
     data,
     hasMore: data.length === PAGE_SIZE,
-    userPosition
+    userPosition,
+    wpmToBeat,
+    wpmToBeatRaw
   };
 };
 
@@ -174,7 +187,7 @@ let submitScoreTimeout: ReturnType<typeof setTimeout> | null = null;
 export const submitScore = async (
   result: GameResult,
   forceSubmit = false
-): Promise<{ success: boolean; rank?: number; wpmToBeat?: number | null; invalid?: boolean; errorCode?: number }> => {
+): Promise<{ success: boolean; rank?: number; wpmToBeat?: number | null; wpmToBeatRaw?: number | null; invalid?: boolean; errorCode?: number }> => {
   if (!API_ENABLED) {
     console.warn("Score not submitted - API disabled in dev mode");
     return { success: true };
@@ -223,7 +236,7 @@ export const submitScore = async (
     }, 2000); // 2s cooldown
 
     await fetchLeaderboard(true, result.username);
-    return { success: true, rank: data.rank, wpmToBeat: data.wpmToBeat };
+    return { success: true, rank: data.rank, wpmToBeat: data.wpmToBeat, wpmToBeatRaw: data.wpmToBeatRaw };
   } catch (error) {
     console.error("Submit score failed", error);
     return { success: false };
