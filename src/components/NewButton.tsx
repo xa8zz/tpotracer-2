@@ -1,5 +1,6 @@
-import React from 'react';
-import { useButtonSound, ButtonSize } from '../hooks/useButtonSound';
+import React, { useRef } from 'react';
+import { ButtonSize } from '../hooks/useButtonSound';
+import { useClickSound } from '../hooks/useClickSound';
 
 interface NewButtonProps {
   onClick?: () => void;
@@ -29,14 +30,16 @@ const NewButton: React.FC<NewButtonProps> = ({
   size,
   style
 }) => {
-  const { playBtnDown, playBtnUp } = useButtonSound();
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const pitchSize = sizeToButtonSize(size);
+
+  // Attach low-latency sound listeners
+  useClickSound(buttonRef, pitchSize);
 
   return (
     <button
+      ref={buttonRef}
       onClick={onClick}
-      onMouseDown={() => playBtnDown(pitchSize)}
-      onMouseUp={() => playBtnUp(pitchSize)}
       className={`font-ptclean text-2xl ${size ? `new-button-${size}` : 'new-button'} text-tpotracer-300 ${className}`}
       style={style}
     >

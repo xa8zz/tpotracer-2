@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback } from 'react';
+import { Howl } from 'howler';
 import btnDownSound from '../assets/sound/btndown.wav';
 import btnUpSound from '../assets/sound/btnup.wav';
 import { isSfxEnabled, getButtonVolume } from '../utils/settingsService';
@@ -13,39 +14,43 @@ export type ButtonSize = -1 | 0 | 1;
  */
 const calculatePitch = (size: ButtonSize): number => {
   const r = Math.random();
-  return 1 + 0.07 * r - 0.06 * size;
+
+  // the larger buttons arent that much bigger, so make it 0.5 instead of 1
+  const bruhSize: number = size === 1 ? 0.5 : size;
+
+  return 1 + 0.07 * r - 0.09 * bruhSize;
 };
 
+// Create Howl instances once to ensure preloading
+// Using Web Audio API (via Howler) provides much lower latency than HTML5 Audio
+const audioDown = new Howl({
+  src: [btnDownSound],
+  preload: true,
+  volume: 1.0,
+});
+
+const audioUp = new Howl({
+  src: [btnUpSound],
+  preload: true,
+  volume: 1.0,
+});
+
 export const useButtonSound = () => {
-  const audioDownRef = useRef<HTMLAudioElement | null>(null);
-  const audioUpRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    audioDownRef.current = new Audio(btnDownSound);
-    audioDownRef.current.preservesPitch = false; // Allow pitch to change with playbackRate
-    
-    audioUpRef.current = new Audio(btnUpSound);
-    audioUpRef.current.preservesPitch = false;
-  }, []);
-
   const playBtnDown = useCallback((size: ButtonSize = 0) => {
-    if (!isSfxEnabled() || !audioDownRef.current) return;
-    audioDownRef.current.volume = getButtonVolume();
-    audioDownRef.current.playbackRate = calculatePitch(size);
-    audioDownRef.current.currentTime = 0;
-    audioDownRef.current.play().catch(() => {
-      // Ignore play errors (e.g. user hasn't interacted with document yet)
-    });
+    if (!isSfxEnabled()) return;
+    
+    // Play immediately - Howler handles concurrency/overlap automatically
+    const id = audioDown.play();
+    audioDown.volume(getButtonVolume(), id);
+    audioDown.rate(calculatePitch(size), id);
   }, []);
 
   const playBtnUp = useCallback((size: ButtonSize = 0) => {
-    if (!isSfxEnabled() || !audioUpRef.current) return;
-    audioUpRef.current.volume = getButtonVolume();
-    audioUpRef.current.playbackRate = calculatePitch(size);
-    audioUpRef.current.currentTime = 0;
-    audioUpRef.current.play().catch(() => {
-      // Ignore play errors
-    });
+    if (!isSfxEnabled()) return;
+    
+    const id = audioUp.play();
+    audioUp.volume(getButtonVolume(), id);
+    audioUp.rate(calculatePitch(size), id);
   }, []);
 
   return { playBtnDown, playBtnUp };
