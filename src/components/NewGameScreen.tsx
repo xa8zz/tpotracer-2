@@ -12,6 +12,7 @@ import sharableBg from '../assets/sharable.png';
 import logo from '../assets/logosm.png';
 import newBestWpmSound from '../assets/sound/newbestwpm2.mp3';
 import almostThereSound from '../assets/sound/almostthere.mp3';
+import ghost from '../assets/ghost.svg';
 
 // Game completion result types
 type GameCompletionResult = 'invalid' | 'newHighScore' | 'almostThere' | 'complete';
@@ -261,6 +262,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   
   const [isFlashing, setIsFlashing] = useState(false);
   const [ghostIndex, setGhostIndex] = useState(0);
+  const [isGhostEnabled, setIsGhostEnabled] = useState(true);
   const [finishedGameState, setFinishedGameState] = useState<{
     wpm: number;
     leaderboardPosition: number | null;
@@ -839,7 +841,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         >
           <div className="badge-row">
             <ul 
-              className="flex"
+              className="flex items-center"
               style={{ gap: `${(20 / CONTAINER_WIDTH) * 100}cqw` }}
             >
               <li 
@@ -910,6 +912,26 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                 >
                   {Math.round(accuracy)}%
                 </span>
+              </li>
+              <li>
+                <button
+                  onClick={() => setIsGhostEnabled(prev => !prev)}
+                  className="cursor-pointer"
+                  style={{ background: 'none', border: 'none', padding: 0 }}
+                >
+                  <img
+                    src={ghost}
+                    alt="Toggle Ghost"
+                    style={{
+                      width: `${(24 / CONTAINER_WIDTH) * 100}cqw`,
+                      height: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
+                      marginTop: `${(0 / CONTAINER_HEIGHT) * 100}cqh`,
+                      filter: `drop-shadow(${glowTextShadow(1, CONTAINER_HEIGHT)})`,
+                      opacity: isGhostEnabled ? 1 : 0.3,
+                      transition: 'opacity 0.15s ease-out'
+                    }}
+                  />
+                </button>
               </li>
             </ul>
           </div>
@@ -1128,12 +1150,15 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
       
       {/* Custom Cursor Component - Outside animated container to maintain correct positioning */}
       <Cursor targetRef={cursorRef} isVisible={isCursorVisible} />
-      {/* Ghost Cursor - Only visible when playing and we have a target WPM */}
+      {/* Ghost Cursor - Only visible when playing, we have a target WPM, and ghost is enabled */}
       <Cursor 
         targetRef={ghostCursorRef} 
-        isVisible={gameState === 'playing' && !!ghostTargetWpm} 
-        className="bg-red-500 opacity-60"
-        glowColor="#ef4444"
+        isVisible={gameState === 'playing' && !!ghostTargetWpm && isGhostEnabled} 
+        className="bg-tpotracer-400"
+        heightScale={0.75}
+        noBlink
+        opacity={0.3}
+        glowColor="#02182D"
       />
     </div>
   );
