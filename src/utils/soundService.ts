@@ -5,6 +5,7 @@
  */
 
 import { Howl, Howler } from 'howler';
+import { isSfxEnabled, getKeypressVolume } from './settingsService';
 
 // Import all click sound files
 import click1 from '../assets/sound/click4_1.wav';
@@ -149,9 +150,12 @@ const randomElementFromArray = <T>(arr: T[]): T => {
  * 4. Seek to 0 and play
  */
 export const playClick = (): void => {
-  if (!soundEnabled || clickSounds === null) return;
+  if (!soundEnabled || !isSfxEnabled() || clickSounds === null) return;
   
   try {
+    // Apply current volume from settings
+    Howler.volume(getKeypressVolume());
+    
     // Pick a random sound variation
     const randomSound = randomElementFromArray(clickSounds);
     
@@ -175,9 +179,12 @@ export const playClick = (): void => {
  * Same logic as playClick but uses error sounds.
  */
 export const playError = (): void => {
-  if (!soundEnabled || errorSounds === null) return;
+  if (!soundEnabled || !isSfxEnabled() || errorSounds === null) return;
   
   try {
+    // Apply current volume from settings
+    Howler.volume(getKeypressVolume());
+    
     // Pick a random error sound variation
     const randomSound = randomElementFromArray(errorSounds);
     

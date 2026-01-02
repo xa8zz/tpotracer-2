@@ -13,6 +13,7 @@ import logo from '../assets/logosm.png';
 import newBestWpmSound from '../assets/sound/newbestwpm2.mp3';
 import almostThereSound from '../assets/sound/almostthere.mp3';
 import ghost from '../assets/ghost.svg';
+import { isSfxEnabled, getGameCompleteVolume, isConfettiEnabled, isAnimationEnabled } from '../utils/settingsService';
 
 // Game completion result types
 type GameCompletionResult = 'invalid' | 'newHighScore' | 'almostThere' | 'complete';
@@ -366,9 +367,9 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     z: 0,
   }));
 
-  // Trigger the spring animation when game completes (unless invalid)
+  // Trigger the spring animation when game completes (unless invalid or animation disabled)
   useEffect(() => {
-    if (gameState === 'completed' && !isScoreInvalid && !FORCE_SHOW_INVALID) {
+    if (gameState === 'completed' && !isScoreInvalid && !FORCE_SHOW_INVALID && isAnimationEnabled()) {
       // Intensity: 3x for new high score
       const intensity = isNewHighScore ? -90 : -30;
       
@@ -394,8 +395,6 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   useEffect(() => {
     newBestWpmAudioRef.current = new Audio(newBestWpmSound);
     almostThereAudioRef.current = new Audio(almostThereSound);
-    if (newBestWpmAudioRef.current) newBestWpmAudioRef.current.volume = 0.1;
-    if (almostThereAudioRef.current) almostThereAudioRef.current.volume = 0.1;
   }, []);
 
   // Compute completion result for use in multiple places
@@ -415,14 +414,21 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
       return;
     }
 
-    // If we haven't played the sound yet and the game is valid
-    if (!hasPlayedSoundRef.current && completionResult !== 'invalid') {
+    // If we haven't played the sound yet and the game is valid and SFX is enabled
+    if (!hasPlayedSoundRef.current && completionResult !== 'invalid' && isSfxEnabled()) {
+      const volume = getGameCompleteVolume();
       switch (completionResult) {
         case 'newHighScore':
-          newBestWpmAudioRef.current?.play().catch(() => {});
+          if (newBestWpmAudioRef.current) {
+            newBestWpmAudioRef.current.volume = volume;
+            newBestWpmAudioRef.current.play().catch(() => {});
+          }
           break;
         case 'almostThere':
-          almostThereAudioRef.current?.play().catch(() => {});
+          if (almostThereAudioRef.current) {
+            almostThereAudioRef.current.volume = volume;
+            almostThereAudioRef.current.play().catch(() => {});
+          }
           break;
         // No sound for regular 'complete'
       }
@@ -468,8 +474,8 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     const myConfetti = confettiFnRef.current;
     if (!myConfetti) return;
     
-    // Start rain only if not already running
-    if (gameState === 'completed' && isNewHighScore && !stopRainRef.current) {
+    // Start rain only if not already running and confetti is enabled
+    if (gameState === 'completed' && isNewHighScore && !stopRainRef.current && isConfettiEnabled()) {
       stopRainRef.current = startConfettiRain(myConfetti);
     }
     

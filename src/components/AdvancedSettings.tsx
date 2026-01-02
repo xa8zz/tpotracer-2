@@ -1,5 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import NewButton from './NewButton';
+import {
+  isAnimationEnabled,
+  setAnimationEnabled,
+  isConfettiEnabled,
+  setConfettiEnabled,
+  isSfxEnabled,
+  setSfxEnabled,
+  getKeypressVolume,
+  setKeypressVolume,
+  getGameCompleteVolume,
+  setGameCompleteVolume,
+  getButtonVolume,
+  setButtonVolume,
+} from '../utils/settingsService';
 
 interface AdvancedSettingsProps {
   visible: boolean;
@@ -24,6 +38,14 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
   className,
   onClose
 }) => {
+  // Settings state
+  const [animationOn, setAnimationOn] = useState(isAnimationEnabled);
+  const [confettiOn, setConfettiOn] = useState(isConfettiEnabled);
+  const [sfxOn, setSfxOn] = useState(isSfxEnabled);
+  const [keypressVol, setKeypressVol] = useState(getKeypressVolume);
+  const [gameCompleteVol, setGameCompleteVol] = useState(getGameCompleteVolume);
+  const [buttonVol, setButtonVol] = useState(getButtonVolume);
+
   // Handle Escape key to close modal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -86,8 +108,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
               left: pctW(40),
               right: pctW(32),
               fontSize: cqw(24),
-              lineHeight: 1.1,
-              backgroundColor: 'rgba(0,0,0,0.5)',
+              lineHeight: 1.1
             }}
           >
             <p>This modal is still under development.</p>
@@ -101,11 +122,104 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
               left: pctW(40),
               right: pctW(32),
               fontSize: cqw(24),
-              lineHeight: 1.1,
-              backgroundColor: 'rgba(0,0,0,0.5)',
+              lineHeight: 1.1
             }}
           >
-            Settings will go here.
+            <div>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={animationOn}
+                  onChange={(e) => {
+                    setAnimationOn(e.target.checked);
+                    setAnimationEnabled(e.target.checked);
+                  }}
+                />
+                {' '}Animation Enabled
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={confettiOn}
+                  onChange={(e) => {
+                    setConfettiOn(e.target.checked);
+                    setConfettiEnabled(e.target.checked);
+                  }}
+                />
+                {' '}Confetti Enabled
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={sfxOn}
+                  onChange={(e) => {
+                    setSfxOn(e.target.checked);
+                    setSfxEnabled(e.target.checked);
+                  }}
+                />
+                {' '}SFX Enabled
+              </label>
+            </div>
+            <div style={{ marginLeft: 20, opacity: sfxOn ? 1 : 0.5, pointerEvents: sfxOn ? 'auto' : 'none' }}>
+              <div>
+                <label>
+                  Keypress Volume: {keypressVol.toFixed(2)}
+                  <br />
+                  <input
+                    type="range"
+                    min={0}
+                    max={0.5}
+                    step={0.01}
+                    value={keypressVol}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      setKeypressVol(val);
+                      setKeypressVolume(val);
+                    }}
+                  />
+                </label>
+              </div>
+              <div>
+                <label>
+                  Game Complete Volume: {gameCompleteVol.toFixed(2)}
+                  <br />
+                  <input
+                    type="range"
+                    min={0}
+                    max={0.1}
+                    step={0.01}
+                    value={gameCompleteVol}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      setGameCompleteVol(val);
+                      setGameCompleteVolume(val);
+                    }}
+                  />
+                </label>
+              </div>
+              <div>
+                <label>
+                  Button Click Volume: {buttonVol.toFixed(2)}
+                  <br />
+                  <input
+                    type="range"
+                    min={0}
+                    max={0.5}
+                    step={0.01}
+                    value={buttonVol}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      setButtonVol(val);
+                      setButtonVolume(val);
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
           </div>
         </div>
       </div>
