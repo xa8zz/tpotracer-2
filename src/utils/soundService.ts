@@ -5,7 +5,7 @@
  */
 
 import { Howl, Howler } from 'howler';
-import { isSfxEnabled, getKeypressVolume } from './settingsService';
+import { isSfxEnabled, getKeypressVolume, getGameCompleteVolume } from './settingsService';
 
 // Import all click sound files
 import click1 from '../assets/sound/click4_1.wav';
@@ -24,6 +24,11 @@ import click6b from '../assets/sound/click4_66.wav';
 // Import error sound files
 import error1 from '../assets/sound/error2_1.wav';
 
+// Import game complete sound
+import gamecomplete from '../assets/sound/gamecomplete.wav';
+import newBestWpm from '../assets/sound/newbestwpm.mp3';
+import almostThere from '../assets/sound/almostthere.mp3';
+
 // Each variation has TWO Howl instances and its own counter for rapid fire handling
 type SoundVariation = {
   sounds: [Howl, Howl];
@@ -33,6 +38,9 @@ type SoundVariation = {
 // Store all sound variations
 let clickSounds: SoundVariation[] | null = null;
 let errorSounds: SoundVariation[] | null = null;
+let gameCompleteSound: Howl | null = null;
+let newBestWpmSound: Howl | null = null;
+let almostThereSound: Howl | null = null;
 
 // Track initialization state
 let isInitialized = false;
@@ -122,6 +130,11 @@ export const initSoundService = async (): Promise<void> => {
         counter: 0,
       },
     ];
+
+    // Game complete sounds (single instances are fine as they're not rapid fire)
+    gameCompleteSound = createHowl(gamecomplete);
+    newBestWpmSound = createHowl(newBestWpm);
+    almostThereSound = createHowl(almostThere);
     
     isInitialized = true;
   } catch (error) {
@@ -200,6 +213,63 @@ export const playError = (): void => {
     soundToPlay.play();
   } catch (error) {
     console.error('Failed to play error sound:', error);
+  }
+};
+
+/**
+ * Play game complete sound
+ * Only plays if sound is enabled
+ */
+export const playGameComplete = (): void => {
+  if (!soundEnabled || !isSfxEnabled() || gameCompleteSound === null) return;
+  
+  try {
+    // Apply volume from settings
+    Howler.volume(getGameCompleteVolume());
+    
+    // Reset position and play
+    gameCompleteSound.seek(0);
+    gameCompleteSound.play();
+  } catch (error) {
+    console.error('Failed to play game complete sound:', error);
+  }
+};
+
+/**
+ * Play new best WPM sound
+ * Only plays if sound is enabled
+ */
+export const playNewBestWpm = (): void => {
+  if (!soundEnabled || !isSfxEnabled() || newBestWpmSound === null) return;
+  
+  try {
+    // Apply volume from settings
+    Howler.volume(getGameCompleteVolume());
+    
+    // Reset position and play
+    newBestWpmSound.seek(0);
+    newBestWpmSound.play();
+  } catch (error) {
+    console.error('Failed to play new best wpm sound:', error);
+  }
+};
+
+/**
+ * Play almost there sound
+ * Only plays if sound is enabled
+ */
+export const playAlmostThere = (): void => {
+  if (!soundEnabled || !isSfxEnabled() || almostThereSound === null) return;
+  
+  try {
+    // Apply volume from settings
+    Howler.volume(getGameCompleteVolume());
+    
+    // Reset position and play
+    almostThereSound.seek(0);
+    almostThereSound.play();
+  } catch (error) {
+    console.error('Failed to play almost there sound:', error);
   }
 };
 

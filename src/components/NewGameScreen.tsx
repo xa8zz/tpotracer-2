@@ -10,10 +10,9 @@ import { getBadgeClass } from '../utils/leaderboardUtils';
 import html2canvas from 'html2canvas';
 import sharableBg from '../assets/sharable.png';
 import logo from '../assets/logosm.png';
-import newBestWpmSound from '../assets/sound/newbestwpm2.mp3';
-import almostThereSound from '../assets/sound/almostthere.mp3';
 import ghost from '../assets/ghost.svg';
-import { isSfxEnabled, getGameCompleteVolume, isConfettiEnabled, isAnimationEnabled } from '../utils/settingsService';
+import { isSfxEnabled, isConfettiEnabled, isAnimationEnabled } from '../utils/settingsService';
+import { playGameComplete, playNewBestWpm, playAlmostThere } from '../utils/soundService';
 
 // Game completion result types
 type GameCompletionResult = 'invalid' | 'newHighScore' | 'almostThere' | 'complete';
@@ -288,8 +287,6 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({
   const confettiCanvasRef = useRef<HTMLCanvasElement>(null);
   const confettiFnRef = useRef<ReturnType<typeof createConfetti> | null>(null);
   const stopRainRef = useRef<(() => void) | null>(null);
-  const newBestWpmAudioRef = useRef<HTMLAudioElement | null>(null);
-  const almostThereAudioRef = useRef<HTMLAudioElement | null>(null);
   const hasPlayedSoundRef = useRef(false);
   
   // Destructure all values and functions from game context
@@ -398,12 +395,6 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({
     }
   }, [gameState, isScoreInvalid, isNewHighScore, springApi]);
 
-  // Initialize audio
-  useEffect(() => {
-    newBestWpmAudioRef.current = new Audio(newBestWpmSound);
-    almostThereAudioRef.current = new Audio(almostThereSound);
-  }, []);
-
   // Compute completion result for use in multiple places
   const completionResult = getGameCompletionResult(
     isScoreInvalid,
@@ -423,21 +414,16 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({
 
     // If we haven't played the sound yet and the game is valid and SFX is enabled
     if (!hasPlayedSoundRef.current && completionResult !== 'invalid' && isSfxEnabled()) {
-      const volume = getGameCompleteVolume();
       switch (completionResult) {
         case 'newHighScore':
-          if (newBestWpmAudioRef.current) {
-            newBestWpmAudioRef.current.volume = volume;
-            newBestWpmAudioRef.current.play().catch(() => {});
-          }
+          playNewBestWpm();
           break;
         case 'almostThere':
-          if (almostThereAudioRef.current) {
-            almostThereAudioRef.current.volume = volume;
-            almostThereAudioRef.current.play().catch(() => {});
-          }
+          playAlmostThere();
           break;
-        // No sound for regular 'complete'
+        case 'complete':
+          playGameComplete();
+          break;
       }
       hasPlayedSoundRef.current = true;
     }
