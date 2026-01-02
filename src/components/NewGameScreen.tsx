@@ -919,7 +919,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                   {Math.round(accuracy)}%
                 </span>
               </li>
-              <li>
+              <li className="ml-auto">
                 <button
                   onClick={() => setIsGhostEnabled(prev => !prev)}
                   className="cursor-pointer"
