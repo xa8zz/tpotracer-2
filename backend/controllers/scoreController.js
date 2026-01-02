@@ -81,20 +81,22 @@ export const submitScore = async (req, res) => {
 
     // Get the WPM of the person ranked just above the user (wpmToBeat)
     let wpmToBeat = null;
+    let wpmToBeatRaw = null;
     if (newRank && newRank > 1) {
       const wpmToBeatQuery = `
         WITH distinct_user_scores AS (
-          SELECT DISTINCT ON (username) username, wpm, timestamp 
+          SELECT DISTINCT ON (username) username, wpm, raw_wpm, timestamp 
           FROM scores 
           ORDER BY username, wpm DESC, timestamp ASC
         ), ranked_users AS (
-          SELECT username, wpm, RANK() OVER (ORDER BY wpm DESC, timestamp ASC) as rank
+          SELECT username, wpm, raw_wpm, RANK() OVER (ORDER BY wpm DESC, timestamp ASC) as rank
           FROM distinct_user_scores
         )
-        SELECT wpm FROM ranked_users WHERE rank = $1;
+        SELECT wpm, raw_wpm FROM ranked_users WHERE rank = $1;
       `;
       const wpmToBeatResult = await db.query(wpmToBeatQuery, [newRank - 1]);
       wpmToBeat = wpmToBeatResult.rows[0]?.wpm ? Math.round(wpmToBeatResult.rows[0].wpm) : null;
+      wpmToBeatRaw = wpmToBeatResult.rows[0]?.raw_wpm ? Math.round(wpmToBeatResult.rows[0].raw_wpm) : null;
     }
 
     // Get the fresh top 20 leaderboard (first page for immediate UI update)
@@ -116,6 +118,7 @@ export const submitScore = async (req, res) => {
       ...result.rows[0], 
       rank: newRank,
       wpmToBeat,
+      wpmToBeatRaw,
       leaderboard: leaderboardResult.rows
     });
 
@@ -259,11 +262,45 @@ export const getUserRank = async (req, res) => {
 
     const rank = parseInt(result.rows[0].rank, 10); // Ensure rank is a number
 
-    // Store in cache (10 minute TTL)
-    cacheService.set(cacheKey, rank, 600);
-     console.log(`Cache set for rank:${username}, rank: ${rank}`);
+    // Get the WPM of the person ranked just above the user (wpmToBeat)
+    let wpmToBeat = null;
+    let wpmToBeatRaw = null;
+    if (rank && rank > 1) {
+      const wpmToBeatQuery = `
+        WITH distinct_user_scores AS (
+          SELECT DISTINCT ON (username) username, wpm, raw_wpm, timestamp 
+          FROM scores 
+          ORDER BY username, wpm DESC, timestamp ASC
+        ), ranked_users AS (
+          SELECT username, wpm, raw_wpm, RANK() OVER (ORDER BY wpm DESC, timestamp ASC) as rank
+          FROM distinct_user_scores
+        )
+        SELECT wpm, raw_wpm FROM ranked_users WHERE rank = $1;
+      `;
+      const wpmToBeatResult = await db.query(wpmToBeatQuery, [rank - 1]);
+      wpmToBeat = wpmToBeatResult.rows[0]?.wpm ? Math.round(wpmToBeatResult.rows[0].wpm) : null;
+      wpmToBeatRaw = wpmToBeatResult.rows[0]?.raw_wpm ? Math.round(wpmToBeatResult.rows[0].raw_wpm) : null;
+    }
 
-    res.json({ rank });
+    // Store in cache (10 minute TTL)
+    // cacheService.set(cacheKey, rank, 600);
+    // console.log(`Cache set for rank:${username}, rank: ${rank}`);
+
+    // Since we now return more than just rank, we shouldn't cache just the number or should update structure
+    // For now, let's bypass cache set or update it to object. 
+    // To keep it simple and compatible with simple get(), we will just return object without caching for now, 
+    // or cache the object.
+    
+    // Let's modify the cache key content to be an object
+    // Note: older cache entries might be just numbers. 
+    // Ideally we invalidate old keys or use a new key prefix, but rank:username is standard.
+    // If the client expects just { rank }, this is fine. 
+    // But we want { rank, wpmToBeat, wpmToBeatRaw }.
+    
+    const responseData = { rank, wpmToBeat, wpmToBeatRaw };
+    // cacheService.set(cacheKey, responseData, 600); // Be careful if existing cache is number
+    
+    res.json(responseData);
   } catch (error) {
     console.error('Error fetching user rank:', error);
     res.status(500).json({ error: 'Failed to fetch user rank' });

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSpring, animated } from '@react-spring/web';
 import NewButton from './NewButton';
+import { createConfetti, startConfettiRain } from '../utils/confettiService';
 import Cursor from './Cursor';
 import { useGameContext } from '../contexts/GameContext';
 import { preloadGameAssets } from '../utils/preloadAssets';
@@ -8,6 +10,40 @@ import { getBadgeClass } from '../utils/leaderboardUtils';
 import html2canvas from 'html2canvas';
 import sharableBg from '../assets/sharable.png';
 import logo from '../assets/logosm.png';
+import ghost from '../assets/ghost.svg';
+import { isSfxEnabled, isConfettiEnabled, isAnimationEnabled } from '../utils/settingsService';
+import { playGameComplete, playNewBestWpm, playAlmostThere } from '../utils/soundService';
+
+// Game completion result types
+type GameCompletionResult = 'invalid' | 'newHighScore' | 'almostThere' | 'complete';
+
+// Helper to determine the game completion result
+const getGameCompletionResult = (
+  isScoreInvalid: boolean,
+  forceShowInvalid: boolean,
+  isNewHighScore: boolean,
+  wpm: number,
+  highScore: number | null
+): GameCompletionResult => {
+  if (isScoreInvalid || forceShowInvalid) return 'invalid';
+  if (isNewHighScore) return 'newHighScore';
+  if (highScore && wpm >= highScore - 5) return 'almostThere';
+  return 'complete';
+};
+
+// Helper to get the completion label text
+const getCompletionLabel = (result: GameCompletionResult, errorCode: number | string | null): string => {
+  switch (result) {
+    case 'invalid':
+      return `GAME ERRORED :( code ${errorCode ?? '?'}`;
+    case 'newHighScore':
+      return 'NEW BEST WPM!';
+    case 'almostThere':
+      return 'ALMOST THERE!';
+    case 'complete':
+      return 'GAME COMPLETE!';
+  }
+};
 
 // Flag to hide share preview card contents (keeps background visible)
 const HIDE_SHARE_PREVIEW_CONTENTS = true;
@@ -15,9 +51,15 @@ const HIDE_SHARE_PREVIEW_CONTENTS = true;
 // Flag to force display "GAME INVALID :(" message (for testing)
 const FORCE_SHOW_INVALID = false;
 
+// Ghost cursor configuration
+// Set to true to use regular WPM, false to use Raw WPM
+const GHOST_USE_REGULAR_WPM = true;
+
 interface NewGameScreenProps {
   username: string | null;
   onSettingsClick: () => void;
+  isBackgrounded?: boolean;
+  isSpringSettled?: boolean;
 }
 
 // DEBUG FLAG: Set to true to preview the share card in center of screen
@@ -68,89 +110,133 @@ const renderWordsWithProgress = (
   currentWordIndex: number, 
   typedText: string, 
   typedHistory: string[],
-  cursorRef: React.RefObject<HTMLSpanElement>
+  cursorRef: React.RefObject<HTMLSpanElement>,
+  ghostCursorRef: React.RefObject<HTMLSpanElement>,
+  ghostIndex: number
 ): JSX.Element => {
   const incorrectCharClass = 'text-red-300 opacity-100 [text-shadow:0_0_2px_rgb(252,165,165)]';
+  let charCounter = 0;
+  
+  // Calculate total text length (words joined with spaces)
+  const totalTextLength = words.join(' ').length;
+  // Check if ghost has reached the end
+  const ghostAtEnd = ghostIndex >= totalTextLength;
 
   return (
     <>
       {words.map((word, wordIndex) => {
-        if (wordIndex < currentWordIndex) {
-          // Word has been completed - show typing history with correct/incorrect styling
-          const typedWord = typedHistory[wordIndex] || '';
-          return (
-            <span key={wordIndex} className="inline-block">
-              {word.split('').map((char, charIndex) => {
-                const typedChar = typedWord[charIndex];
-                const wasTyped = charIndex < typedWord.length;
-                const wasCorrect = wasTyped && typedChar === char;
-                
-                let className = '';
-                if (wasTyped) {
-                  className += wasCorrect ? 'text-tpotracer-100 opacity-100' : incorrectCharClass;
-                } else {
-                  // Character was never typed (word was shorter than expected)
-                  className += 'text-tpotracer-100 opacity-40';
-                }
-                
-                return (
-                  <span key={charIndex} className={className}>
-                    {char}
-                  </span>
-                );
-              })}
-            </span>
-          );
-        } else if (wordIndex === currentWordIndex) {
-          // Current word being typed
-          return (
-            <span key={wordIndex} className="inline-block relative">
-              {word.split('').map((char, charIndex) => {
-                const isTyped = charIndex < typedText.length;
-                const isCorrect = isTyped && typedText[charIndex] === char;
-                const isCursorPosition = charIndex === typedText.length && typedText.length < word.length;
-                
-                let className = '';
-                if (isTyped) {
-                  className += isCorrect ? 'text-tpotracer-100 opacity-100' : incorrectCharClass;
-                } else {
-                  className += 'text-tpotracer-100 opacity-40';
-                }
-                
-                return (
-                  <span key={charIndex} className="relative">
-                    <span className={className}>
+        const startIndex = charCounter;
+        charCounter += word.length;
+        // Add space to counter if not the last word, to match words.join(' ') indices
+        if (wordIndex < words.length - 1) {
+          charCounter++;
+        }
+        
+        const isLastWord = wordIndex === words.length - 1;
+
+        return (
+          <span key={wordIndex} className="inline-block relative">
+            {wordIndex < currentWordIndex ? (
+              // Word has been completed
+              (() => {
+                const typedWord = typedHistory[wordIndex] || '';
+                return word.split('').map((char, charIndex) => {
+                  const typedChar = typedWord[charIndex];
+                  const wasTyped = charIndex < typedWord.length;
+                  const wasCorrect = wasTyped && typedChar === char;
+                  const globalIndex = startIndex + charIndex;
+                  const isGhostPosition = globalIndex === ghostIndex;
+                  
+                  let className = '';
+                  if (wasTyped) {
+                    className += wasCorrect ? 'text-tpotracer-100 opacity-100' : incorrectCharClass;
+                  } else {
+                    className += 'text-tpotracer-100 opacity-40';
+                  }
+                  
+                  return (
+                    <span 
+                      key={charIndex} 
+                      className={className}
+                      ref={isGhostPosition ? ghostCursorRef : undefined}
+                    >
                       {char}
                     </span>
-                    {isCursorPosition && (
+                  );
+                });
+              })()
+            ) : wordIndex === currentWordIndex ? (
+              // Current word being typed
+              <>
+                {word.split('').map((char, charIndex) => {
+                  const isTyped = charIndex < typedText.length;
+                  const isCorrect = isTyped && typedText[charIndex] === char;
+                  const isCursorPosition = charIndex === typedText.length && typedText.length < word.length;
+                  const globalIndex = startIndex + charIndex;
+                  const isGhostPosition = globalIndex === ghostIndex;
+                  
+                  let className = '';
+                  if (isTyped) {
+                    className += isCorrect ? 'text-tpotracer-100 opacity-100' : incorrectCharClass;
+                  } else {
+                    className += 'text-tpotracer-100 opacity-40';
+                  }
+                  
+                  return (
+                    <span key={charIndex} className="relative">
                       <span 
-                        ref={cursorRef}
-                        className="absolute left-0 top-0 w-0 h-full opacity-0 pointer-events-none"
-                        aria-hidden="true"
-                      />
-                    )}
-                  </span>
-                );
-              })}
-              {/* Handle cursor at the end of completed current word - stays here until space is pressed */}
-              {typedText.length === word.length && (
-                <span 
-                  ref={cursorRef}
-                  className="absolute opacity-0 pointer-events-none top-0 h-full"
-                  style={{ left: '100%' }}
-                  aria-hidden="true"
-                />
-              )}
-            </span>
-          );
-        } else {
-          // Future words - tpotracer-100 with low opacity
-          return (
-            <span key={wordIndex} className="text-tpotracer-100 opacity-40 inline-block">
-              {word}
-            </span>
-          );
-        }
+                        className={className}
+                        ref={isGhostPosition ? ghostCursorRef : undefined}
+                      >
+                        {char}
+                      </span>
+                      {isCursorPosition && (
+                        <span 
+                          ref={cursorRef}
+                          className="absolute left-0 top-0 w-0 h-full opacity-0 pointer-events-none"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </span>
+                  );
+                })}
+                {/* Handle cursor at the end of completed current word */}
+                {typedText.length === word.length && (
+                  <span 
+                    ref={cursorRef}
+                    className="absolute opacity-0 pointer-events-none top-0 h-full"
+                    style={{ left: '100%' }}
+                    aria-hidden="true"
+                  />
+                )}
+              </>
+            ) : (
+              // Future words
+              word.split('').map((char, charIndex) => {
+                  const globalIndex = startIndex + charIndex;
+                  const isGhostPosition = globalIndex === ghostIndex;
+                  return (
+                    <span 
+                      key={charIndex} 
+                      className="text-tpotracer-100 opacity-40 inline-block"
+                      ref={isGhostPosition ? ghostCursorRef : undefined}
+                    >
+                      {char}
+                    </span>
+                  );
+              })
+            )}
+            {/* Ghost end marker - invisible element after last character of last word */}
+            {isLastWord && ghostAtEnd && (
+              <span 
+                ref={ghostCursorRef}
+                className="absolute opacity-0 pointer-events-none top-0 h-full"
+                style={{ left: '100%' }}
+                aria-hidden="true"
+              />
+            )}
+          </span>
+        );
       })}
     </>
   );
@@ -168,7 +254,12 @@ const darkBoxShadow = (blur: number, spread: number, height: number) =>
 const tpotracer300BoxShadow = (blur: number, spread: number, height: number) => 
   `0 0 ${(blur * 1.5 / height) * 100}cqh ${(spread * 1.2 / height) * 100}cqh #03223F`;
 
-const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick }) => {
+const NewGameScreen: React.FC<NewGameScreenProps> = ({ 
+  username, 
+  onSettingsClick,
+  isBackgrounded = false,
+  isSpringSettled = true
+}) => {
   // Game container dimensions (from src/index.css)
   const CONTAINER_WIDTH = 853;
   const CONTAINER_HEIGHT = 806;
@@ -177,16 +268,26 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   const relBorderRadius = (px: number) => `${(px / CONTAINER_HEIGHT) * 100}cqh`;
   
   const [isFlashing, setIsFlashing] = useState(false);
+  const [ghostIndex, setGhostIndex] = useState(0);
+  const [isGhostEnabled, setIsGhostEnabled] = useState(true);
   const [finishedGameState, setFinishedGameState] = useState<{
     wpm: number;
     leaderboardPosition: number | null;
     isNewHighScore: boolean;
     wpmToBeat: number | null;
+    completionResult: GameCompletionResult;
+    invalidErrorCode: number | string | null;
   } | null>(null);
   // Create ref for cursor positioning
   const cursorRef = useRef<HTMLSpanElement>(null);
+  const ghostCursorRef = useRef<HTMLSpanElement>(null);
   // Create ref for share card
   const shareCardRef = useRef<HTMLDivElement>(null);
+  // Retro confetti canvas ref
+  const confettiCanvasRef = useRef<HTMLCanvasElement>(null);
+  const confettiFnRef = useRef<ReturnType<typeof createConfetti> | null>(null);
+  const stopRainRef = useRef<(() => void) | null>(null);
+  const hasPlayedSoundRef = useRef(false);
   
   // Destructure all values and functions from game context
   const {
@@ -212,13 +313,127 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     isHelpExpanded,
     leaderboardPosition,
     wpmToBeat,
-    width,
-    height,
-    initializeGame,
-    handleGameComplete,
+    wpmToBeatRaw,
     handleStartNewGame,
     toggleHelp,
   } = useGameContext();
+
+  // Ghost Logic
+  // Calculate ghost target WPM based on configuration flag
+  const ghostTargetWpm = GHOST_USE_REGULAR_WPM ? wpmToBeat : wpmToBeatRaw;
+  
+  useEffect(() => {
+    if (gameState === 'waiting') {
+      setGhostIndex(0);
+      return;
+    }
+
+    if (gameState !== 'playing' || !ghostTargetWpm || !startTime) {
+       return;
+    }
+
+    let animationFrameId: number;
+
+    const updateGhost = () => {
+      const now = Date.now();
+      const elapsedSeconds = (now - startTime) / 1000;
+      // WPM = (chars / 5) / min -> chars/sec = (WPM * 5) / 60 = WPM / 12
+      const charsPerSecond = ghostTargetWpm / 12;
+      let rawIndex = Math.floor(elapsedSeconds * charsPerSecond);
+      
+      const fullText = words.join(' ');
+      const totalLen = fullText.length;
+      
+      // Allow ghost to reach position after last character (totalLen, not totalLen - 1)
+      if (rawIndex > totalLen) {
+        rawIndex = totalLen;
+      }
+      
+      // If on a space, skip to next char (start of next word)
+      // This makes the ghost appear to wait at the start of the next word
+      if (rawIndex < totalLen && fullText[rawIndex] === ' ') {
+         setGhostIndex(rawIndex + 1);
+      } else {
+         setGhostIndex(rawIndex);
+      }
+      
+      if (gameState === 'playing') {
+        animationFrameId = requestAnimationFrame(updateGhost);
+      }
+    };
+
+    animationFrameId = requestAnimationFrame(updateGhost);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [gameState, startTime, ghostTargetWpm, words]);
+
+  // Spring animation for game completion
+  const [{ z }, springApi] = useSpring(() => ({
+    z: 0,
+  }));
+
+  // Compute completion result for use in multiple places
+  const completionResult = getGameCompletionResult(
+    isScoreInvalid,
+    FORCE_SHOW_INVALID,
+    isNewHighScore,
+    wpm,
+    highScore
+  );
+
+  // Trigger the spring animation when game completes (unless invalid or animation disabled)
+  useEffect(() => {
+    if (gameState === 'completed' && !isScoreInvalid && !FORCE_SHOW_INVALID && isAnimationEnabled()) {
+      // Intensity: 3x for new high score
+      // temporarily set to 0 to remove animation for game complete page bc it just looks weird
+      let intensity = 0;
+      if (completionResult === 'newHighScore') {
+        intensity = -90;
+      } else if (completionResult === 'almostThere') {
+        intensity = -30;
+      }
+      
+      springApi.start({
+        to: async (next) => {
+          // 1. Sudden push back (fast animation)
+          await next({ z: intensity, config: { duration: 40 } });
+          // 2. Spring forward
+          // High score: fast, bouncy, exciting
+          // Regular complete: subtle feedback, quick return, minimal bounce
+          await next({ 
+            z: 0, 
+            config: completionResult === 'newHighScore'
+              ? { tension: 280, friction: 12, mass: 1.5 } 
+              : { tension: 200, friction: 20, mass: 1 } 
+          });
+        }
+      });
+    }
+  }, [gameState, isScoreInvalid, completionResult, springApi]);
+
+  // Play sounds on completion
+  useEffect(() => {
+    // Reset the played flag when game is not completed
+    if (gameState !== 'completed') {
+      hasPlayedSoundRef.current = false;
+      return;
+    }
+
+    // If we haven't played the sound yet and the game is valid and SFX is enabled
+    if (!hasPlayedSoundRef.current && completionResult !== 'invalid' && isSfxEnabled()) {
+      switch (completionResult) {
+        case 'newHighScore':
+          playNewBestWpm();
+          break;
+        case 'almostThere':
+          playAlmostThere();
+          break;
+        case 'complete':
+          playGameComplete();
+          break;
+      }
+      hasPlayedSoundRef.current = true;
+    }
+  }, [gameState, completionResult]);
 
   useEffect(() => {
     if (gameState === 'completed') {
@@ -227,16 +442,18 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         leaderboardPosition,
         isNewHighScore,
         wpmToBeat,
+        completionResult,
+        invalidErrorCode,
       });
     }
-  }, [gameState, wpm, leaderboardPosition, isNewHighScore, wpmToBeat]);
+  }, [gameState, wpm, leaderboardPosition, isNewHighScore, wpmToBeat, completionResult, invalidErrorCode]);
 
   useEffect(() => {
     if (gameState === 'completed' && isNewHighScore) {
       setIsFlashing(true);
       const timer = setTimeout(() => {
         setIsFlashing(false);
-      }, 900);
+      }, 1500);
 
       return () => clearTimeout(timer);
     } else {
@@ -244,12 +461,37 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     }
   }, [gameState, isNewHighScore]);
 
+  // Initialize confetti function bound to our custom canvas
+  useEffect(() => {
+    if (confettiCanvasRef.current && !confettiFnRef.current) {
+      confettiFnRef.current = createConfetti(confettiCanvasRef.current);
+    }
+  }, []);
+
+  // Continuous rain while on completed screen with new high score
+  useEffect(() => {
+    const myConfetti = confettiFnRef.current;
+    if (!myConfetti) return;
+    
+    // Start rain only if not already running and confetti is enabled
+    if (gameState === 'completed' && isNewHighScore && !stopRainRef.current && isConfettiEnabled()) {
+      stopRainRef.current = startConfettiRain(myConfetti);
+    }
+    
+    // Stop rain when leaving completed state
+    if (gameState !== 'completed' && stopRainRef.current) {
+      stopRainRef.current();
+      stopRainRef.current = null;
+    }
+  }, [gameState, isNewHighScore]);
+
   // Determine if cursor should be visible (during typing states)
-  const isCursorVisible = gameState === 'playing' || gameState === 'waiting';
+  // Hide cursor if game is backgrounded or spring animation is still running
+  const isCursorVisible = (gameState === 'playing' || gameState === 'waiting') && !isBackgrounded && isSpringSettled;
 
   const statsForFinishedScreen =
     gameState === 'completed'
-      ? { wpm, leaderboardPosition, isNewHighScore, wpmToBeat }
+      ? { wpm, leaderboardPosition, isNewHighScore, wpmToBeat, completionResult, invalidErrorCode }
       : finishedGameState;
 
   const handleDownloadShareImage = async () => {
@@ -314,8 +556,14 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   };
 
   return (
-    <div className="">
-      <div className="game-container relative grow">
+    <div className="" style={{ perspective: `${(1000 / CONTAINER_HEIGHT) * 100}cqh` }}>
+      <animated.div 
+        className="game-container relative grow"
+        style={{
+          transform: z.to(val => `translateZ(${val}px)`),
+          transformStyle: 'preserve-3d',
+        }}
+      >
         {(highScore && highScore > 0) ? (
           <>
             <span 
@@ -484,11 +732,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                     textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
                   }}
                 >
-                  {(isScoreInvalid || FORCE_SHOW_INVALID)
-                    ? `GAME ERRORED :( code ${invalidErrorCode ?? '?'}` 
-                    : statsForFinishedScreen.isNewHighScore 
-                      ? "NEW BEST WPM!" 
-                      : "GAME COMPLETE!"}
+                  {getCompletionLabel(statsForFinishedScreen.completionResult, statsForFinishedScreen.invalidErrorCode)}
                 </h2>
                 <div 
                   className="flex items-center"
@@ -603,7 +847,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         >
           <div className="badge-row">
             <ul 
-              className="flex"
+              className="flex items-center"
               style={{ gap: `${(20 / CONTAINER_WIDTH) * 100}cqw` }}
             >
               <li 
@@ -675,6 +919,27 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                   {Math.round(accuracy)}%
                 </span>
               </li>
+              <li className="ml-auto">
+                <button
+                  onClick={() => setIsGhostEnabled(prev => !prev)}
+                  className="cursor-pointer"
+                  style={{ background: 'none', border: 'none', padding: 0 }}
+                >
+                  <img
+                    src={ghost}
+                    alt="Toggle Ghost"
+                    style={{
+                      width: `${(24 / CONTAINER_WIDTH) * 100}cqw`,
+                      height: `${(24 / CONTAINER_HEIGHT) * 100}cqh`,
+                      marginTop: `${(0 / CONTAINER_HEIGHT) * 100}cqh`,
+                      filter: `drop-shadow(${glowTextShadow(1, CONTAINER_HEIGHT)})`,
+                      opacity: isGhostEnabled ? 1 : 0.3,
+                      transition: 'opacity 0.15s ease-out',
+                      cursor: 'pointer'
+                    }}
+                  />
+                </button>
+              </li>
             </ul>
           </div>
           <div 
@@ -691,11 +956,11 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                 textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
               }}
             >
-              {renderWordsWithProgress(words, currentWordIndex, typedText, typedHistory, cursorRef)}
+              {renderWordsWithProgress(words, currentWordIndex, typedText, typedHistory, cursorRef, ghostCursorRef, ghostIndex)}
             </div>
           </div>
         </div>
-        <div 
+        <div  
           className="share-preview absolute overflow-hidden"
           style={{ 
             top: `${(592 / CONTAINER_HEIGHT) * 100}%`, 
@@ -869,9 +1134,40 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           Share on X
         </NewButton>
         
-        {/* Custom Cursor Component */}
-        <Cursor targetRef={cursorRef} isVisible={isCursorVisible} />
-      </div>
+        {/* Retro Confetti Canvas Overlay - positioned over inner-screen */}
+        <canvas
+          ref={confettiCanvasRef}
+          width={118}  // Low resolution: ~1/4 of 471
+          height={84}  // Low resolution: ~1/4 of 336
+          style={{
+            position: 'absolute',
+            top: `${(212 / CONTAINER_HEIGHT) * 100}%`,
+            left: `${(241 / CONTAINER_WIDTH) * 100}%`,
+            width: `${(471 / CONTAINER_WIDTH) * 100}%`,
+            height: `${(336 / CONTAINER_HEIGHT) * 100}%`,
+            pointerEvents: 'none',
+            borderRadius: `${(49 / CONTAINER_HEIGHT) * 100}cqh`, // Match inner-screen corners
+            imageRendering: 'pixelated',
+            opacity: (showConfetti || (gameState === 'completed' && isNewHighScore)) ? 1 : 0,
+            transition: 'opacity 0.3s ease-out',
+            zIndex: 1000
+          }}
+        />
+      </animated.div>
+      
+      {/* Custom Cursor Component - Outside animated container to maintain correct positioning */}
+      <Cursor targetRef={cursorRef} isVisible={isCursorVisible} />
+      {/* Ghost Cursor - Only visible when playing, we have a target WPM, and ghost is enabled */}
+      <Cursor 
+        targetRef={ghostCursorRef} 
+        isVisible={gameState === 'playing' && !!ghostTargetWpm && isGhostEnabled && !isBackgrounded && isSpringSettled} 
+        className="bg-tpotracer-400"
+        orientation="horizontal"
+        widthScale={0.9}
+        noBlink
+        opacity={0.4}
+        glowColor="#02182D"
+      />
     </div>
   );
 };

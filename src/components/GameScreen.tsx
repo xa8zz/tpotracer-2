@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import confetti from 'canvas-confetti';
 import WordDisplay from './WordDisplay';
 import ScoreDisplay from './ScoreDisplay';
 import { getRandomWords } from '../utils/wordUtils';
@@ -7,7 +8,6 @@ import { submitScore } from '../utils/apiService';
 import { Keystroke, GameState } from '../types';
 import SocialShareCard from './SocialShareCard';
 import HelpSection from './HelpSection';
-import Confetti from 'react-confetti';
 import { useWindowSize } from '../hooks/useWindowSize';
 import { RotateCcw, Keyboard } from 'lucide-react';
 
@@ -72,6 +72,37 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
   useEffect(() => {
     initializeGame();
   }, []);
+
+  // Trigger confetti when showConfetti becomes true
+  useEffect(() => {
+    if (showConfetti) {
+      const colors = ['#A7F1FA', '#77DFF6', '#2A8FC3', '#0d3f62', '#03223F', '#02182D'];
+      const end = Date.now() + 2000;
+
+      const frame = () => {
+        confetti({
+          particleCount: 3,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: colors
+        });
+        confetti({
+          particleCount: 3,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: colors
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      };
+      
+      frame();
+    }
+  }, [showConfetti]);
 
   // Handle global keypresses
   useEffect(() => {
@@ -279,16 +310,6 @@ const GameScreen: React.FC<GameScreenProps> = ({ username }) => {
 
   return (
     <div className="flex flex-col items-center justify-start min-h-full bg-gray-900 p-6 pt-12 overflow-y-auto">
-      {/* Confetti effect for new high scores */}
-      {showConfetti && (
-        <Confetti
-          width={width}
-          height={height}
-          recycle={false}
-          numberOfPieces={500}
-        />
-      )}
-
       <div ref={contentRef} className="w-full max-w-3xl space-y-12">
         {/* Header with WPM counter and controls */}
         <div className="flex items-center justify-between">

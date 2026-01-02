@@ -4,6 +4,8 @@
 
 :root {
   --btn-active-scale: 0.97;
+  --btn-transition-duration: 0.075s;
+  --btn-transition-easing: cubic-bezier(0,1,1,1);
 }
 
 @font-face {
@@ -79,18 +81,25 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  isolation: isolate;
+  cursor: pointer;
 }
 
-.new-button:active {
+.new-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background-image: url('./assets/buttondepressedalt.png');
-  font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity var(--btn-transition-duration) var(--btn-transition-easing);
+  pointer-events: none;
+  z-index: -1;
 }
 
-.new-button:active > svg,
-.new-button-md:active > svg,
-.new-button-lg:active > svg,
-.new-button-circle:active > svg {
-  transform: scale(var(--btn-active-scale));
+.new-button:active::before {
+  opacity: 1;
 }
 
 .new-button-md {
@@ -104,11 +113,25 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  isolation: isolate;
+  cursor: pointer;
 }
 
-.new-button-md:active {
+.new-button-md::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background-image: url('./assets/mdbuttonpressed.png');
-  font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity var(--btn-transition-duration) var(--btn-transition-easing);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.new-button-md:active::before {
+  opacity: 1;
 }
 
 .new-button-lg {
@@ -122,11 +145,25 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  isolation: isolate;
+  cursor: pointer;
 }
 
-.new-button-lg:active {
+.new-button-lg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background-image: url('./assets/lgbuttonpressed.png');
-  font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity var(--btn-transition-duration) var(--btn-transition-easing);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.new-button-lg:active::before {
+  opacity: 1;
 }
 
 .new-button-circle {
@@ -141,11 +178,54 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  isolation: isolate;
+  cursor: pointer;
 }
 
-.new-button-circle:active {
+.new-button-circle::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background-image: url('./assets/smallbuttonpressed.png');
-  font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity var(--btn-transition-duration) var(--btn-transition-easing);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.new-button-circle:active::before {
+  opacity: 1;
+}
+
+/* Button text and SVG scaling on active */
+.btn-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  transition: transform var(--btn-transition-duration) var(--btn-transition-easing);
+  cursor: pointer;
+}
+
+.new-button > svg,
+.new-button-md > svg,
+.new-button-lg > svg,
+.new-button-circle > svg {
+  transition: transform var(--btn-transition-duration) var(--btn-transition-easing);
+}
+
+.new-button:active .btn-text,
+.new-button:active > svg,
+.new-button-md:active .btn-text,
+.new-button-md:active > svg,
+.new-button-lg:active .btn-text,
+.new-button-lg:active > svg,
+.new-button-circle:active .btn-text,
+.new-button-circle:active > svg {
+  transform: scale(var(--btn-active-scale));
 }
 
 .glow-text-shadow {
@@ -307,6 +387,10 @@ body {
   text-shadow: 0 0 0.2cqh #fff;
 }
 
+.modal-overlay {
+  z-index: 10000;
+}
+
 .new-settings-modal {
   background-image: url('./assets/settingsmodalcropped.png');
   background-size: 509px 403px;
@@ -349,11 +433,25 @@ body {
   transform: translate(-50%, -50%);
 }
 
+.advanced-settings-modal {
+  background-image: url('./assets/bigahhmodal.png');
+  background-size: 628px 769px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: transparent;
+  width: 628px;
+  height: 769px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 #loader {
   opacity: 1;
-  transition: opacity 0.35s ease-out;
+  transition: opacity 0.5s ease-out;
   position: relative;
-  z-index: 10000;
+  z-index: 99999;
 }
 
 #loader.fade-out {
@@ -438,19 +536,23 @@ body {
   opacity: 0;
   transition: opacity 0.2s ease;
   z-index: 999;
+  pointer-events: none;
 }
 
 .game-finished-screen.tr-visible {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .wordlist {
   opacity: 0;
   transition: opacity 0.2s ease;
+  pointer-events: none;
 }
 
 .wordlist.tr-visible {
   opacity: 1;
+  pointer-events: auto;
 }
 
 @keyframes tr-flash {

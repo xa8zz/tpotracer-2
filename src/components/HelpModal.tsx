@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
+import { animated } from '@react-spring/web';
 import NewButton from './NewButton';
+import { useBackgroundSpring } from '../hooks/useBackgroundSpring';
 
 interface HelpModalProps {
   visible: boolean;
@@ -24,6 +26,9 @@ const HelpModal: React.FC<HelpModalProps> = ({
   className,
   onClose
 }) => {
+  // intent='modal', skipEnter=false, preserveCenter=true
+  const { styles: modalStyles } = useBackgroundSpring(!visible, 'modal', false, false, true);
+
   // Handle Escape key to close modal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -42,14 +47,14 @@ const HelpModal: React.FC<HelpModalProps> = ({
   return (
     <div
       className={`
-        absolute inset-0 w-screen h-screen
+        modal-overlay absolute inset-0 w-screen h-screen
         transition-all duration-[0.2s] ease-out
         ${visible ? 'opacity-100 visible' : 'opacity-0 invisible'}
       `}
       onClick={onClose}
     >
       <div className="absolute inset-0 w-screen h-screen bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_70%)]"></div>
-      <div
+      <animated.div
         className={`help-modal ${className}`}
         onClick={(e) => e.stopPropagation()}
         style={{
@@ -58,6 +63,7 @@ const HelpModal: React.FC<HelpModalProps> = ({
           aspectRatio: `${MODAL_WIDTH} / ${MODAL_HEIGHT}`,
           backgroundSize: '100% 100%',
           containerType: 'size',
+          ...modalStyles
         }}
       >
         <div className="relative w-full h-full">
@@ -94,7 +100,7 @@ const HelpModal: React.FC<HelpModalProps> = ({
           <div 
             className="instructions-text absolute font-ptclean dark-text-shadow text-tpotracer-400"
             style={{
-              top: pctH(184),
+              top: pctH(174),
               left: pctW(40),
               right: pctW(30),
               fontSize: cqw(24), // text-2xl approx 24px
@@ -124,7 +130,7 @@ const HelpModal: React.FC<HelpModalProps> = ({
           <div 
             className="instructions-text absolute font-ptclean dark-text-shadow text-tpotracer-400"
             style={{
-              top: pctH(620),
+              top: pctH(610),
               left: pctW(40),
               right: pctW(30),
               fontSize: cqw(24), // text-2xl
@@ -144,7 +150,7 @@ const HelpModal: React.FC<HelpModalProps> = ({
             >@sensho</a> on X!
           </div>
         </div>
-      </div>
+      </animated.div>
     </div>
   );
 };

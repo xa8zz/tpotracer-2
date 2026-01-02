@@ -45,7 +45,7 @@ const Credits: React.FC<CreditsProps> = ({ usernameModalVisible }) => {
                 left: usernameModalVisible ? vh(4) : vh(120)
               }}
             >
-              by <a href="https://x.com/marcusquest" target="_blank" rel="noopener noreferrer" className="underline">@marcusquest</a>, <a href="https://x.com/sensho" target="_blank" rel="noopener noreferrer" className="underline">@sensho</a> - <a href="/credits.html" target="_blank" rel="noopener noreferrer" className="underline">more info</a>
+              v1.1 - by <a href="https://x.com/marcusquest" target="_blank" rel="noopener noreferrer" className="underline">@marcusquest</a>, <a href="https://x.com/sensho" target="_blank" rel="noopener noreferrer" className="underline">@sensho</a> - <a href="/credits.html" target="_blank" rel="noopener noreferrer" className="underline">more credits</a>
             </p>
           </div>
         </div>

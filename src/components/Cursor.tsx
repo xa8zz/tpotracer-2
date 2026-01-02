@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface CursorProps {
   targetRef: React.RefObject<HTMLSpanElement> | null;
   isVisible: boolean;
+  className?: string;
+  glowColor?: string;
+  heightScale?: number;
+  noBlink?: boolean;
+  opacity?: number;
+  orientation?: 'vertical' | 'horizontal';
+  widthScale?: number;
 }
 
-const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible }) => {
-  const [position, setPosition] = useState({ left: 0, top: 0, height: 0 });
+const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible, className, glowColor, heightScale = 1, noBlink = false, opacity, orientation = 'vertical', widthScale = 0.8 }) => {
+  const [position, setPosition] = useState({ left: 0, top: 0, height: 0, width: 0 });
   const [isInitialized, setIsInitialized] = useState(false);
 
   const updatePosition = () => {
@@ -23,7 +31,8 @@ const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible }) => {
       setPosition({
         left: isNextChar ? rect.left : rect.left + rect.width, // Position before or after based on ref type
         top: rect.top,
-        height: rect.height
+        height: rect.height,
+        width: rect.width
       });
 
       if (!isInitialized) {
@@ -62,16 +71,34 @@ const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible }) => {
 
   if (!isVisible || !isInitialized) return null;
 
-  return (
+  const isHorizontal = orientation === 'horizontal';
+
+  return createPortal(
     <div
-      className="fixed w-[2px] bg-tpotracer-100 transition-all duration-100 ease-out animate-blink glow-shadow-sm"
-      style={{
+      className={`fixed transition-all duration-100 ease-out ${noBlink ? '' : 'animate-blink'} ${glowColor ? '' : 'glow-shadow-sm'} ${className || 'bg-tpotracer-100'}`}
+      style={isHorizontal ? {
+        // Horizontal underline mode
+        left: `${position.left + (position.width * (1 - widthScale) / 2)}px`,
+        top: `${position.top + position.height - 2}px`,
+        width: `${position.width * widthScale}px`,
+        height: '2px',
+        zIndex: 9999,
+        pointerEvents: 'none',
+        ...(glowColor ? { boxShadow: `0 0 0.35cqh 0.15cqh ${glowColor}` } : {}),
+        ...(opacity !== undefined ? { opacity } : {}),
+      } : {
+        // Vertical cursor mode (default)
         left: `${position.left - 1}px`,
-        top: `${position.top}px`,
-        height: `${position.height}px`,
-        transform: 'translateX(0)',
+        top: `${position.top + (position.height * (1 - heightScale) / 2)}px`,
+        width: '2px',
+        height: `${position.height * heightScale}px`,
+        zIndex: 9999,
+        pointerEvents: 'none',
+        ...(glowColor ? { boxShadow: `0 0 0.35cqh 0.15cqh ${glowColor}` } : {}),
+        ...(opacity !== undefined ? { opacity } : {}),
       }}
-    />
+    />,
+    document.body
   );
 };
 

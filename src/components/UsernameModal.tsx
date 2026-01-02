@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { animated } from '@react-spring/web';
 import NewButton from './NewButton';
 import logo from '../assets/logosm.png';
+import { useBackgroundSpring } from '../hooks/useBackgroundSpring';
 
 interface UsernameModalProps {
   currentUsername: string;
   visible: boolean;
   className?: string;
+  style?: any;
   onUsernameChange: (username: string) => void;
 }
 
@@ -25,9 +28,12 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
   currentUsername,
   visible,
   className,
+  style,
   onUsernameChange
 }) => {
   const [username, setUsername] = useState(currentUsername);
+  // intent='modal', skipEnter=true, preserveCenter=true
+  const { styles: modalStyles } = useBackgroundSpring(!visible, 'modal', false, true, true);
 
   useEffect(() => {
     if (visible) {
@@ -65,13 +71,13 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
   return (
     <div
       className={`
-        absolute inset-0 w-screen h-screen
+        modal-overlay absolute inset-0 w-screen h-screen
         transition-all duration-[0.2s] ease-out
         ${visible ? 'opacity-100 visible' : 'opacity-0 invisible'}
       `}
     >
       <div className="absolute inset-0 w-screen h-screen bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_70%)]"></div>
-      <div 
+      <animated.div 
         className={`username-modal ${className}`}
         style={{
           height: `calc(${GAME_CONTAINER_VH}vh * ${MODAL_HEIGHT} / ${GAME_CONTAINER_HEIGHT})`,
@@ -79,6 +85,8 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
           aspectRatio: `${MODAL_WIDTH} / ${MODAL_HEIGHT}`,
           backgroundSize: '100% 100%',
           containerType: 'size',
+          ...style,
+          ...(visible ? {} : modalStyles)
         }}
       >
         <div className="relative w-full h-full">
@@ -193,7 +201,7 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
             Save
           </NewButton>
         </div>
-      </div>
+      </animated.div>
     </div>
   );
 };

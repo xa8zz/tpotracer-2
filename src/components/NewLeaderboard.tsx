@@ -5,6 +5,7 @@ import { getRemainingTimeUntilEnd, getBadgeClass } from '../utils/leaderboardUti
 import UserAvatar from './UserAvatar';
 import retryIcon from '../assets/path291.png';
 import NewButton from './NewButton';
+import { useClickSound } from '../hooks/useClickSound';
 
 interface LeaderboardProps {
   currentUsername: string | null;
@@ -50,7 +51,11 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
 
   const { highScore, leaderboardPosition } = useGameContext();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const refreshBtnRef = useRef<HTMLButtonElement>(null);
   const [isSpinning, setIsSpinning] = useState(false);
+  
+  // Attach low-latency sound to refresh button
+  useClickSound(refreshBtnRef, -1);
 
   const handleRetry = () => {
     if (isSpinning) return;
@@ -98,6 +103,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
     >
       <div className="leaderboard">
         <button 
+            ref={refreshBtnRef}
             className="absolute" 
             onClick={handleRetry}
             style={{

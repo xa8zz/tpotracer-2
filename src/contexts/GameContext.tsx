@@ -4,6 +4,7 @@ import { calculateScores } from '../utils/scoreUtils';
 import { submitScore, fetchLeaderboard } from '../utils/apiService';
 import { Keystroke, GameState } from '../types';
 import { useWindowSize } from '../hooks/useWindowSize';
+import { initSoundService, playClick, playError } from '../utils/soundService';
 
 interface GameContextType {
   // State values
@@ -30,6 +31,7 @@ interface GameContextType {
   isHelpExpanded: boolean;
   leaderboardPosition: number | null;
   wpmToBeat: number | null;
+  wpmToBeatRaw: number | null;
   width: number;
   height: number;
   
@@ -73,6 +75,7 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
   const [isHelpExpanded, setIsHelpExpanded] = useState(false);
   const [leaderboardPosition, setLeaderboardPosition] = useState<number | null>(null);
   const [wpmToBeat, setWpmToBeat] = useState<number | null>(null);
+  const [wpmToBeatRaw, setWpmToBeatRaw] = useState<number | null>(null);
   
   const { width, height } = useWindowSize();
 
@@ -163,6 +166,7 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
             }
             // Set wpmToBeat (null if user is #1)
             setWpmToBeat(result.wpmToBeat ?? null);
+            setWpmToBeatRaw(result.wpmToBeatRaw ?? null);
             
             // Save new high score to local storage ONLY on success
             if (isNewRecord) {
@@ -187,6 +191,8 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
         if (cache.userPosition) {
            setLeaderboardPosition(cache.userPosition);
         }
+        setWpmToBeat(cache.wpmToBeat ?? null);
+        setWpmToBeatRaw(cache.wpmToBeatRaw ?? null);
       } catch (e) {
         console.error("Failed to update rank after game", e);
       }
@@ -232,6 +238,8 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
         if (cache.userPosition) {
           setLeaderboardPosition(cache.userPosition);
         }
+        setWpmToBeat(cache.wpmToBeat ?? null);
+        setWpmToBeatRaw(cache.wpmToBeatRaw ?? null);
       } catch (e) {
         console.error("Failed to fetch initial rank", e);
       }
@@ -242,6 +250,8 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
   // Initialize on component mount
   useEffect(() => {
     initializeGame();
+    // Initialize sound service (lazy load)
+    initSoundService();
   }, []);
 
   // Handle global keypresses
@@ -282,6 +292,11 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
         return;
       }
 
+      // Ignore non-game keys (Escape, function keys, etc.) - these should not start the game
+      if (e.key === 'Escape' || e.key.startsWith('F') && e.key.length > 1) {
+        return;
+      }
+
       // Record keystroke
       const keystroke: Keystroke = {
         key: e.key,
@@ -298,6 +313,9 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
 
       // Handle space key (move to next word)
       if (e.key === ' ' && typedText.length > 0) {
+        // Play click sound for space
+        playClick();
+        
         // Count space as a correct character when the word is typed correctly
         const currentWord = words[currentWordIndex];
         if (typedText === currentWord) {
@@ -339,13 +357,17 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
         let newIncorrectChars = incorrectChars;
         const newTotalChars = totalChars + 1;
 
-        // Update character count statistics
+        // Update character count statistics and play appropriate sound
         setTotalChars(prev => prev + 1);
         if (newTypedText.length <= currentWord.length && 
             currentWord[newTypedText.length - 1] === e.key) {
+          // Correct character - play click sound
+          playClick();
           setCorrectChars(prev => prev + 1);
           newCorrectChars++;
         } else {
+          // Incorrect character - play error sound
+          playError();
           setIncorrectChars(prev => prev + 1);
           newIncorrectChars++;
         }
@@ -430,6 +452,7 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
     isHelpExpanded,
     leaderboardPosition,
     wpmToBeat,
+    wpmToBeatRaw,
     width,
     height,
     

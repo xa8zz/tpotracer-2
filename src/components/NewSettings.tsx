@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { animated } from '@react-spring/web';
 import NewButton from './NewButton';
+import { useBackgroundSpring } from '../hooks/useBackgroundSpring';
+import { 
+  isMusicMuted, 
+  setMusicMuted, 
+  isVideoPlaying as isVideoPlayingService, 
+  setVideoPlaying 
+} from '../utils/settingsService';
 
 interface SettingsProps {
   currentUsername: string;
@@ -7,6 +15,7 @@ interface SettingsProps {
   className?: string;
   onClose: () => void;
   onUsernameChange: (username: string) => void;
+  onOpenAdvancedSettings: () => void;
 }
 
 // Dimensions constants
@@ -32,27 +41,29 @@ const Settings: React.FC<SettingsProps> = ({
   visible,
   className,
   onClose,
-  onUsernameChange
+  onUsernameChange,
+  onOpenAdvancedSettings
 }) => {
   const [username, setUsername] = useState(currentUsername);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(true);
-  const [isAudioMuted, setIsAudioMuted] = useState(true); // Video starts muted by default
+  const [isVideoPlaying, setIsVideoPlaying] = useState(isVideoPlayingService());
+  const [isMuted, setIsMuted] = useState(isMusicMuted());
+  
+  // intent='modal', skipEnter=false, preserveCenter=true
+  const { styles: modalStyles } = useBackgroundSpring(!visible, 'modal', false, false, true);
 
-  // Reset username to current when modal opens
+  // Reset username to current when modal opens and sync video state
   useEffect(() => {
     if (visible) {
       setUsername(currentUsername);
+      setIsMuted(isMusicMuted());
+      setIsVideoPlaying(isVideoPlayingService());
     }
   }, [visible, currentUsername]);
 
   // Handle Escape key to close modal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        e.key === 'Escape' &&
-        visible &&
-        document.activeElement?.tagName !== 'INPUT'
-      ) {
+      if (e.key === 'Escape' && visible) {
         onClose();
       }
     };
@@ -85,23 +96,15 @@ const Settings: React.FC<SettingsProps> = ({
   };
 
   const toggleVideo = () => {
-    const videoElement = document.getElementById('video') as HTMLVideoElement;
-    if (videoElement) {
-      if (isVideoPlaying) {
-        videoElement.pause();
-      } else {
-        videoElement.play();
-      }
-      setIsVideoPlaying(!isVideoPlaying);
-    }
+    const newState = !isVideoPlaying;
+    setVideoPlaying(newState);
+    setIsVideoPlaying(newState);
   };
 
-  const toggleAudio = () => {
-    const videoElement = document.getElementById('video') as HTMLVideoElement;
-    if (videoElement) {
-      videoElement.muted = !videoElement.muted;
-      setIsAudioMuted(!isAudioMuted);
-    }
+  const toggleMusic = () => {
+    const newState = !isMuted;
+    setMusicMuted(newState);
+    setIsMuted(newState);
   };
 
   const handleSave = () => {
@@ -115,14 +118,14 @@ const Settings: React.FC<SettingsProps> = ({
   return (
     <div
       className={`
-        absolute inset-0 w-screen h-screen
+        modal-overlay absolute inset-0 w-screen h-screen
         transition-all duration-[0.2s] ease-out
         ${visible ? 'opacity-100 visible' : 'opacity-0 invisible'}
       `}
       onClick={onClose}
     >
-      <div className="absolute inset-0 w-screen h-screen bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_40%)]"></div>
-      <div
+      <div className="absolute inset-0 w-screen h-screen bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_20%)]"></div>
+      <animated.div
         className={`new-settings-modal ${className}`}
         onClick={(e) => e.stopPropagation()}
         style={{
@@ -132,6 +135,7 @@ const Settings: React.FC<SettingsProps> = ({
           aspectRatio: `${MODAL_WIDTH} / ${MODAL_HEIGHT}`,
           backgroundSize: '100% 100%',
           containerType: 'size',
+          ...modalStyles
         }}
       >
         <div className="relative w-full h-full">
@@ -155,7 +159,8 @@ const Settings: React.FC<SettingsProps> = ({
             x
           </NewButton>
           <span 
-            className="absolute font-ptclean text-tpotracer-400"
+            className="absolute font-ptclean text-tpotracer-400 underline cursor-pointer hover:opacity-80"
+            onClick={onOpenAdvancedSettings}
             style={{
               top: pctH(110),
               left: pctW(50),
@@ -164,7 +169,7 @@ const Settings: React.FC<SettingsProps> = ({
               textShadow: darkTextShadowLight(2, MODAL_HEIGHT),
             }}
           >
-            What is your X username?
+            Advanced Settings &gt;
           </span>
           <span 
             className="absolute font-ptclean text-tpotracer-400 opacity-30"
@@ -218,7 +223,7 @@ const Settings: React.FC<SettingsProps> = ({
           <NewButton 
             size="lg" 
             className="absolute"
-            onClick={toggleAudio}
+            onClick={toggleMusic}
             style={{
               top: pctH(253),
               left: pctW(270),
@@ -232,7 +237,7 @@ const Settings: React.FC<SettingsProps> = ({
               textShadow: darkTextShadow(2, MODAL_HEIGHT),
             } as React.CSSProperties}
           >
-            {isAudioMuted ? 'Unmute Audio' : 'Mute Audio'}
+            {isMuted ? 'Unmute Music' : 'Mute Music'}
           </NewButton>
           <NewButton 
             size="lg" 
@@ -254,7 +259,7 @@ const Settings: React.FC<SettingsProps> = ({
             {isVideoPlaying ? 'Pause Video' : 'Play Video'}
           </NewButton>
         </div>
-      </div>
+      </animated.div>
     </div>
   );
 };

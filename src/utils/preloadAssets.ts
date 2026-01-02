@@ -49,7 +49,8 @@ const preloadVideo = (src: string): Promise<void> => {
         const video = document.createElement('video');
         video.src = src;
         video.preload = 'auto';
-        video.muted = true; // Autoplay policy
+        video.muted = true; // Autoplay policy for preload element
+        video.disablePictureInPicture = true; // Disable PiP
         
         // We consider it "preloaded" when we have enough data to start playing
         const onLoaded = () => {
@@ -64,14 +65,44 @@ const preloadVideo = (src: string): Promise<void> => {
         };
 
         const cleanup = () => {
-            video.removeEventListener('canplay', onLoaded);
+            video.removeEventListener('canplaythrough', onLoaded);
             video.removeEventListener('error', onError);
         };
 
-        video.addEventListener('canplay', onLoaded);
+        // Use 'canplaythrough' instead of 'canplay' to ensure more buffering
+        video.addEventListener('canplaythrough', onLoaded);
         video.addEventListener('error', onError);
         
         video.load();
+    });
+};
+
+const preloadAudio = (src: string): Promise<void> => {
+    return new Promise((resolve) => {
+        const audio = new Audio();
+        audio.src = src;
+        audio.preload = 'auto';
+
+        const onLoaded = () => {
+            cleanup();
+            resolve();
+        };
+
+        const onError = () => {
+            console.warn(`Failed to preload audio: ${src}`);
+            cleanup();
+            resolve();
+        };
+
+        const cleanup = () => {
+            audio.removeEventListener('canplaythrough', onLoaded);
+            audio.removeEventListener('error', onError);
+        };
+
+        audio.addEventListener('canplaythrough', onLoaded);
+        audio.addEventListener('error', onError);
+        
+        audio.load();
     });
 };
 
@@ -89,8 +120,15 @@ const fontModules = import.meta.glob('../assets/*.{ttf,otf,woff,woff2}', {
     import: 'default' 
 });
 
+const audioModules = import.meta.glob('../assets/sound/*.{mp3,wav}', { 
+    eager: true, 
+    query: '?url', 
+    import: 'default' 
+});
+
 export const preloadGameAssets = async (): Promise<void> => {
     const imageUrls = Object.values(imageModules) as string[];
+    const audioUrls = Object.values(audioModules) as string[];
     
     // Find ProggyClean font
     // The key in fontModules will be like '../assets/ProggyClean.ttf'
@@ -109,6 +147,7 @@ export const preloadGameAssets = async (): Promise<void> => {
     const imagePromises = imageUrls.map(preloadImage);
     const fontPromises = fontDetails.map(f => preloadFont(f.name, f.url));
     const videoPromises = videoUrls.map(preloadVideo);
+    const audioPromises = audioUrls.map(preloadAudio);
 
-    await Promise.all([...imagePromises, ...fontPromises, ...videoPromises]);
+    await Promise.all([...imagePromises, ...fontPromises, ...videoPromises, ...audioPromises]);
 };
