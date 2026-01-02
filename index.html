@@ -53,7 +53,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        z-index: 50;
+        z-index: 99999;
         font-family: 'ProggyCleanTT', monospace;
       }
 
@@ -85,7 +85,7 @@
         font-size: 3vh; /* 24px */
         line-height: 4vh; /* 32px */
         color: #A7F1FA; /* tpotracer-100 */
-        text-shadow: 0 0 0.25vh #A7F1FA; /* glow-text-shadow-md */
+        text-shadow: 0 0 0.5vh #A7F1FA; /* glow-text-shadow-md */
         font-weight: 700;
         width: 15vh; /* 120px */
         opacity: 0;
@@ -151,7 +151,7 @@
         opacity: 0;
       }
 
-      #video {
+      .background-video {
         position: fixed;
         top: 0;
         left: 0;
@@ -159,12 +159,15 @@
         height: 100vh;
         object-fit: cover;
         z-index: -2;
-        opacity: 1;
         pointer-events: none;
       }
       
+      .background-video.is-hidden {
+        visibility: hidden;
+      }
+      
       /* Prevent PiP button from appearing in video controls */
-      #video::-webkit-media-controls-picture-in-picture-button {
+      .background-video::-webkit-media-controls-picture-in-picture-button {
         display: none !important;
       }
 
@@ -237,11 +240,20 @@
   </head>
   <body>
     <div id="video-fallback"></div>
+    <!-- Dual video elements for seamless looping -->
     <video 
-      id="video" 
-      src="/tr2.mp4" 
-      autoplay 
-      loop 
+      id="video-a" 
+      class="background-video"
+      muted
+      playsinline
+      disablepictureinpicture
+      disableremoteplayback
+      preload="auto"
+      x-webkit-airplay="deny"
+    ></video>
+    <video 
+      id="video-b" 
+      class="background-video is-hidden"
       muted
       playsinline
       disablepictureinpicture
@@ -250,75 +262,226 @@
       x-webkit-airplay="deny"
     ></video>
     <script>
-      // Set background video volume and prevent loop stuttering
-      const videoElement = document.getElementById('video');
-      videoElement.volume = 0.03;
-      videoElement.muted = true;
+      // === SEAMLESS DUAL-VIDEO LOOP SYSTEM ===
+      // Uses two video elements that swap before one ends to eliminate loop stutter
       
-      // AGGRESSIVE Picture-in-Picture Prevention (for Arc and other browsers)
-      // Set multiple properties to disable PiP
-      videoElement.disablePictureInPicture = true;
-      videoElement.disableRemotePlayback = true;
+      const videoA = document.getElementById('video-a');
+      const videoB = document.getElementById('video-b');
+      const videos = [videoA, videoB];
       
-      // Monitor and force-exit PiP if it somehow gets triggered
-      videoElement.addEventListener('enterpictureinpicture', function(event) {
-        console.log('PiP attempted, exiting immediately');
-        event.preventDefault();
-        if (document.pictureInPictureElement) {
-          document.exitPictureInPicture().catch(err => console.log('Error exiting PiP:', err));
+      // How many seconds before end to start the pre-warm process
+      const SWAP_LEAD_TIME = 1.5;
+      
+      // Track which video is currently active (0 = A, 1 = B)
+      let activeVideoIndex = 0;
+      let swapScheduled = false;
+      let nextVideoReady = false; // True if next video is pre-warmed and paused at frame 0
+      let blobUrl = null;
+      
+      window._videoLoaded = false;
+      window._videosPlaying = false;
+      
+      // Initialize both videos
+      videos.forEach((video, i) => {
+        video.volume = 0.03;
+        video.muted = true;
+        video.disablePictureInPicture = true;
+        video.disableRemotePlayback = true;
+      });
+      
+      // === SEAMLESS LOOP: Load video as blob into memory ===
+      (function loadVideoAsBlob() {
+        console.log('[Video] Starting blob fetch for seamless looping...');
+        fetch('/tr2.mp4')
+          .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch video');
+            return response.blob();
+          })
+          .then(blob => {
+            blobUrl = URL.createObjectURL(blob);
+            console.log('[Video] Blob URL created (' + (blob.size / 1024 / 1024).toFixed(1) + 'MB)');
+            
+            // Set both videos to use the same blob URL
+            videoA.src = blobUrl;
+            videoB.src = blobUrl;
+            
+            // Wait for both videos to be ready
+            let readyCount = 0;
+            const onReady = () => {
+              readyCount++;
+              if (readyCount >= 2) {
+                window._videoLoaded = true;
+                console.log('[Video] Both videos ready for seamless playback');
+                if (window._checkAllLoaded) window._checkAllLoaded();
+              }
+            };
+            
+            videoA.addEventListener('canplaythrough', onReady, { once: true });
+            videoB.addEventListener('canplaythrough', onReady, { once: true });
+            
+            // Handle if already ready
+            if (videoA.readyState >= 4) onReady();
+            if (videoB.readyState >= 4) onReady();
+          })
+          .catch(err => {
+            console.error('[Video] Blob loading failed, falling back to direct src:', err);
+            videoA.src = '/tr2.mp4';
+            videoB.src = '/tr2.mp4';
+            window._videoLoaded = true;
+            if (window._checkAllLoaded) window._checkAllLoaded();
+          });
+      })();
+      
+      // Swap to the other video
+      function swapVideos() {
+        const currentVideo = videos[activeVideoIndex];
+        const nextIndex = (activeVideoIndex + 1) % 2;
+        const nextVideo = videos[nextIndex];
+        
+        // Ensure the next video is audible and visible
+        // It should already be paused at frame 0 (pre-warmed)
+        // or playing if pre-warm failed/timing was tight
+        
+        nextVideo.muted = currentVideo.muted; // Restore intended mute state
+        nextVideo.volume = currentVideo.volume;
+        nextVideo.classList.remove('is-hidden');
+        
+        // Resume playback instantly (decoder should be hot)
+        nextVideo.play().catch(err => console.log('[Video] Error resuming next video:', err));
+        
+        // Hide and silence the old video immediately
+        currentVideo.classList.add('is-hidden');
+        currentVideo.pause();
+        currentVideo.currentTime = 0;
+        
+        // Update active index
+        activeVideoIndex = nextIndex;
+        swapScheduled = false;
+        nextVideoReady = false;
+        
+        console.log('[Video] Swapped to video ' + (nextIndex === 0 ? 'A' : 'B'));
+      }
+      
+      // Check if we need to schedule a swap (called on timeupdate)
+      function checkForSwap(event) {
+        const video = event.target;
+        const timeRemaining = video.duration - video.currentTime;
+        
+        // Only schedule swap for the active video
+        if (videos.indexOf(video) !== activeVideoIndex) return;
+        
+        // 1. PRE-WARM PHASE: Start next video early, then pause at frame 0
+        if (!swapScheduled && timeRemaining <= SWAP_LEAD_TIME && timeRemaining > 0) {
+          swapScheduled = true;
+          
+          const nextVideo = videos[(activeVideoIndex + 1) % 2];
+          
+          console.log('[Video] Pre-warming next video...');
+          
+          // Mute initially
+          nextVideo.muted = true;
+          nextVideo.currentTime = 0;
+          
+          // Play to initialize decoder
+          const playPromise = nextVideo.play();
+          
+          if (playPromise !== undefined) {
+            playPromise.then(() => {
+              // Once it starts playing (decoder ready), pause it immediately!
+              // This keeps the first frame in memory and decoder hot.
+              // We use a tiny timeout to ensure it actually rendered a frame? 
+              // Usually requestAnimationFrame is better but setTimeout 50ms is safe.
+              setTimeout(() => {
+                nextVideo.pause();
+                nextVideo.currentTime = 0; // Ensure at start
+                nextVideoReady = true;
+                console.log('[Video] Next video pre-warmed and ready at frame 0');
+              }, 50);
+            }).catch(err => console.log('[Video] Error pre-warming:', err));
+          }
+          
+          // Schedule the actual visual swap for when current video ends
+          // We swap slightly before the absolute end to avoid any frame drop
+          const swapDelay = Math.max(0, (timeRemaining - 0.05) * 1000); 
+          setTimeout(swapVideos, swapDelay);
+          
+          console.log('[Video] Swap scheduled in ' + timeRemaining.toFixed(2) + 's');
         }
-      }, true); // Use capture phase
+      }
       
-      videoElement.addEventListener('leavepictureinpicture', function() {
-        console.log('Left PiP mode');
+      // Attach timeupdate listeners for swap detection
+      videos.forEach(video => {
+        video.addEventListener('timeupdate', checkForSwap);
+      });
+      
+      // Start the video loop system (called when game starts)
+      window._startVideoLoop = function(volume, muted, shouldPlay) {
+        if (window._videosPlaying) return;
+        window._videosPlaying = true;
+        
+        const activeVideo = videos[activeVideoIndex];
+        activeVideo.volume = volume;
+        activeVideo.muted = muted;
+        activeVideo.currentTime = 0;
+        
+        if (shouldPlay) {
+          activeVideo.play().catch(err => console.log('[Video] Error starting video:', err));
+        }
+        
+        console.log('[Video] Loop system started');
+      };
+      
+      // Update volume on active video only (next video will inherit on swap)
+      window._setVideoVolume = function(volume) {
+        videos[activeVideoIndex].volume = volume;
+      };
+      
+      // Update muted state on active video only
+      window._setVideoMuted = function(muted) {
+        videos[activeVideoIndex].muted = muted;
+      };
+      
+      // Pause/play both videos
+      window._setVideoPlaying = function(playing) {
+        const activeVideo = videos[activeVideoIndex];
+        if (playing) {
+          activeVideo.play().catch(err => console.log('[Video] Error playing:', err));
+        } else {
+          videos.forEach(v => v.pause());
+        }
+      };
+      
+      // AGGRESSIVE Picture-in-Picture Prevention
+      videos.forEach(video => {
+        video.addEventListener('enterpictureinpicture', function(event) {
+          console.log('PiP attempted, exiting immediately');
+          event.preventDefault();
+          if (document.pictureInPictureElement) {
+            document.exitPictureInPicture().catch(err => console.log('Error exiting PiP:', err));
+          }
+        }, true);
       });
       
       // Pause video when tab is hidden (prevents Arc auto-PiP trigger)
       document.addEventListener('visibilitychange', function() {
+        if (!window._videosPlaying) return;
+        const activeVideo = videos[activeVideoIndex];
         if (document.hidden) {
-          videoElement.pause();
+          activeVideo.pause();
         } else {
-          videoElement.play().catch(err => console.log('Error resuming video:', err));
+          activeVideo.play().catch(err => console.log('Error resuming video:', err));
         }
       });
       
-      // Additional PiP prevention: Monitor for any PiP requests
+      // Additional PiP prevention
       if ('pictureInPictureEnabled' in document) {
-        // Override requestPictureInPicture for this video element
-        const originalRequestPiP = videoElement.requestPictureInPicture;
-        videoElement.requestPictureInPicture = function() {
-          console.log('PiP request blocked');
-          return Promise.reject(new Error('Picture-in-Picture disabled for this video'));
-        };
-      }
-      
-      // Prevent re-downloading on loop by handling the ended event
-      videoElement.addEventListener('ended', function() {
-        this.currentTime = 0;
-        this.play();
-      }, false);
-      
-      // Ensure video stays loaded in memory
-      videoElement.addEventListener('emptied', function() {
-        this.load();
-      }, false);
-      
-      // Use MutationObserver to ensure disablePictureInPicture attribute stays set
-      const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-          if (mutation.type === 'attributes' && mutation.attributeName === 'disablepictureinpicture') {
-            if (!videoElement.hasAttribute('disablepictureinpicture')) {
-              videoElement.setAttribute('disablepictureinpicture', '');
-              videoElement.disablePictureInPicture = true;
-            }
-          }
+        videos.forEach(video => {
+          video.requestPictureInPicture = function() {
+            console.log('PiP request blocked');
+            return Promise.reject(new Error('Picture-in-Picture disabled for this video'));
+          };
         });
-      });
-      
-      observer.observe(videoElement, {
-        attributes: true,
-        attributeFilter: ['disablepictureinpicture']
-      });
+      }
     </script>
     <div id="mobile-warning">
       <div class="warning-container">
@@ -354,6 +517,14 @@
       // === STATE ===
       window._loadingComplete = false; // Set to true when React app signals ready
       window._gameStarted = false; // Set to true when Play is clicked
+      
+      // Check if both video and app are loaded
+      window._checkAllLoaded = function() {
+        if (window._loadingComplete && window._videoLoaded) {
+          console.log('[Loader] Both app and video ready, showing play button');
+          showPlayButton();
+        }
+      };
 
       // Mobile detection and warning
       function isMobileDevice() {
@@ -430,51 +601,37 @@
           window._introSound.play().catch(err => console.log('Error playing intro sound:', err));
         }
 
-        // 2. Restart video from beginning, unmute/mute and play/pause based on settings
-        const videoElement = document.getElementById('video');
-        if (videoElement) {
-          // Get settings from localStorage
-          const storedVolume = localStorage.getItem('tpotracer_music_volume');
-          const targetVolume = storedVolume !== null ? parseFloat(storedVolume) : DEFAULT_MUSIC_VOLUME;
+        // 2. Start the dual-video loop system with user settings
+        const storedVolume = localStorage.getItem('tpotracer_music_volume');
+        const targetVolume = storedVolume !== null ? parseFloat(storedVolume) : DEFAULT_MUSIC_VOLUME;
+        
+        const storedMuted = localStorage.getItem('tpotracer_music_muted');
+        const isMuted = storedMuted === 'true';
+
+        const storedPlaying = localStorage.getItem('tpotracer_video_playing');
+        const isPlaying = storedPlaying === null || storedPlaying === 'true';
+
+        // Start with volume 0 for fade-in, unless muted
+        if (window._startVideoLoop) {
+          window._startVideoLoop(isMuted ? targetVolume : 0, isMuted, isPlaying);
+        }
+        
+        // Fade in volume if playing and not muted
+        if (isPlaying && !isMuted) {
+          const fadeSteps = 30;
+          const fadeInterval = VIDEO_FADE_DURATION_MS / fadeSteps;
+          const volumeStep = targetVolume / fadeSteps;
+          let currentStep = 0;
           
-          const storedMuted = localStorage.getItem('tpotracer_music_muted');
-          const isMuted = storedMuted === 'true';
-
-          const storedPlaying = localStorage.getItem('tpotracer_video_playing');
-          const isPlaying = storedPlaying === null || storedPlaying === 'true';
-
-          videoElement.currentTime = 0;
-          
-          if (isMuted) {
-            videoElement.muted = true;
-            videoElement.volume = targetVolume;
-          } else {
-            videoElement.muted = false;
-            videoElement.volume = 0;
-          }
-
-          if (isPlaying) {
-            videoElement.play().catch(err => console.log('Error playing video:', err));
-            
-            // Only fade in if we are playing and NOT muted
-            if (!isMuted) {
-              const fadeSteps = 30;
-              const fadeInterval = VIDEO_FADE_DURATION_MS / fadeSteps;
-              const volumeStep = targetVolume / fadeSteps;
-              let currentStep = 0;
-              
-              const fadeIn = setInterval(() => {
-                currentStep++;
-                videoElement.volume = Math.min(volumeStep * currentStep, targetVolume);
-                if (currentStep >= fadeSteps) {
-                  clearInterval(fadeIn);
-                  videoElement.volume = targetVolume;
-                }
-              }, fadeInterval);
+          const fadeIn = setInterval(() => {
+            currentStep++;
+            const newVolume = Math.min(volumeStep * currentStep, targetVolume);
+            if (window._setVideoVolume) window._setVideoVolume(newVolume);
+            if (currentStep >= fadeSteps) {
+              clearInterval(fadeIn);
+              if (window._setVideoVolume) window._setVideoVolume(targetVolume);
             }
-          } else {
-            videoElement.pause();
-          }
+          }, fadeInterval);
         }
 
         // 3. Start fading out the loader (slow ease-in-out via CSS)
@@ -494,13 +651,13 @@
       window._signalLoadingComplete = function() {
         console.log('[index.html] Loading complete signal received');
         window._loadingComplete = true;
-        showPlayButton();
+        window._checkAllLoaded();
       };
 
       // === LOADING SEQUENCE ===
       // After LOADER_TEXT_DELAY_MS, check if still loading
       setTimeout(() => {
-        if (window._loadingComplete) {
+        if (window._loadingComplete && window._videoLoaded) {
           // Already done loading, show play button
           showPlayButton();
         } else {

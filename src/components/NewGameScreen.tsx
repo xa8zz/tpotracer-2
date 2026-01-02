@@ -371,11 +371,26 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({
     z: 0,
   }));
 
+  // Compute completion result for use in multiple places
+  const completionResult = getGameCompletionResult(
+    isScoreInvalid,
+    FORCE_SHOW_INVALID,
+    isNewHighScore,
+    wpm,
+    highScore
+  );
+
   // Trigger the spring animation when game completes (unless invalid or animation disabled)
   useEffect(() => {
     if (gameState === 'completed' && !isScoreInvalid && !FORCE_SHOW_INVALID && isAnimationEnabled()) {
       // Intensity: 3x for new high score
-      const intensity = isNewHighScore ? -90 : -30;
+      // temporarily set to 0 to remove animation for game complete page bc it just looks weird
+      let intensity = 0;
+      if (completionResult === 'newHighScore') {
+        intensity = -90;
+      } else if (completionResult === 'almostThere') {
+        intensity = -30;
+      }
       
       springApi.start({
         to: async (next) => {
@@ -386,23 +401,14 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({
           // Regular complete: subtle feedback, quick return, minimal bounce
           await next({ 
             z: 0, 
-            config: isNewHighScore 
+            config: completionResult === 'newHighScore'
               ? { tension: 280, friction: 12, mass: 1.5 } 
               : { tension: 200, friction: 20, mass: 1 } 
           });
         }
       });
     }
-  }, [gameState, isScoreInvalid, isNewHighScore, springApi]);
-
-  // Compute completion result for use in multiple places
-  const completionResult = getGameCompletionResult(
-    isScoreInvalid,
-    FORCE_SHOW_INVALID,
-    isNewHighScore,
-    wpm,
-    highScore
-  );
+  }, [gameState, isScoreInvalid, completionResult, springApi]);
 
   // Play sounds on completion
   useEffect(() => {

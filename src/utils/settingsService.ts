@@ -107,6 +107,15 @@ export const setButtonVolume = (volume: number): void => {
   localStorage.setItem(BUTTON_VOLUME_KEY, buttonVolume.toString());
 };
 
+// Declare global video control functions from index.html
+declare global {
+  interface Window {
+    _setVideoVolume?: (volume: number) => void;
+    _setVideoMuted?: (muted: boolean) => void;
+    _setVideoPlaying?: (playing: boolean) => void;
+  }
+}
+
 // Music Volume (background video)
 // Note: Only sets volume level, never touches muted state.
 // User controls muting via Settings modal - video must stay muted on startup for autoplay.
@@ -114,10 +123,9 @@ export const getMusicVolume = (): number => musicVolume;
 export const setMusicVolume = (volume: number): void => {
   musicVolume = Math.max(0, Math.min(MAX_MUSIC_VOLUME, volume));
   localStorage.setItem(MUSIC_VOLUME_KEY, musicVolume.toString());
-  // Update volume only, don't touch muted state
-  const videoEl = document.getElementById('video') as HTMLVideoElement | null;
-  if (videoEl) {
-    videoEl.volume = musicVolume;
+  // Update volume on dual-video system
+  if (window._setVideoVolume) {
+    window._setVideoVolume(musicVolume);
   }
 };
 
@@ -126,9 +134,9 @@ export const isMusicMuted = (): boolean => musicMuted;
 export const setMusicMuted = (muted: boolean): void => {
   musicMuted = muted;
   localStorage.setItem(MUSIC_MUTED_KEY, muted.toString());
-  const videoEl = document.getElementById('video') as HTMLVideoElement | null;
-  if (videoEl) {
-    videoEl.muted = muted;
+  // Update muted state on dual-video system
+  if (window._setVideoMuted) {
+    window._setVideoMuted(muted);
   }
 };
 
@@ -137,23 +145,14 @@ export const isVideoPlaying = (): boolean => videoPlaying;
 export const setVideoPlaying = (playing: boolean): void => {
   videoPlaying = playing;
   localStorage.setItem(VIDEO_PLAYING_KEY, playing.toString());
-  const videoEl = document.getElementById('video') as HTMLVideoElement | null;
-  if (videoEl) {
-    if (playing) {
-      videoEl.play().catch(console.error);
-    } else {
-      videoEl.pause();
-    }
+  // Update playing state on dual-video system
+  if (window._setVideoPlaying) {
+    window._setVideoPlaying(playing);
   }
 };
 
 // Initialize music volume on the video element (volume only, keeps muted for autoplay)
 export const initMusicVolume = (): void => {
-  const videoEl = document.getElementById('video') as HTMLVideoElement | null;
-  if (videoEl) {
-    videoEl.volume = musicVolume;
-    // We don't force muted/playing here because index.html handles the startup flow
-    // which includes unmuting and playing on user interaction.
-    // However, if we wanted to sync state after that interaction, we might need more logic.
-  }
+  // Dual-video system handles initialization via index.html
+  // This is kept for compatibility but doesn't need to do anything now
 };
