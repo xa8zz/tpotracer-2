@@ -119,7 +119,7 @@ const Settings: React.FC<SettingsProps> = ({
       `}
       onClick={onClose}
     >
-      <div className="absolute inset-0 w-screen h-screen bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_40%)]"></div>
+      <div className="absolute inset-0 w-screen h-screen bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_20%)]"></div>
       <div
         className={`new-settings-modal ${className}`}
         onClick={(e) => e.stopPropagation()}
