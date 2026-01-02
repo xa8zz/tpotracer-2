@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { animated } from '@react-spring/web';
 import NewButton from './NewButton';
+import { useBackgroundSpring } from '../hooks/useBackgroundSpring';
 import {
   isAnimationEnabled,
   setAnimationEnabled,
@@ -52,6 +54,9 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
   const [gameCompleteVol, setGameCompleteVol] = useState(getGameCompleteVolume);
   const [buttonVol, setButtonVol] = useState(getButtonVolume);
   const [musicVol, setMusicVol] = useState(getMusicVolume);
+  
+  // intent='modal', skipEnter=true, preserveCenter=true
+  const { styles: modalStyles } = useBackgroundSpring(!visible, 'modal', false, true, true);
 
   // Handle Escape key to close modal
   useEffect(() => {
@@ -78,7 +83,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
       onClick={onClose}
     >
       <div className="absolute inset-0 w-screen h-screen bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_40%)]"></div>
-      <div
+      <animated.div
         className={`advanced-settings-modal ${className}`}
         onClick={(e) => e.stopPropagation()}
         style={{
@@ -87,6 +92,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
           aspectRatio: `${MODAL_WIDTH} / ${MODAL_HEIGHT}`,
           backgroundSize: '100% 100%',
           containerType: 'size',
+          ...modalStyles
         }}
       >
         <div className="relative w-full h-full">
@@ -247,7 +253,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
             </div>
           </div>
         </div>
-      </div>
+      </animated.div>
     </div>
   );
 };

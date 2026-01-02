@@ -20,18 +20,24 @@ function getBackgroundFilter(isActive: boolean, intent: BackgroundIntent): strin
   return 'blur(20px)';
 }
 
-function getBackgroundTransform(isActive: boolean, intent: BackgroundIntent): string {
-  if (!isActive) return 'scale(1)';
-  
-  if (intent === 'firstStartup') {
-    return 'scale(0.70)';
-  }
+function getBackgroundTransform(isActive: boolean, intent: BackgroundIntent, preserveCenter: boolean): string {
+  let transform = 'scale(1)';
 
-  if (intent === 'modal') {
-    return 'scale(0.95)';
+  if (isActive) {
+    if (intent === 'firstStartup') {
+      transform = 'scale(0.70)';
+    } else if (intent === 'modal') {
+      transform = 'scale(0.95)';
+    } else {
+      transform = 'scale(0.80)';
+    }
   }
   
-  return 'scale(0.80)';
+  if (preserveCenter) {
+    return `translate(-50%, -50%) ${transform}`;
+  }
+  
+  return transform;
 }
 
 export function getSpringConfig(intent: BackgroundIntent) {
@@ -59,12 +65,20 @@ export function getSpringConfig(intent: BackgroundIntent) {
  * Hook to create a spring animation for backgrounding content (blur + scale).
  * Used for the main game container when modals are open or during loading.
  * 
- * @param isActive - Whether the background effect should be active (blurred and scaled down)
+ * @param isActive - Whether the background effect should be active (blurred and scaled down). For a modal: isActive=true means "hidden/backgrounded" state (blurred), isActive=false means "visible" state (clear).
  * @param intent - The intent of the backgrounding ('modal', 'startup', or 'firstStartup')
  * @param useFirstStartupConfig - Override to use firstStartup config (for slow transition out of firstStartup)
+ * @param skipEnter - If true, the transition to the "not active" (visible/clear) state will be immediate (no animation).
+ * @param preserveCenter - If true, prepends translate(-50%, -50%) to the transform (for centering absolute modals)
  * @returns Object containing the spring styles and the settled state
  */
-export const useBackgroundSpring = (isActive: boolean, intent: BackgroundIntent = 'startup', useFirstStartupConfig = false) => {
+export const useBackgroundSpring = (
+  isActive: boolean, 
+  intent: BackgroundIntent = 'startup', 
+  useFirstStartupConfig = false,
+  skipEnter = false,
+  preserveCenter = false
+) => {
   const [isSettled, setIsSettled] = useState(true);
 
   // Keep track of the last intent when active to use for exit animations
@@ -86,7 +100,7 @@ export const useBackgroundSpring = (isActive: boolean, intent: BackgroundIntent 
   const styles = useSpring({
     to: {
       filter: getBackgroundFilter(isActive, intent),
-      transform: getBackgroundTransform(isActive, intent),
+      transform: getBackgroundTransform(isActive, intent, preserveCenter),
     },
     onStart: () => setIsSettled(false),
     onRest: () => setIsSettled(true),
@@ -108,6 +122,11 @@ export const useBackgroundSpring = (isActive: boolean, intent: BackgroundIntent 
       }
     },
     config,
+    immediate: () => {
+      // If skipEnter is true and we are transitioning to !isActive (entering/clearing), skip animation
+      if (skipEnter && !isActive) return true;
+      return false;
+    }
   });
 
   return { styles, isSettled };

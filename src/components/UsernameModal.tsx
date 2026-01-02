@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { animated } from '@react-spring/web';
 import NewButton from './NewButton';
 import logo from '../assets/logosm.png';
+import { useBackgroundSpring } from '../hooks/useBackgroundSpring';
 
 interface UsernameModalProps {
   currentUsername: string;
@@ -31,6 +32,8 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
   onUsernameChange
 }) => {
   const [username, setUsername] = useState(currentUsername);
+  // intent='modal', skipEnter=true, preserveCenter=true
+  const { styles: modalStyles } = useBackgroundSpring(!visible, 'modal', false, true, true);
 
   useEffect(() => {
     if (visible) {
@@ -82,7 +85,8 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
           aspectRatio: `${MODAL_WIDTH} / ${MODAL_HEIGHT}`,
           backgroundSize: '100% 100%',
           containerType: 'size',
-          ...style
+          ...style,
+          ...(visible ? {} : modalStyles)
         }}
       >
         <div className="relative w-full h-full">

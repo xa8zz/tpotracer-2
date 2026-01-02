@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { animated } from '@react-spring/web';
 import NewButton from './NewButton';
+import { useBackgroundSpring } from '../hooks/useBackgroundSpring';
 import { 
   isMusicMuted, 
   setMusicMuted, 
@@ -45,6 +47,9 @@ const Settings: React.FC<SettingsProps> = ({
   const [username, setUsername] = useState(currentUsername);
   const [isVideoPlaying, setIsVideoPlaying] = useState(isVideoPlayingService());
   const [isMuted, setIsMuted] = useState(isMusicMuted());
+  
+  // intent='modal', skipEnter=false, preserveCenter=true
+  const { styles: modalStyles } = useBackgroundSpring(!visible, 'modal', false, false, true);
 
   // Reset username to current when modal opens and sync video state
   useEffect(() => {
@@ -120,7 +125,7 @@ const Settings: React.FC<SettingsProps> = ({
       onClick={onClose}
     >
       <div className="absolute inset-0 w-screen h-screen bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_20%)]"></div>
-      <div
+      <animated.div
         className={`new-settings-modal ${className}`}
         onClick={(e) => e.stopPropagation()}
         style={{
@@ -130,6 +135,7 @@ const Settings: React.FC<SettingsProps> = ({
           aspectRatio: `${MODAL_WIDTH} / ${MODAL_HEIGHT}`,
           backgroundSize: '100% 100%',
           containerType: 'size',
+          ...modalStyles
         }}
       >
         <div className="relative w-full h-full">
@@ -253,7 +259,7 @@ const Settings: React.FC<SettingsProps> = ({
             {isVideoPlaying ? 'Pause Video' : 'Play Video'}
           </NewButton>
         </div>
-      </div>
+      </animated.div>
     </div>
   );
 };
