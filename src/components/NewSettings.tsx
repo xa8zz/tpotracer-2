@@ -7,6 +7,7 @@ interface SettingsProps {
   className?: string;
   onClose: () => void;
   onUsernameChange: (username: string) => void;
+  onOpenAdvancedSettings: () => void;
 }
 
 // Dimensions constants
@@ -32,7 +33,8 @@ const Settings: React.FC<SettingsProps> = ({
   visible,
   className,
   onClose,
-  onUsernameChange
+  onUsernameChange,
+  onOpenAdvancedSettings
 }) => {
   const [username, setUsername] = useState(currentUsername);
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
@@ -156,7 +158,8 @@ const Settings: React.FC<SettingsProps> = ({
             x
           </NewButton>
           <span 
-            className="absolute font-ptclean text-tpotracer-400"
+            className="absolute font-ptclean text-tpotracer-400 underline cursor-pointer hover:opacity-80"
+            onClick={onOpenAdvancedSettings}
             style={{
               top: pctH(110),
               left: pctW(50),
@@ -165,7 +168,7 @@ const Settings: React.FC<SettingsProps> = ({
               textShadow: darkTextShadowLight(2, MODAL_HEIGHT),
             }}
           >
-            What is your X username?
+            Advanced Settings &gt;
           </span>
           <span 
             className="absolute font-ptclean text-tpotracer-400 opacity-30"

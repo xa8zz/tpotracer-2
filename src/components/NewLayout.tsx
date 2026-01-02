@@ -6,6 +6,7 @@ import { useLeaderboard } from '../hooks/useLeaderboard';
 import NewLeaderboard from './NewLeaderboard';
 import NewGameScreen from './NewGameScreen';
 import NewSettings from './NewSettings';
+import AdvancedSettings from './AdvancedSettings';
 import Credits from './Credits';
 import UsernameModal from './UsernameModal';
 import HelpModal from './HelpModal';
@@ -18,6 +19,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
   const [isLeaderboardVisible, setIsLeaderboardVisible] = useState(false);
   const { isHelpExpanded, toggleHelp } = useGameContext();
 
@@ -39,11 +41,20 @@ const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) =>
     setIsSettingsOpen(!isSettingsOpen);
   };
 
+  const openAdvancedSettings = () => {
+    setIsSettingsOpen(false);
+    setIsAdvancedSettingsOpen(true);
+  };
+
+  const closeAdvancedSettings = () => {
+    setIsAdvancedSettingsOpen(false);
+  };
+
   const isUsernameModalVisible = !currentUsername || currentUsername === '';
 
   return (
     <>
-      <div className={`flex flex-row w-screen h-screen overflow-hidden items-center justify-center relative transition-[filter] duration-[0.2s] ease-out ${isSettingsOpen || isUsernameModalVisible || isHelpExpanded ? 'blur-sm' : ''}`}>
+      <div className={`flex flex-row w-screen h-screen overflow-hidden items-center justify-center relative transition-[filter] duration-[0.2s] ease-out ${isSettingsOpen || isAdvancedSettingsOpen || isUsernameModalVisible || isHelpExpanded ? 'blur-sm' : ''}`}>
         <div className="stupid-big-ass-container flex flex-row relative max-h-screen">
           <NewGameScreen username={currentUsername} onSettingsClick={toggleSettings} />
           <NewLeaderboard currentUsername={currentUsername} />
@@ -54,6 +65,11 @@ const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) =>
         visible={isSettingsOpen}
         onUsernameChange={onUsernameChange}
         currentUsername={currentUsername}
+        onOpenAdvancedSettings={openAdvancedSettings}
+      />
+      <AdvancedSettings
+        visible={isAdvancedSettingsOpen}
+        onClose={closeAdvancedSettings}
       />
       <UsernameModal
         visible={isUsernameModalVisible}
