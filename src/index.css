@@ -4,6 +4,8 @@
 
 :root {
   --btn-active-scale: 0.97;
+  --btn-transition-duration: 0.1s;
+  --btn-transition-easing: cubic-bezier(0,1,1,1);
 }
 
 @font-face {
@@ -79,7 +81,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: font-size 0.1s cubic-bezier(0,1,1,1);
   isolation: isolate;
 }
 
@@ -91,25 +92,13 @@ body {
   background-size: 100% 100%;
   background-repeat: no-repeat;
   opacity: 0;
-  transition: opacity 0.1s cubic-bezier(0,1,1,1);
+  transition: opacity var(--btn-transition-duration) var(--btn-transition-easing);
   pointer-events: none;
   z-index: -1;
 }
 
-.new-button:active {
-  font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
-}
-
 .new-button:active::before {
   opacity: 1;
-}
-
-.new-button:active > svg,
-.new-button-md:active > svg,
-.new-button-lg:active > svg,
-.new-button-circle:active > svg {
-  transition: transform 0.1s cubic-bezier(0,1,1,1);
-  transform: scale(var(--btn-active-scale));
 }
 
 .new-button-md {
@@ -123,7 +112,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: font-size 0.1s cubic-bezier(0,1,1,1);
   isolation: isolate;
 }
 
@@ -135,13 +123,9 @@ body {
   background-size: 100% 100%;
   background-repeat: no-repeat;
   opacity: 0;
-  transition: opacity 0.1s cubic-bezier(0,1,1,1);
+  transition: opacity var(--btn-transition-duration) var(--btn-transition-easing);
   pointer-events: none;
   z-index: -1;
-}
-
-.new-button-md:active {
-  font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
 }
 
 .new-button-md:active::before {
@@ -159,7 +143,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: font-size 0.1s cubic-bezier(0,1,1,1);
   isolation: isolate;
 }
 
@@ -171,13 +154,9 @@ body {
   background-size: 100% 100%;
   background-repeat: no-repeat;
   opacity: 0;
-  transition: opacity 0.1s cubic-bezier(0,1,1,1);
+  transition: opacity var(--btn-transition-duration) var(--btn-transition-easing);
   pointer-events: none;
   z-index: -1;
-}
-
-.new-button-lg:active {
-  font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
 }
 
 .new-button-lg:active::before {
@@ -196,7 +175,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: font-size 0.1s cubic-bezier(0,1,1,1);
   isolation: isolate;
 }
 
@@ -208,17 +186,33 @@ body {
   background-size: 100% 100%;
   background-repeat: no-repeat;
   opacity: 0;
-  transition: opacity 0.1s cubic-bezier(0,1,1,1);
+  transition: opacity var(--btn-transition-duration) var(--btn-transition-easing);
   pointer-events: none;
   z-index: -1;
 }
 
-.new-button-circle:active {
-  font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
-}
-
 .new-button-circle:active::before {
   opacity: 1;
+}
+
+/* Button text and SVG scaling on active */
+.btn-text,
+.new-button > svg,
+.new-button-md > svg,
+.new-button-lg > svg,
+.new-button-circle > svg {
+  transition: transform var(--btn-transition-duration) var(--btn-transition-easing);
+}
+
+.new-button:active .btn-text,
+.new-button:active > svg,
+.new-button-md:active .btn-text,
+.new-button-md:active > svg,
+.new-button-lg:active .btn-text,
+.new-button-lg:active > svg,
+.new-button-circle:active .btn-text,
+.new-button-circle:active > svg {
+  transform: scale(var(--btn-active-scale));
 }
 
 .glow-text-shadow {

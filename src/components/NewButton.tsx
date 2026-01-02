@@ -26,7 +26,7 @@ const NewButton: React.FC<NewButtonProps> = ({
       className={`font-ptclean text-2xl ${size ? `new-button-${size}` : 'new-button'} text-tpotracer-300 ${className}`}
       style={style}
     >
-      {children}
+      <span className="btn-text">{children}</span>
     </button>
   );
 };
