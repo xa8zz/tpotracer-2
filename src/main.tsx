@@ -4,6 +4,7 @@ import NewApp from './NewApp.tsx';
 import './index.css';
 import { preloadGameAssets } from './utils/preloadAssets.ts';
 import { whenVideoPlaying } from './utils/videoUtils.ts';
+import { initMusicVolume } from './utils/settingsService.ts';
 
 const rootElement = document.getElementById('root')!;
 const root = createRoot(rootElement);
@@ -26,6 +27,9 @@ async function main() {
     skipLoadingPromise,
     timeoutPromise
   ]);
+
+  // Initialize music volume from saved settings
+  initMusicVolume();
 
   const onAppReady = () => {
     const loader = document.getElementById('loader');

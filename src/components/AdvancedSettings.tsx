@@ -13,6 +13,8 @@ import {
   setGameCompleteVolume,
   getButtonVolume,
   setButtonVolume,
+  getMusicVolume,
+  setMusicVolume,
 } from '../utils/settingsService';
 
 interface AdvancedSettingsProps {
@@ -45,6 +47,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
   const [keypressVol, setKeypressVol] = useState(getKeypressVolume);
   const [gameCompleteVol, setGameCompleteVol] = useState(getGameCompleteVolume);
   const [buttonVol, setButtonVol] = useState(getButtonVolume);
+  const [musicVol, setMusicVol] = useState(getMusicVolume);
 
   // Handle Escape key to close modal
   useEffect(() => {
@@ -219,6 +222,24 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                   />
                 </label>
               </div>
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <label>
+                Music Volume: {musicVol.toFixed(2)}
+                <br />
+                <input
+                  type="range"
+                  min={0}
+                  max={0.13}
+                  step={0.01}
+                  value={musicVol}
+                  onChange={(e) => {
+                    const val = parseFloat(e.target.value);
+                    setMusicVol(val);
+                    setMusicVolume(val);
+                  }}
+                />
+              </label>
             </div>
           </div>
         </div>

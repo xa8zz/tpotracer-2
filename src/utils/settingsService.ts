@@ -10,6 +10,7 @@ const SFX_ENABLED_KEY = 'tpotracer_sfx_enabled';
 const KEYPRESS_VOLUME_KEY = 'tpotracer_keypress_volume';
 const GAME_COMPLETE_VOLUME_KEY = 'tpotracer_game_complete_volume';
 const BUTTON_VOLUME_KEY = 'tpotracer_button_volume';
+const MUSIC_VOLUME_KEY = 'tpotracer_music_volume';
 
 // Defaults
 const DEFAULT_ANIMATION_ENABLED = true;
@@ -18,6 +19,7 @@ const DEFAULT_SFX_ENABLED = true;
 const DEFAULT_KEYPRESS_VOLUME = 0.5;
 const DEFAULT_GAME_COMPLETE_VOLUME = 0.1;
 const DEFAULT_BUTTON_VOLUME = 0.5;
+const DEFAULT_MUSIC_VOLUME = 0.03;
 
 // In-memory cache
 let animationEnabled = DEFAULT_ANIMATION_ENABLED;
@@ -26,6 +28,7 @@ let sfxEnabled = DEFAULT_SFX_ENABLED;
 let keypressVolume = DEFAULT_KEYPRESS_VOLUME;
 let gameCompleteVolume = DEFAULT_GAME_COMPLETE_VOLUME;
 let buttonVolume = DEFAULT_BUTTON_VOLUME;
+let musicVolume = DEFAULT_MUSIC_VOLUME;
 
 // Load settings from localStorage
 const loadFromStorage = () => {
@@ -36,6 +39,7 @@ const loadFromStorage = () => {
     keypress: localStorage.getItem(KEYPRESS_VOLUME_KEY),
     gameComplete: localStorage.getItem(GAME_COMPLETE_VOLUME_KEY),
     button: localStorage.getItem(BUTTON_VOLUME_KEY),
+    music: localStorage.getItem(MUSIC_VOLUME_KEY),
   };
 
   if (stored.animation !== null) animationEnabled = stored.animation === 'true';
@@ -44,6 +48,7 @@ const loadFromStorage = () => {
   if (stored.keypress !== null) keypressVolume = parseFloat(stored.keypress);
   if (stored.gameComplete !== null) gameCompleteVolume = parseFloat(stored.gameComplete);
   if (stored.button !== null) buttonVolume = parseFloat(stored.button);
+  if (stored.music !== null) musicVolume = parseFloat(stored.music);
 };
 
 // Initialize on module load
@@ -89,5 +94,27 @@ export const getButtonVolume = (): number => buttonVolume;
 export const setButtonVolume = (volume: number): void => {
   buttonVolume = Math.max(0, Math.min(0.5, volume));
   localStorage.setItem(BUTTON_VOLUME_KEY, buttonVolume.toString());
+};
+
+// Music Volume (background video)
+// Note: Only sets volume level, never touches muted state.
+// User controls muting via Settings modal - video must stay muted on startup for autoplay.
+export const getMusicVolume = (): number => musicVolume;
+export const setMusicVolume = (volume: number): void => {
+  musicVolume = Math.max(0, Math.min(0.13, volume));
+  localStorage.setItem(MUSIC_VOLUME_KEY, musicVolume.toString());
+  // Update volume only, don't touch muted state
+  const videoEl = document.getElementById('video') as HTMLVideoElement | null;
+  if (videoEl) {
+    videoEl.volume = musicVolume;
+  }
+};
+
+// Initialize music volume on the video element (volume only, keeps muted for autoplay)
+export const initMusicVolume = (): void => {
+  const videoEl = document.getElementById('video') as HTMLVideoElement | null;
+  if (videoEl) {
+    videoEl.volume = musicVolume;
+  }
 };
 
