@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import NewButton from './NewButton';
+import { 
+  isMusicMuted, 
+  setMusicMuted, 
+  isVideoPlaying as isVideoPlayingService, 
+  setVideoPlaying 
+} from '../utils/settingsService';
 
 interface SettingsProps {
   currentUsername: string;
@@ -37,18 +43,15 @@ const Settings: React.FC<SettingsProps> = ({
   onOpenAdvancedSettings
 }) => {
   const [username, setUsername] = useState(currentUsername);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(true);
-  const [isAudioMuted, setIsAudioMuted] = useState(true); // Video starts muted by default
+  const [isVideoPlaying, setIsVideoPlaying] = useState(isVideoPlayingService());
+  const [isMuted, setIsMuted] = useState(isMusicMuted());
 
   // Reset username to current when modal opens and sync video state
   useEffect(() => {
     if (visible) {
       setUsername(currentUsername);
-      const videoElement = document.getElementById('video') as HTMLVideoElement;
-      if (videoElement) {
-        setIsAudioMuted(videoElement.muted);
-        setIsVideoPlaying(!videoElement.paused);
-      }
+      setIsMuted(isMusicMuted());
+      setIsVideoPlaying(isVideoPlayingService());
     }
   }, [visible, currentUsername]);
 
@@ -88,23 +91,15 @@ const Settings: React.FC<SettingsProps> = ({
   };
 
   const toggleVideo = () => {
-    const videoElement = document.getElementById('video') as HTMLVideoElement;
-    if (videoElement) {
-      if (isVideoPlaying) {
-        videoElement.pause();
-      } else {
-        videoElement.play();
-      }
-      setIsVideoPlaying(!isVideoPlaying);
-    }
+    const newState = !isVideoPlaying;
+    setVideoPlaying(newState);
+    setIsVideoPlaying(newState);
   };
 
-  const toggleAudio = () => {
-    const videoElement = document.getElementById('video') as HTMLVideoElement;
-    if (videoElement) {
-      videoElement.muted = !videoElement.muted;
-      setIsAudioMuted(!isAudioMuted);
-    }
+  const toggleMusic = () => {
+    const newState = !isMuted;
+    setMusicMuted(newState);
+    setIsMuted(newState);
   };
 
   const handleSave = () => {
@@ -222,7 +217,7 @@ const Settings: React.FC<SettingsProps> = ({
           <NewButton 
             size="lg" 
             className="absolute"
-            onClick={toggleAudio}
+            onClick={toggleMusic}
             style={{
               top: pctH(253),
               left: pctW(270),
@@ -236,7 +231,7 @@ const Settings: React.FC<SettingsProps> = ({
               textShadow: darkTextShadow(2, MODAL_HEIGHT),
             } as React.CSSProperties}
           >
-            {isAudioMuted ? 'Unmute Audio' : 'Mute Audio'}
+            {isMuted ? 'Unmute Music' : 'Mute Music'}
           </NewButton>
           <NewButton 
             size="lg" 

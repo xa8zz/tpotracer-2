@@ -430,32 +430,51 @@
           window._introSound.play().catch(err => console.log('Error playing intro sound:', err));
         }
 
-        // 2. Restart video from beginning, unmute and play with audio fade-in
+        // 2. Restart video from beginning, unmute/mute and play/pause based on settings
         const videoElement = document.getElementById('video');
         if (videoElement) {
-          // Get target volume from localStorage or use default
+          // Get settings from localStorage
           const storedVolume = localStorage.getItem('tpotracer_music_volume');
           const targetVolume = storedVolume !== null ? parseFloat(storedVolume) : DEFAULT_MUSIC_VOLUME;
+          
+          const storedMuted = localStorage.getItem('tpotracer_music_muted');
+          const isMuted = storedMuted === 'true';
+
+          const storedPlaying = localStorage.getItem('tpotracer_video_playing');
+          const isPlaying = storedPlaying === null || storedPlaying === 'true';
 
           videoElement.currentTime = 0;
-          videoElement.volume = 0;
-          videoElement.muted = false;
-          videoElement.play().catch(err => console.log('Error playing video:', err));
           
-          // Fade in video audio
-          const fadeSteps = 30;
-          const fadeInterval = VIDEO_FADE_DURATION_MS / fadeSteps;
-          const volumeStep = targetVolume / fadeSteps;
-          let currentStep = 0;
-          
-          const fadeIn = setInterval(() => {
-            currentStep++;
-            videoElement.volume = Math.min(volumeStep * currentStep, targetVolume);
-            if (currentStep >= fadeSteps) {
-              clearInterval(fadeIn);
-              videoElement.volume = targetVolume;
+          if (isMuted) {
+            videoElement.muted = true;
+            videoElement.volume = targetVolume;
+          } else {
+            videoElement.muted = false;
+            videoElement.volume = 0;
+          }
+
+          if (isPlaying) {
+            videoElement.play().catch(err => console.log('Error playing video:', err));
+            
+            // Only fade in if we are playing and NOT muted
+            if (!isMuted) {
+              const fadeSteps = 30;
+              const fadeInterval = VIDEO_FADE_DURATION_MS / fadeSteps;
+              const volumeStep = targetVolume / fadeSteps;
+              let currentStep = 0;
+              
+              const fadeIn = setInterval(() => {
+                currentStep++;
+                videoElement.volume = Math.min(volumeStep * currentStep, targetVolume);
+                if (currentStep >= fadeSteps) {
+                  clearInterval(fadeIn);
+                  videoElement.volume = targetVolume;
+                }
+              }, fadeInterval);
             }
-          }, fadeInterval);
+          } else {
+            videoElement.pause();
+          }
         }
 
         // 3. Start fading out the loader (slow ease-in-out via CSS)
