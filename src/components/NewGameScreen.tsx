@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSpring, animated } from '@react-spring/web';
 import NewButton from './NewButton';
 import { createConfetti, startConfettiRain } from '../utils/confettiService';
 import Cursor from './Cursor';
@@ -230,6 +231,35 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     toggleHelp,
   } = useGameContext();
 
+  // Spring animation for game completion
+  const [{ z }, springApi] = useSpring(() => ({
+    z: 0,
+  }));
+
+  // Trigger the spring animation when game completes (unless invalid)
+  useEffect(() => {
+    if (gameState === 'completed' && !isScoreInvalid && !FORCE_SHOW_INVALID) {
+      // Intensity: 3x for new high score
+      const intensity = isNewHighScore ? -90 : -30;
+      
+      springApi.start({
+        to: async (next) => {
+          // 1. Sudden push back (fast animation)
+          await next({ z: intensity, config: { duration: 40 } });
+          // 2. Spring forward
+          // High score: fast, bouncy, exciting
+          // Regular complete: subtle feedback, quick return, minimal bounce
+          await next({ 
+            z: 0, 
+            config: isNewHighScore 
+              ? { tension: 280, friction: 8, mass: 1.5 } 
+              : { tension: 200, friction: 20, mass: 1 } 
+          });
+        }
+      });
+    }
+  }, [gameState, isScoreInvalid, isNewHighScore, springApi]);
+
   // Initialize audio
   useEffect(() => {
     gameCompleteAudioRef.current = new Audio(gameCompleteSound);
@@ -379,8 +409,14 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   };
 
   return (
-    <div className="">
-      <div className="game-container relative grow">
+    <div className="" style={{ perspective: `${(1000 / CONTAINER_HEIGHT) * 100}cqh` }}>
+      <animated.div 
+        className="game-container relative grow"
+        style={{
+          transform: z.to(val => `translateZ(${val}px)`),
+          transformStyle: 'preserve-3d',
+        }}
+      >
         {(highScore && highScore > 0) ? (
           <>
             <span 
@@ -934,9 +970,6 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
           Share on X
         </NewButton>
         
-        {/* Custom Cursor Component */}
-        <Cursor targetRef={cursorRef} isVisible={isCursorVisible} />
-        
         {/* Retro Confetti Canvas Overlay - positioned over inner-screen */}
         <canvas
           ref={confettiCanvasRef}
@@ -956,7 +989,10 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
             zIndex: 1000
           }}
         />
-      </div>
+      </animated.div>
+      
+      {/* Custom Cursor Component - Outside animated container to maintain correct positioning */}
+      <Cursor targetRef={cursorRef} isVisible={isCursorVisible} />
     </div>
   );
 };

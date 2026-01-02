@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface CursorProps {
   targetRef: React.RefObject<HTMLSpanElement> | null;
@@ -62,7 +63,7 @@ const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible }) => {
 
   if (!isVisible || !isInitialized) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed w-[2px] bg-tpotracer-100 transition-all duration-100 ease-out animate-blink glow-shadow-sm"
       style={{
@@ -70,8 +71,11 @@ const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible }) => {
         top: `${position.top}px`,
         height: `${position.height}px`,
         transform: 'translateX(0)',
+        zIndex: 9999,
+        pointerEvents: 'none',
       }}
-    />
+    />,
+    document.body
   );
 };
 

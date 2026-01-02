@@ -12,6 +12,7 @@
     "init-db": "node backend/db/init.js"
   },
   "dependencies": {
+    "@react-spring/web": "^10.0.3",
     "canvas-confetti": "^1.9.4",
     "howler": "^2.2.4",
     "html2canvas": "^1.4.1",
