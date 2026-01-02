@@ -65,7 +65,7 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
   return (
     <div
       className={`
-        absolute inset-0 w-screen h-screen
+        modal-overlay absolute inset-0 w-screen h-screen
         transition-all duration-[0.2s] ease-out
         ${visible ? 'opacity-100 visible' : 'opacity-0 invisible'}
       `}

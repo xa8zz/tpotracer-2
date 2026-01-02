@@ -67,7 +67,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
   return (
     <div
       className={`
-        absolute inset-0 w-screen h-screen
+        modal-overlay absolute inset-0 w-screen h-screen
         transition-all duration-[0.2s] ease-out
         ${visible ? 'opacity-100 visible' : 'opacity-0 invisible'}
       `}
@@ -116,7 +116,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
           >
             <p>This modal is still under development.</p>
             <br />
-            <p>Note: to disable the ghost, use the ghost icon in the game screen.</p>
+            <p><b>Note:</b> to disable the ghost, click the ghost button to the right of ACC on the game screen.</p>
           </div>
           <div 
             className="absolute font-ptclean dark-text-shadow text-tpotracer-400"

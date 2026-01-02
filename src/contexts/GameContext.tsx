@@ -292,6 +292,11 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({ childr
         return;
       }
 
+      // Ignore non-game keys (Escape, function keys, etc.) - these should not start the game
+      if (e.key === 'Escape' || e.key.startsWith('F') && e.key.length > 1) {
+        return;
+      }
+
       // Record keystroke
       const keystroke: Keystroke = {
         key: e.key,

@@ -374,6 +374,10 @@ body {
   text-shadow: 0 0 0.2cqh #fff;
 }
 
+.modal-overlay {
+  z-index: 10000;
+}
+
 .new-settings-modal {
   background-image: url('./assets/settingsmodalcropped.png');
   background-size: 509px 403px;
