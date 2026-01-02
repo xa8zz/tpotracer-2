@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import NewButton from './NewButton';
+import { createConfetti, startConfettiRain } from '../utils/confettiService';
 import Cursor from './Cursor';
 import { useGameContext } from '../contexts/GameContext';
 import { preloadGameAssets } from '../utils/preloadAssets';
@@ -187,6 +188,10 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   const cursorRef = useRef<HTMLSpanElement>(null);
   // Create ref for share card
   const shareCardRef = useRef<HTMLDivElement>(null);
+  // Retro confetti canvas ref
+  const confettiCanvasRef = useRef<HTMLCanvasElement>(null);
+  const confettiFnRef = useRef<ReturnType<typeof createConfetti> | null>(null);
+  const stopRainRef = useRef<(() => void) | null>(null);
   
   // Destructure all values and functions from game context
   const {
@@ -241,6 +246,30 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
       return () => clearTimeout(timer);
     } else {
       setIsFlashing(false);
+    }
+  }, [gameState, isNewHighScore]);
+
+  // Initialize confetti function bound to our custom canvas
+  useEffect(() => {
+    if (confettiCanvasRef.current && !confettiFnRef.current) {
+      confettiFnRef.current = createConfetti(confettiCanvasRef.current);
+    }
+  }, []);
+
+  // Continuous rain while on completed screen with new high score
+  useEffect(() => {
+    const myConfetti = confettiFnRef.current;
+    if (!myConfetti) return;
+    
+    // Start rain only if not already running
+    if (gameState === 'completed' && isNewHighScore && !stopRainRef.current) {
+      stopRainRef.current = startConfettiRain(myConfetti);
+    }
+    
+    // Stop rain when leaving completed state
+    if (gameState !== 'completed' && stopRainRef.current) {
+      stopRainRef.current();
+      stopRainRef.current = null;
     }
   }, [gameState, isNewHighScore]);
 
@@ -871,6 +900,26 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         
         {/* Custom Cursor Component */}
         <Cursor targetRef={cursorRef} isVisible={isCursorVisible} />
+        
+        {/* Retro Confetti Canvas Overlay - positioned over inner-screen */}
+        <canvas
+          ref={confettiCanvasRef}
+          width={118}  // Low resolution: ~1/4 of 471
+          height={84}  // Low resolution: ~1/4 of 336
+          style={{
+            position: 'absolute',
+            top: `${(212 / CONTAINER_HEIGHT) * 100}%`,
+            left: `${(241 / CONTAINER_WIDTH) * 100}%`,
+            width: `${(471 / CONTAINER_WIDTH) * 100}%`,
+            height: `${(336 / CONTAINER_HEIGHT) * 100}%`,
+            pointerEvents: 'none',
+            borderRadius: `${(49 / CONTAINER_HEIGHT) * 100}cqh`, // Match inner-screen corners
+            imageRendering: 'pixelated',
+            opacity: (showConfetti || (gameState === 'completed' && isNewHighScore)) ? 1 : 0,
+            transition: 'opacity 0.3s ease-out',
+            zIndex: 1000
+          }}
+        />
       </div>
     </div>
   );
