@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useSpring } from '@react-spring/web';
 
 // Flag to enable early settling (showing cursor before animation fully finishes)
@@ -14,7 +14,7 @@ function getBackgroundFilter(isActive: boolean, intent: BackgroundIntent): strin
   }
 
   if (intent === 'modal') {
-    return 'blur(10px)';
+    return 'blur(5px)';
   }
   
   return 'blur(20px)';
@@ -28,7 +28,7 @@ function getBackgroundTransform(isActive: boolean, intent: BackgroundIntent): st
   }
 
   if (intent === 'modal') {
-    return 'scale(0.90)';
+    return 'scale(0.95)';
   }
   
   return 'scale(0.80)';
@@ -37,8 +37,8 @@ function getBackgroundTransform(isActive: boolean, intent: BackgroundIntent): st
 export function getSpringConfig(intent: BackgroundIntent) {
   if (intent === 'modal') {
     return {
-      tension: 300,
-      friction: 30,
+      tension: 500,
+      friction: 50,
     };
   }
 
@@ -67,7 +67,21 @@ export function getSpringConfig(intent: BackgroundIntent) {
 export const useBackgroundSpring = (isActive: boolean, intent: BackgroundIntent = 'startup', useFirstStartupConfig = false) => {
   const [isSettled, setIsSettled] = useState(true);
 
-  const config = useFirstStartupConfig ? getSpringConfig('firstStartup') : getSpringConfig(intent);
+  // Keep track of the last intent when active to use for exit animations
+  // This ensures that when closing a modal, we use the 'modal' spring config
+  // instead of falling back to the slower 'startup' config
+  const activeIntentRef = useRef(intent);
+
+  useEffect(() => {
+    if (isActive) {
+      activeIntentRef.current = intent;
+    }
+  }, [isActive, intent]);
+
+  // If we are active, use current intent. If not active (exiting), use the last active intent.
+  const configIntent = isActive ? intent : activeIntentRef.current;
+
+  const config = useFirstStartupConfig ? getSpringConfig('firstStartup') : getSpringConfig(configIntent);
 
   const styles = useSpring({
     to: {
