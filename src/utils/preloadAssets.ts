@@ -77,6 +77,35 @@ const preloadVideo = (src: string): Promise<void> => {
     });
 };
 
+const preloadAudio = (src: string): Promise<void> => {
+    return new Promise((resolve) => {
+        const audio = new Audio();
+        audio.src = src;
+        audio.preload = 'auto';
+
+        const onLoaded = () => {
+            cleanup();
+            resolve();
+        };
+
+        const onError = () => {
+            console.warn(`Failed to preload audio: ${src}`);
+            cleanup();
+            resolve();
+        };
+
+        const cleanup = () => {
+            audio.removeEventListener('canplaythrough', onLoaded);
+            audio.removeEventListener('error', onError);
+        };
+
+        audio.addEventListener('canplaythrough', onLoaded);
+        audio.addEventListener('error', onError);
+        
+        audio.load();
+    });
+};
+
 // Import all assets using Vite's import.meta.glob
 // This ensures they are processed by the bundler and have correct paths in production
 const imageModules = import.meta.glob('../assets/*.{png,jpg,jpeg,svg}', { 
@@ -91,8 +120,15 @@ const fontModules = import.meta.glob('../assets/*.{ttf,otf,woff,woff2}', {
     import: 'default' 
 });
 
+const audioModules = import.meta.glob('../assets/sound/*.{mp3,wav}', { 
+    eager: true, 
+    query: '?url', 
+    import: 'default' 
+});
+
 export const preloadGameAssets = async (): Promise<void> => {
     const imageUrls = Object.values(imageModules) as string[];
+    const audioUrls = Object.values(audioModules) as string[];
     
     // Find ProggyClean font
     // The key in fontModules will be like '../assets/ProggyClean.ttf'
@@ -111,6 +147,7 @@ export const preloadGameAssets = async (): Promise<void> => {
     const imagePromises = imageUrls.map(preloadImage);
     const fontPromises = fontDetails.map(f => preloadFont(f.name, f.url));
     const videoPromises = videoUrls.map(preloadVideo);
+    const audioPromises = audioUrls.map(preloadAudio);
 
-    await Promise.all([...imagePromises, ...fontPromises, ...videoPromises]);
+    await Promise.all([...imagePromises, ...fontPromises, ...videoPromises, ...audioPromises]);
 };

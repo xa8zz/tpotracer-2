@@ -9,6 +9,8 @@ import { getBadgeClass } from '../utils/leaderboardUtils';
 import html2canvas from 'html2canvas';
 import sharableBg from '../assets/sharable.png';
 import logo from '../assets/logosm.png';
+import gameCompleteSound from '../assets/sound/gamecomplete.mp3';
+import newBestWpmSound from '../assets/sound/newbestwpm2.mp3';
 
 // Flag to hide share preview card contents (keeps background visible)
 const HIDE_SHARE_PREVIEW_CONTENTS = true;
@@ -192,6 +194,9 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   const confettiCanvasRef = useRef<HTMLCanvasElement>(null);
   const confettiFnRef = useRef<ReturnType<typeof createConfetti> | null>(null);
   const stopRainRef = useRef<(() => void) | null>(null);
+  const gameCompleteAudioRef = useRef<HTMLAudioElement | null>(null);
+  const newBestWpmAudioRef = useRef<HTMLAudioElement | null>(null);
+  const hasPlayedSoundRef = useRef(false);
   
   // Destructure all values and functions from game context
   const {
@@ -224,6 +229,37 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     handleStartNewGame,
     toggleHelp,
   } = useGameContext();
+
+  // Initialize audio
+  useEffect(() => {
+    gameCompleteAudioRef.current = new Audio(gameCompleteSound);
+    newBestWpmAudioRef.current = new Audio(newBestWpmSound);
+    if (gameCompleteAudioRef.current) gameCompleteAudioRef.current.volume = 0.5;
+    if (newBestWpmAudioRef.current) newBestWpmAudioRef.current.volume = 0.5;
+  }, []);
+
+  // Play sounds on completion
+  useEffect(() => {
+    // Reset the played flag when game is not completed
+    if (gameState !== 'completed') {
+      hasPlayedSoundRef.current = false;
+      return;
+    }
+
+    // If we haven't played the sound yet and the game is valid
+    if (!hasPlayedSoundRef.current && !isScoreInvalid && !FORCE_SHOW_INVALID) {
+      if (isNewHighScore) {
+        newBestWpmAudioRef.current?.play().catch(() => {
+          // Ignore autoplay errors
+        });
+      } else {
+        gameCompleteAudioRef.current?.play().catch(() => {
+          // Ignore autoplay errors
+        });
+      }
+      hasPlayedSoundRef.current = true;
+    }
+  }, [gameState, isScoreInvalid, isNewHighScore]);
 
   useEffect(() => {
     if (gameState === 'completed') {
