@@ -13,13 +13,14 @@ const BUTTON_VOLUME_KEY = 'tpotracer_button_volume';
 const MUSIC_VOLUME_KEY = 'tpotracer_music_volume';
 
 // Defaults
-const DEFAULT_ANIMATION_ENABLED = true;
-const DEFAULT_CONFETTI_ENABLED = true;
-const DEFAULT_SFX_ENABLED = true;
-const DEFAULT_KEYPRESS_VOLUME = 0.5;
-const DEFAULT_GAME_COMPLETE_VOLUME = 0.1;
-const DEFAULT_BUTTON_VOLUME = 0.5;
-const DEFAULT_MUSIC_VOLUME = 0.03;
+export const DEFAULT_ANIMATION_ENABLED = true;
+export const DEFAULT_CONFETTI_ENABLED = true;
+export const DEFAULT_SFX_ENABLED = true;
+export const DEFAULT_KEYPRESS_VOLUME = 0.5;
+export const DEFAULT_GAME_COMPLETE_VOLUME = 0.1;
+export const DEFAULT_BUTTON_VOLUME = 0.6;
+export const DEFAULT_MUSIC_VOLUME = 0.01;
+export const MAX_MUSIC_VOLUME = 0.13;
 
 // In-memory cache
 let animationEnabled = DEFAULT_ANIMATION_ENABLED;
@@ -78,21 +79,21 @@ export const setSfxEnabled = (enabled: boolean): void => {
 // Keypress Volume
 export const getKeypressVolume = (): number => keypressVolume;
 export const setKeypressVolume = (volume: number): void => {
-  keypressVolume = Math.max(0, Math.min(0.5, volume));
+  keypressVolume = Math.max(0, Math.min(DEFAULT_KEYPRESS_VOLUME, volume));
   localStorage.setItem(KEYPRESS_VOLUME_KEY, keypressVolume.toString());
 };
 
 // Game Complete Volume
 export const getGameCompleteVolume = (): number => gameCompleteVolume;
 export const setGameCompleteVolume = (volume: number): void => {
-  gameCompleteVolume = Math.max(0, Math.min(0.1, volume));
+  gameCompleteVolume = Math.max(0, Math.min(DEFAULT_GAME_COMPLETE_VOLUME, volume));
   localStorage.setItem(GAME_COMPLETE_VOLUME_KEY, gameCompleteVolume.toString());
 };
 
 // Button Volume
 export const getButtonVolume = (): number => buttonVolume;
 export const setButtonVolume = (volume: number): void => {
-  buttonVolume = Math.max(0, Math.min(0.5, volume));
+  buttonVolume = Math.max(0, Math.min(DEFAULT_BUTTON_VOLUME, volume));
   localStorage.setItem(BUTTON_VOLUME_KEY, buttonVolume.toString());
 };
 
@@ -101,7 +102,7 @@ export const setButtonVolume = (volume: number): void => {
 // User controls muting via Settings modal - video must stay muted on startup for autoplay.
 export const getMusicVolume = (): number => musicVolume;
 export const setMusicVolume = (volume: number): void => {
-  musicVolume = Math.max(0, Math.min(0.13, volume));
+  musicVolume = Math.max(0, Math.min(MAX_MUSIC_VOLUME, volume));
   localStorage.setItem(MUSIC_VOLUME_KEY, musicVolume.toString());
   // Update volume only, don't touch muted state
   const videoEl = document.getElementById('video') as HTMLVideoElement | null;

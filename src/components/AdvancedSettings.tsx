@@ -15,6 +15,10 @@ import {
   setButtonVolume,
   getMusicVolume,
   setMusicVolume,
+  DEFAULT_KEYPRESS_VOLUME,
+  DEFAULT_GAME_COMPLETE_VOLUME,
+  DEFAULT_BUTTON_VOLUME,
+  MAX_MUSIC_VOLUME,
 } from '../utils/settingsService';
 
 interface AdvancedSettingsProps {
@@ -175,7 +179,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                   <input
                     type="range"
                     min={0}
-                    max={0.5}
+                    max={DEFAULT_KEYPRESS_VOLUME}
                     step={0.01}
                     value={keypressVol}
                     onChange={(e) => {
@@ -193,7 +197,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                   <input
                     type="range"
                     min={0}
-                    max={0.1}
+                    max={DEFAULT_GAME_COMPLETE_VOLUME}
                     step={0.01}
                     value={gameCompleteVol}
                     onChange={(e) => {
@@ -211,7 +215,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                   <input
                     type="range"
                     min={0}
-                    max={0.5}
+                    max={DEFAULT_BUTTON_VOLUME}
                     step={0.01}
                     value={buttonVol}
                     onChange={(e) => {
@@ -230,7 +234,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                 <input
                   type="range"
                   min={0}
-                  max={0.13}
+                  max={MAX_MUSIC_VOLUME}
                   step={0.01}
                   value={musicVol}
                   onChange={(e) => {

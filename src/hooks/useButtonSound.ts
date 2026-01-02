@@ -18,7 +18,7 @@ const calculatePitch = (size: ButtonSize): number => {
   // the larger buttons arent that much bigger, so make it 0.5 instead of 1
   const bruhSize: number = size === 1 ? 0.5 : size;
 
-  return 1 + 0.07 * r - 0.09 * bruhSize;
+  return 1 + 0.07 * r - 0.11 * bruhSize;
 };
 
 // Create Howl instances once to ensure preloading
