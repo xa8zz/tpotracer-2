@@ -10,8 +10,39 @@ import { getBadgeClass } from '../utils/leaderboardUtils';
 import html2canvas from 'html2canvas';
 import sharableBg from '../assets/sharable.png';
 import logo from '../assets/logosm.png';
-import gameCompleteSound from '../assets/sound/gamecomplete.mp3';
 import newBestWpmSound from '../assets/sound/newbestwpm2.mp3';
+import almostThereSound from '../assets/sound/almostthere.mp3';
+
+// Game completion result types
+type GameCompletionResult = 'invalid' | 'newHighScore' | 'almostThere' | 'complete';
+
+// Helper to determine the game completion result
+const getGameCompletionResult = (
+  isScoreInvalid: boolean,
+  forceShowInvalid: boolean,
+  isNewHighScore: boolean,
+  wpm: number,
+  highScore: number | null
+): GameCompletionResult => {
+  if (isScoreInvalid || forceShowInvalid) return 'invalid';
+  if (isNewHighScore) return 'newHighScore';
+  if (highScore && wpm >= highScore - 5) return 'almostThere';
+  return 'complete';
+};
+
+// Helper to get the completion label text
+const getCompletionLabel = (result: GameCompletionResult, errorCode: number | string | null): string => {
+  switch (result) {
+    case 'invalid':
+      return `GAME ERRORED :( code ${errorCode ?? '?'}`;
+    case 'newHighScore':
+      return 'NEW BEST WPM!';
+    case 'almostThere':
+      return 'ALMOST THERE!';
+    case 'complete':
+      return 'GAME COMPLETE!';
+  }
+};
 
 // Flag to hide share preview card contents (keeps background visible)
 const HIDE_SHARE_PREVIEW_CONTENTS = true;
@@ -245,8 +276,8 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   const confettiCanvasRef = useRef<HTMLCanvasElement>(null);
   const confettiFnRef = useRef<ReturnType<typeof createConfetti> | null>(null);
   const stopRainRef = useRef<(() => void) | null>(null);
-  const gameCompleteAudioRef = useRef<HTMLAudioElement | null>(null);
   const newBestWpmAudioRef = useRef<HTMLAudioElement | null>(null);
+  const almostThereAudioRef = useRef<HTMLAudioElement | null>(null);
   const hasPlayedSoundRef = useRef(false);
   
   // Destructure all values and functions from game context
@@ -357,11 +388,20 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
 
   // Initialize audio
   useEffect(() => {
-    gameCompleteAudioRef.current = new Audio(gameCompleteSound);
     newBestWpmAudioRef.current = new Audio(newBestWpmSound);
-    if (gameCompleteAudioRef.current) gameCompleteAudioRef.current.volume = 0.1;
+    almostThereAudioRef.current = new Audio(almostThereSound);
     if (newBestWpmAudioRef.current) newBestWpmAudioRef.current.volume = 0.1;
+    if (almostThereAudioRef.current) almostThereAudioRef.current.volume = 0.1;
   }, []);
+
+  // Compute completion result for use in multiple places
+  const completionResult = getGameCompletionResult(
+    isScoreInvalid,
+    FORCE_SHOW_INVALID,
+    isNewHighScore,
+    wpm,
+    highScore
+  );
 
   // Play sounds on completion
   useEffect(() => {
@@ -372,19 +412,19 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     }
 
     // If we haven't played the sound yet and the game is valid
-    if (!hasPlayedSoundRef.current && !isScoreInvalid && !FORCE_SHOW_INVALID) {
-      if (isNewHighScore) {
-        newBestWpmAudioRef.current?.play().catch(() => {
-          // Ignore autoplay errors
-        });
-      } else {
-        gameCompleteAudioRef.current?.play().catch(() => {
-          // Ignore autoplay errors
-        });
+    if (!hasPlayedSoundRef.current && completionResult !== 'invalid') {
+      switch (completionResult) {
+        case 'newHighScore':
+          newBestWpmAudioRef.current?.play().catch(() => {});
+          break;
+        case 'almostThere':
+          almostThereAudioRef.current?.play().catch(() => {});
+          break;
+        // No sound for regular 'complete'
       }
       hasPlayedSoundRef.current = true;
     }
-  }, [gameState, isScoreInvalid, isNewHighScore]);
+  }, [gameState, completionResult]);
 
   useEffect(() => {
     if (gameState === 'completed') {
@@ -680,11 +720,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                     textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
                   }}
                 >
-                  {(isScoreInvalid || FORCE_SHOW_INVALID)
-                    ? `GAME ERRORED :( code ${invalidErrorCode ?? '?'}` 
-                    : statsForFinishedScreen.isNewHighScore 
-                      ? "NEW BEST WPM!" 
-                      : "GAME COMPLETE!"}
+                  {getCompletionLabel(completionResult, invalidErrorCode)}
                 </h2>
                 <div 
                   className="flex items-center"
