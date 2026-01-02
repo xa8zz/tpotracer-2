@@ -59,20 +59,66 @@
 
       #loader .loader-content {
         text-align: center;
+        width: 37.5vh; /* 300px relative to 800px height */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
 
       #loader .loader-logo {
-        width: 200px;
-        margin-bottom: 16px;
+        display: block;
+        width: 25vh; /* 200px */
+        height: 12.375vh; /* 99px */
+        margin-bottom: 4vh; /* 32px */
+        filter: drop-shadow(0 0 0.125vh #A7F1FA) drop-shadow(0 0 0.25vh #A7F1FA);
+      }
+
+      #loader .loader-status-container {
+        height: 4vh; /* 32px */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
       }
 
       #loader .loader-text {
-        font-size: 1.5rem; /* 24px */
-        line-height: 2rem; /* 32px */
+        font-size: 3vh; /* 24px */
+        line-height: 4vh; /* 32px */
         color: #A7F1FA; /* tpotracer-100 */
-        text-shadow: 0 0 2px #A7F1FA; /* glow-text-shadow-md */
+        text-shadow: 0 0 0.25vh #A7F1FA; /* glow-text-shadow-md */
         font-weight: 700;
-        width: 120px;
+        width: 15vh; /* 120px */
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        margin: 0; /* Remove default p margin */
+      }
+
+      #loader .loader-text.is-visible {
+        opacity: 1;
+      }
+
+      #loader .loader-play-button {
+        display: none;
+        font-size: 3vh; /* 24px */
+        line-height: 4vh;
+        color: #A7F1FA;
+        text-shadow: 0 0 0.5vh #A7F1FA;
+        cursor: pointer;
+        transition: opacity 0.3s ease-in-out, transform 0.15s ease;
+        opacity: 0;
+        white-space: nowrap;
+      }
+
+      #loader .loader-play-button.is-visible {
+        opacity: 1;
+      }
+
+      #loader .loader-play-button:hover {
+        opacity: 0.7;
+      }
+
+      #loader .loader-play-button:active {
+        transform: scale(0.95);
       }
 
       #video-fallback {
@@ -287,19 +333,28 @@
     <div id="loader">
       <div class="loader-container">
         <div class="loader-content">
-            <!-- <img src="/logosm.png" alt="tpotracer logo" class="loader-logo" /> -->
-            <p class="loader-text" id="loader-text">
-              Loading.
-            </p>
-            <p id="skip-loader" style="display: none; margin-top: 1rem;">
-              <a href="#" onclick="skipLoading(); return false;" style="color: #A7F1FA; font-size: 1rem">Skip &gt;</a>
-            </p>
+            <img src="/logosm.png" alt="tpotracer logo" class="loader-logo" />
+            <div class="loader-status-container">
+              <p class="loader-text" id="loader-text">
+                Loading.
+              </p>
+              <a class="loader-play-button" id="loader-play-button" onclick="startGame(); return false;">&lt; Click to Play &gt;</a>
+            </div>
         </div>
       </div>
     </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
+      // === LOADING SEQUENCE CONSTANTS ===
+      const LOADER_TEXT_DELAY_MS = 1000; // Delay before showing "Loading..." text if still loading
+      const VIDEO_FADE_DURATION_MS = 1500; // Duration for video audio fade-in
+      const DEFAULT_MUSIC_VOLUME = 0.03; // Default fallback if no setting saved
+
+      // === STATE ===
+      window._loadingComplete = false; // Set to true when React app signals ready
+      window._gameStarted = false; // Set to true when Play is clicked
+
       // Mobile detection and warning
       function isMobileDevice() {
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
@@ -324,42 +379,119 @@
         }
       }
 
-      window._skipLoading = false;
-
+      // === LOADER TEXT ANIMATION ===
       const loaderText = document.getElementById('loader-text');
+      const playButton = document.getElementById('loader-play-button');
       const dots = ['.', '..', '...'];
       let currentDot = 0;
+      let dotInterval = null;
 
-      window.dotInterval = setInterval(() => {
-        if (loaderText) {
-          loaderText.innerHTML = 'Loading' + dots[currentDot];
-          currentDot = (currentDot + 1) % dots.length;
-        }
-      }, 400);
-
-      setTimeout(() => {
-        const skipLink = document.getElementById('skip-loader');
-        if (skipLink) {
-          skipLink.style.display = 'block';
-        }
-      }, 4000);
-
-      // Auto-skip after 3 seconds no matter what
-      setTimeout(() => {
-        const loader = document.getElementById('loader');
-        if (loader && loader.style.display !== 'none') {
-          console.log('[index.html] Auto-skipping loader after 3s');
-          window._skipLoading = true;
-          loader.style.display = 'none';
-        }
-      }, 3000);
-
-      function skipLoading() {
-        console.log('[index.html] skipLoading called.');
-        window._skipLoading = true;
-        const loader = document.getElementById('loader');
-        if (loader) loader.style.display = 'none';
+      function startLoadingTextAnimation() {
+        if (dotInterval) return; // Already running
+        dotInterval = setInterval(() => {
+          if (loaderText) {
+            loaderText.innerHTML = 'Loading' + dots[currentDot];
+            currentDot = (currentDot + 1) % dots.length;
+          }
+        }, 400);
       }
+
+      function stopLoadingTextAnimation() {
+        if (dotInterval) {
+          clearInterval(dotInterval);
+          dotInterval = null;
+        }
+      }
+
+      // === SHOW PLAY BUTTON ===
+      function showPlayButton() {
+        stopLoadingTextAnimation();
+        if (loaderText) {
+          loaderText.style.opacity = '0';
+          loaderText.style.display = 'none';
+        }
+        if (playButton) {
+          playButton.style.display = 'block';
+          // Trigger fade-in
+          requestAnimationFrame(() => {
+            playButton.classList.add('is-visible');
+          });
+        }
+      }
+
+      // === PLAY BUTTON CLICK ===
+      function startGame() {
+        if (window._gameStarted) return;
+        window._gameStarted = true;
+
+        // 1. Play intro sound immediately (preloaded by main.tsx)
+        if (window._introSound) {
+          window._introSound.currentTime = 0;
+          window._introSound.play().catch(err => console.log('Error playing intro sound:', err));
+        }
+
+        // 2. Restart video from beginning, unmute and play with audio fade-in
+        const videoElement = document.getElementById('video');
+        if (videoElement) {
+          // Get target volume from localStorage or use default
+          const storedVolume = localStorage.getItem('tpotracer_music_volume');
+          const targetVolume = storedVolume !== null ? parseFloat(storedVolume) : DEFAULT_MUSIC_VOLUME;
+
+          videoElement.currentTime = 0;
+          videoElement.volume = 0;
+          videoElement.muted = false;
+          videoElement.play().catch(err => console.log('Error playing video:', err));
+          
+          // Fade in video audio
+          const fadeSteps = 30;
+          const fadeInterval = VIDEO_FADE_DURATION_MS / fadeSteps;
+          const volumeStep = targetVolume / fadeSteps;
+          let currentStep = 0;
+          
+          const fadeIn = setInterval(() => {
+            currentStep++;
+            videoElement.volume = Math.min(volumeStep * currentStep, targetVolume);
+            if (currentStep >= fadeSteps) {
+              clearInterval(fadeIn);
+              videoElement.volume = targetVolume;
+            }
+          }, fadeInterval);
+        }
+
+        // 3. Start fading out the loader (slow ease-in-out via CSS)
+        const loader = document.getElementById('loader');
+        if (loader) {
+          loader.addEventListener('transitionend', (e) => {
+            // Only remove when the loader's own opacity transition ends
+            if (e.target === loader && e.propertyName === 'opacity') {
+              loader.remove();
+            }
+          });
+          loader.classList.add('fade-out');
+        }
+      }
+
+      // Called by main.tsx when app is ready
+      window._signalLoadingComplete = function() {
+        console.log('[index.html] Loading complete signal received');
+        window._loadingComplete = true;
+        showPlayButton();
+      };
+
+      // === LOADING SEQUENCE ===
+      // After LOADER_TEXT_DELAY_MS, check if still loading
+      setTimeout(() => {
+        if (window._loadingComplete) {
+          // Already done loading, show play button
+          showPlayButton();
+        } else {
+          // Still loading, fade in the loading text
+          if (loaderText) {
+            loaderText.classList.add('is-visible');
+            startLoadingTextAnimation();
+          }
+        }
+      }, LOADER_TEXT_DELAY_MS);
     </script>
   </body>
 </html>
