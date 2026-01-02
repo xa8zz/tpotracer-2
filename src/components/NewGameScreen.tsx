@@ -266,6 +266,8 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
     leaderboardPosition: number | null;
     isNewHighScore: boolean;
     wpmToBeat: number | null;
+    completionResult: GameCompletionResult;
+    invalidErrorCode: number | string | null;
   } | null>(null);
   // Create ref for cursor positioning
   const cursorRef = useRef<HTMLSpanElement>(null);
@@ -433,9 +435,11 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         leaderboardPosition,
         isNewHighScore,
         wpmToBeat,
+        completionResult,
+        invalidErrorCode,
       });
     }
-  }, [gameState, wpm, leaderboardPosition, isNewHighScore, wpmToBeat]);
+  }, [gameState, wpm, leaderboardPosition, isNewHighScore, wpmToBeat, completionResult, invalidErrorCode]);
 
   useEffect(() => {
     if (gameState === 'completed' && isNewHighScore) {
@@ -479,7 +483,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
 
   const statsForFinishedScreen =
     gameState === 'completed'
-      ? { wpm, leaderboardPosition, isNewHighScore, wpmToBeat }
+      ? { wpm, leaderboardPosition, isNewHighScore, wpmToBeat, completionResult, invalidErrorCode }
       : finishedGameState;
 
   const handleDownloadShareImage = async () => {
@@ -720,7 +724,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
                     textShadow: glowTextShadow(2, CONTAINER_HEIGHT)
                   }}
                 >
-                  {getCompletionLabel(completionResult, invalidErrorCode)}
+                  {getCompletionLabel(statsForFinishedScreen.completionResult, statsForFinishedScreen.invalidErrorCode)}
                 </h2>
                 <div 
                   className="flex items-center"
