@@ -196,7 +196,15 @@ body {
 }
 
 /* Button text and SVG scaling on active */
-.btn-text,
+.btn-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  transition: transform var(--btn-transition-duration) var(--btn-transition-easing);
+}
+
 .new-button > svg,
 .new-button-md > svg,
 .new-button-lg > svg,
