@@ -9,10 +9,12 @@ interface CursorProps {
   heightScale?: number;
   noBlink?: boolean;
   opacity?: number;
+  orientation?: 'vertical' | 'horizontal';
+  widthScale?: number;
 }
 
-const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible, className, glowColor, heightScale = 1, noBlink = false, opacity }) => {
-  const [position, setPosition] = useState({ left: 0, top: 0, height: 0 });
+const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible, className, glowColor, heightScale = 1, noBlink = false, opacity, orientation = 'vertical', widthScale = 0.8 }) => {
+  const [position, setPosition] = useState({ left: 0, top: 0, height: 0, width: 0 });
   const [isInitialized, setIsInitialized] = useState(false);
 
   const updatePosition = () => {
@@ -29,7 +31,8 @@ const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible, className, glowCo
       setPosition({
         left: isNextChar ? rect.left : rect.left + rect.width, // Position before or after based on ref type
         top: rect.top,
-        height: rect.height
+        height: rect.height,
+        width: rect.width
       });
 
       if (!isInitialized) {
@@ -68,14 +71,27 @@ const Cursor: React.FC<CursorProps> = ({ targetRef, isVisible, className, glowCo
 
   if (!isVisible || !isInitialized) return null;
 
+  const isHorizontal = orientation === 'horizontal';
+
   return createPortal(
     <div
-      className={`fixed w-[2px] transition-all duration-100 ease-out ${noBlink ? '' : 'animate-blink'} ${glowColor ? '' : 'glow-shadow-sm'} ${className || 'bg-tpotracer-100'}`}
-      style={{
+      className={`fixed transition-all duration-100 ease-out ${noBlink ? '' : 'animate-blink'} ${glowColor ? '' : 'glow-shadow-sm'} ${className || 'bg-tpotracer-100'}`}
+      style={isHorizontal ? {
+        // Horizontal underline mode
+        left: `${position.left + (position.width * (1 - widthScale) / 2)}px`,
+        top: `${position.top + position.height - 2}px`,
+        width: `${position.width * widthScale}px`,
+        height: '2px',
+        zIndex: 9999,
+        pointerEvents: 'none',
+        ...(glowColor ? { boxShadow: `0 0 0.35cqh 0.15cqh ${glowColor}` } : {}),
+        ...(opacity !== undefined ? { opacity } : {}),
+      } : {
+        // Vertical cursor mode (default)
         left: `${position.left - 1}px`,
         top: `${position.top + (position.height * (1 - heightScale) / 2)}px`,
+        width: '2px',
         height: `${position.height * heightScale}px`,
-        transform: 'translateX(0)',
         zIndex: 9999,
         pointerEvents: 'none',
         ...(glowColor ? { boxShadow: `0 0 0.35cqh 0.15cqh ${glowColor}` } : {}),

@@ -1161,9 +1161,10 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
         targetRef={ghostCursorRef} 
         isVisible={gameState === 'playing' && !!ghostTargetWpm && isGhostEnabled} 
         className="bg-tpotracer-400"
-        heightScale={0.75}
+        orientation="horizontal"
+        widthScale={0.9}
         noBlink
-        opacity={0.3}
+        opacity={0.4}
         glowColor="#02182D"
       />
     </div>
