@@ -94,7 +94,7 @@ const HelpModal: React.FC<HelpModalProps> = ({
           <div 
             className="instructions-text absolute font-ptclean dark-text-shadow text-tpotracer-400"
             style={{
-              top: pctH(184),
+              top: pctH(174),
               left: pctW(40),
               right: pctW(30),
               fontSize: cqw(24), // text-2xl approx 24px
@@ -124,7 +124,7 @@ const HelpModal: React.FC<HelpModalProps> = ({
           <div 
             className="instructions-text absolute font-ptclean dark-text-shadow text-tpotracer-400"
             style={{
-              top: pctH(620),
+              top: pctH(610),
               left: pctW(40),
               right: pctW(30),
               fontSize: cqw(24), // text-2xl
