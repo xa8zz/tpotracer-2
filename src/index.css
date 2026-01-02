@@ -79,17 +79,36 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: font-size 0.1s cubic-bezier(0,1,1,1);
+  isolation: isolate;
+}
+
+.new-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('./assets/buttondepressedalt.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.1s cubic-bezier(0,1,1,1);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .new-button:active {
-  background-image: url('./assets/buttondepressedalt.png');
   font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
+}
+
+.new-button:active::before {
+  opacity: 1;
 }
 
 .new-button:active > svg,
 .new-button-md:active > svg,
 .new-button-lg:active > svg,
 .new-button-circle:active > svg {
+  transition: transform 0.1s cubic-bezier(0,1,1,1);
   transform: scale(var(--btn-active-scale));
 }
 
@@ -104,11 +123,29 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: font-size 0.1s cubic-bezier(0,1,1,1);
+  isolation: isolate;
+}
+
+.new-button-md::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('./assets/mdbuttonpressed.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.1s cubic-bezier(0,1,1,1);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .new-button-md:active {
-  background-image: url('./assets/mdbuttonpressed.png');
   font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
+}
+
+.new-button-md:active::before {
+  opacity: 1;
 }
 
 .new-button-lg {
@@ -122,11 +159,29 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: font-size 0.1s cubic-bezier(0,1,1,1);
+  isolation: isolate;
+}
+
+.new-button-lg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('./assets/lgbuttonpressed.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.1s cubic-bezier(0,1,1,1);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .new-button-lg:active {
-  background-image: url('./assets/lgbuttonpressed.png');
   font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
+}
+
+.new-button-lg:active::before {
+  opacity: 1;
 }
 
 .new-button-circle {
@@ -141,11 +196,29 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: font-size 0.1s cubic-bezier(0,1,1,1);
+  isolation: isolate;
+}
+
+.new-button-circle::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('./assets/smallbuttonpressed.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.1s cubic-bezier(0,1,1,1);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .new-button-circle:active {
-  background-image: url('./assets/smallbuttonpressed.png');
   font-size: calc(var(--btn-font-size, 24px) * var(--btn-active-scale));
+}
+
+.new-button-circle:active::before {
+  opacity: 1;
 }
 
 .glow-text-shadow {
