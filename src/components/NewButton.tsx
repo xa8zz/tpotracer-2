@@ -1,4 +1,5 @@
 import React from 'react';
+import { useButtonSound } from '../hooks/useButtonSound';
 
 interface NewButtonProps {
   onClick?: () => void;
@@ -15,9 +16,13 @@ const NewButton: React.FC<NewButtonProps> = ({
   size,
   style
 }) => {
+  const { playBtnDown, playBtnUp } = useButtonSound();
+
   return (
     <button
       onClick={onClick}
+      onMouseDown={playBtnDown}
+      onMouseUp={playBtnUp}
       className={`font-ptclean text-2xl ${size ? `new-button-${size}` : 'new-button'} text-tpotracer-300 ${className}`}
       style={style}
     >
