@@ -4,7 +4,7 @@
 
 :root {
   --btn-active-scale: 0.97;
-  --btn-transition-duration: 0.1s;
+  --btn-transition-duration: 0.075s;
   --btn-transition-easing: cubic-bezier(0,1,1,1);
 }
 

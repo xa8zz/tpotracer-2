@@ -102,8 +102,8 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
         <button 
             className="absolute" 
             onClick={handleRetry}
-            onMouseDown={playBtnDown}
-            onMouseUp={playBtnUp}
+            onMouseDown={() => playBtnDown(-1)}
+            onMouseUp={() => playBtnUp(-1)}
             style={{
                 top: pct(203, LB_HEIGHT),
                 left: pct(62, LB_WIDTH),
