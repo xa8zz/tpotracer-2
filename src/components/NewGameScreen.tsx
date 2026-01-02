@@ -387,7 +387,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({
           await next({ 
             z: 0, 
             config: isNewHighScore 
-              ? { tension: 280, friction: 8, mass: 1.5 } 
+              ? { tension: 280, friction: 12, mass: 1.5 } 
               : { tension: 200, friction: 20, mass: 1 } 
           });
         }
