@@ -194,6 +194,7 @@
       src="/tr2.mp4" 
       autoplay 
       loop 
+      muted
       playsinline
       disablepictureinpicture
       disableremoteplayback
@@ -204,6 +205,7 @@
       // Set background video volume and prevent loop stuttering
       const videoElement = document.getElementById('video');
       videoElement.volume = 0.05;
+      videoElement.muted = true;
       
       // AGGRESSIVE Picture-in-Picture Prevention (for Arc and other browsers)
       // Set multiple properties to disable PiP

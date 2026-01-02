@@ -36,12 +36,17 @@ const Settings: React.FC<SettingsProps> = ({
 }) => {
   const [username, setUsername] = useState(currentUsername);
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
-  const [isAudioMuted, setIsAudioMuted] = useState(false); // Video starts unmuted by default
+  const [isAudioMuted, setIsAudioMuted] = useState(true); // Video starts muted by default
 
-  // Reset username to current when modal opens
+  // Reset username to current when modal opens and sync video state
   useEffect(() => {
     if (visible) {
       setUsername(currentUsername);
+      const videoElement = document.getElementById('video') as HTMLVideoElement;
+      if (videoElement) {
+        setIsAudioMuted(videoElement.muted);
+        setIsVideoPlaying(!videoElement.paused);
+      }
     }
   }, [visible, currentUsername]);
 
