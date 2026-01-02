@@ -59,6 +59,8 @@ const GHOST_USE_REGULAR_WPM = true;
 interface NewGameScreenProps {
   username: string | null;
   onSettingsClick: () => void;
+  isBackgrounded?: boolean;
+  isSpringSettled?: boolean;
 }
 
 // DEBUG FLAG: Set to true to preview the share card in center of screen
@@ -253,7 +255,12 @@ const darkBoxShadow = (blur: number, spread: number, height: number) =>
 const tpotracer300BoxShadow = (blur: number, spread: number, height: number) => 
   `0 0 ${(blur * 1.5 / height) * 100}cqh ${(spread * 1.2 / height) * 100}cqh #03223F`;
 
-const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick }) => {
+const NewGameScreen: React.FC<NewGameScreenProps> = ({ 
+  username, 
+  onSettingsClick,
+  isBackgrounded = false,
+  isSpringSettled = true
+}) => {
   // Game container dimensions (from src/index.css)
   const CONTAINER_WIDTH = 853;
   const CONTAINER_HEIGHT = 806;
@@ -487,7 +494,8 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
   }, [gameState, isNewHighScore]);
 
   // Determine if cursor should be visible (during typing states)
-  const isCursorVisible = gameState === 'playing' || gameState === 'waiting';
+  // Hide cursor if game is backgrounded or spring animation is still running
+  const isCursorVisible = (gameState === 'playing' || gameState === 'waiting') && !isBackgrounded && isSpringSettled;
 
   const statsForFinishedScreen =
     gameState === 'completed'
@@ -1160,7 +1168,7 @@ const NewGameScreen: React.FC<NewGameScreenProps> = ({ username, onSettingsClick
       {/* Ghost Cursor - Only visible when playing, we have a target WPM, and ghost is enabled */}
       <Cursor 
         targetRef={ghostCursorRef} 
-        isVisible={gameState === 'playing' && !!ghostTargetWpm && isGhostEnabled} 
+        isVisible={gameState === 'playing' && !!ghostTargetWpm && isGhostEnabled && !isBackgrounded && isSpringSettled} 
         className="bg-tpotracer-400"
         orientation="horizontal"
         widthScale={0.9}

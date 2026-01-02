@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Leaderboard from './Leaderboard';
-import Settings from './Settings';
-import { Settings as SettingsIcon, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useLeaderboard } from '../hooks/useLeaderboard';
+import { animated } from '@react-spring/web';
 import NewLeaderboard from './NewLeaderboard';
 import NewGameScreen from './NewGameScreen';
 import NewSettings from './NewSettings';
@@ -11,6 +8,7 @@ import Credits from './Credits';
 import UsernameModal from './UsernameModal';
 import HelpModal from './HelpModal';
 import { useGameContext } from '../contexts/GameContext';
+import { useBackgroundSpring } from '../hooks/useBackgroundSpring';
 
 interface LayoutProps {
   onUsernameChange: (username: string) => void;
@@ -20,10 +18,59 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
-  const [isLeaderboardVisible, setIsLeaderboardVisible] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const { isHelpExpanded, toggleHelp } = useGameContext();
 
-  const defaultLeaderboardOpen = window.innerWidth >= 1000;
+  // Track when loading screen is ready to fade out
+  useEffect(() => {
+    const checkLoader = () => {
+      const loader = document.getElementById('loader');
+      // If loader doesn't exist or has fade-out class, loading is complete
+      if (!loader || loader.classList.contains('fade-out')) {
+        setIsLoaded(true);
+        return true;
+      }
+      return false;
+    };
+
+    // Check immediately
+    if (checkLoader()) {
+      return;
+    }
+
+    // Listen for when fade-out class is added to the loader
+    const loader = document.getElementById('loader');
+    if (loader) {
+      const observer = new MutationObserver(() => {
+        if (checkLoader()) {
+          observer.disconnect();
+        }
+      });
+      observer.observe(loader, { attributes: true, attributeFilter: ['class'] });
+      
+      // Also check periodically as fallback (in case loader isn't in DOM yet)
+      const interval = setInterval(() => {
+        if (checkLoader()) {
+          clearInterval(interval);
+          observer.disconnect();
+        }
+      }, 50);
+
+      return () => {
+        clearInterval(interval);
+        observer.disconnect();
+      };
+    }
+
+    // Fallback: if loader doesn't exist yet, poll for it
+    const pollInterval = setInterval(() => {
+      if (checkLoader()) {
+        clearInterval(pollInterval);
+      }
+    }, 50);
+
+    return () => clearInterval(pollInterval);
+  }, []);
 
   // useEffect(() => {
   //   const setInitialLeaderboardVisibility = () => {
@@ -52,13 +99,26 @@ const Layout: React.FC<LayoutProps> = ({ onUsernameChange, currentUsername }) =>
 
   const isUsernameModalVisible = !currentUsername || currentUsername === '';
 
+  // Determine if container should be backgrounded
+  const shouldBeBackgrounded = !isLoaded || isSettingsOpen || isAdvancedSettingsOpen || isUsernameModalVisible || isHelpExpanded;
+  const intent = (isSettingsOpen || isAdvancedSettingsOpen || isUsernameModalVisible || isHelpExpanded) ? 'modal' : 'startup';
+  const { styles: springStyles, isSettled } = useBackgroundSpring(shouldBeBackgrounded, intent);
+
   return (
     <>
-      <div className={`flex flex-row w-screen h-screen overflow-hidden items-center justify-center relative transition-[filter] duration-[0.2s] ease-out ${isSettingsOpen || isAdvancedSettingsOpen || isUsernameModalVisible || isHelpExpanded ? 'blur-sm' : ''}`}>
-        <div className="stupid-big-ass-container flex flex-row relative max-h-screen">
-          <NewGameScreen username={currentUsername} onSettingsClick={toggleSettings} />
+      <div className="flex flex-row w-screen h-screen overflow-hidden items-center justify-center relative">
+        <animated.div 
+          className="stupid-big-ass-container flex flex-row relative max-h-screen"
+          style={springStyles}
+        >
+          <NewGameScreen 
+            username={currentUsername} 
+            onSettingsClick={toggleSettings} 
+            isBackgrounded={shouldBeBackgrounded}
+            isSpringSettled={isSettled}
+          />
           <NewLeaderboard currentUsername={currentUsername} />
-        </div>
+        </animated.div>
       </div>
       <NewSettings
         onClose={toggleSettings} 
