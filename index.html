@@ -63,6 +63,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        position: relative;
       }
 
       #loader .loader-logo {
@@ -118,6 +119,33 @@
       }
 
       #loader .loader-play-button:active {
+        transform: scale(0.95);
+      }
+
+      #loader .loader-skip-button {
+        display: none;
+        font-size: 2.5vh;
+        line-height: 3vh;
+        color: #A7F1FA;
+        text-shadow: 0 0 0.5vh #A7F1FA;
+        cursor: pointer;
+        transition: opacity 0.3s ease-in-out, transform 0.15s ease;
+        opacity: 0;
+        white-space: nowrap;
+        margin-top: 2vh;
+        position: absolute;
+        bottom: -5vh;
+      }
+
+      #loader .loader-skip-button.is-visible {
+        opacity: 0.7;
+      }
+
+      #loader .loader-skip-button:hover {
+        opacity: 1;
+      }
+
+      #loader .loader-skip-button:active {
         transform: scale(0.95);
       }
 
@@ -503,6 +531,7 @@
               </p>
               <a class="loader-play-button" id="loader-play-button" onclick="startGame(); return false;">&lt; Click to Play &gt;</a>
             </div>
+            <a class="loader-skip-button" id="loader-skip-button" onclick="startGame(); return false;">&lt; skip loading &gt;</a>
         </div>
       </div>
     </div>
@@ -511,6 +540,7 @@
     <script>
       // === LOADING SEQUENCE CONSTANTS ===
       const LOADER_TEXT_DELAY_MS = 1000; // Delay before showing "Loading..." text if still loading
+      const SKIP_BUTTON_DELAY_MS = 3000; // Delay before showing skip button
       const VIDEO_FADE_DURATION_MS = 1500; // Duration for video audio fade-in
       const DEFAULT_MUSIC_VOLUME = 0.01; // Default fallback if no setting saved
 
@@ -553,6 +583,7 @@
       // === LOADER TEXT ANIMATION ===
       const loaderText = document.getElementById('loader-text');
       const playButton = document.getElementById('loader-play-button');
+      const skipButton = document.getElementById('loader-skip-button');
       const dots = ['.', '..', '...'];
       let currentDot = 0;
       let dotInterval = null;
@@ -574,9 +605,30 @@
         }
       }
 
+      // === SHOW SKIP BUTTON ===
+      function showSkipButton() {
+        // Show skip button if game hasn't started and still waiting for either video or app to load
+        const stillLoading = !(window._loadingComplete && window._videoLoaded);
+        if (skipButton && !window._gameStarted && stillLoading) {
+          skipButton.style.display = 'block';
+          requestAnimationFrame(() => {
+            skipButton.classList.add('is-visible');
+          });
+        }
+      }
+
+      // === HIDE SKIP BUTTON ===
+      function hideSkipButton() {
+        if (skipButton) {
+          skipButton.classList.remove('is-visible');
+          skipButton.style.display = 'none';
+        }
+      }
+
       // === SHOW PLAY BUTTON ===
       function showPlayButton() {
         stopLoadingTextAnimation();
+        hideSkipButton();
         if (loaderText) {
           loaderText.style.opacity = '0';
           loaderText.style.display = 'none';
@@ -668,6 +720,11 @@
           }
         }
       }, LOADER_TEXT_DELAY_MS);
+
+      // After SKIP_BUTTON_DELAY_MS, show skip button if still loading
+      setTimeout(() => {
+        showSkipButton();
+      }, SKIP_BUTTON_DELAY_MS);
     </script>
   </body>
 </html>
