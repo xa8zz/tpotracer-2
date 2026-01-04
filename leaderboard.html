@@ -749,7 +749,7 @@
 
     <script type="module">
         // === CONFIGURATION ===
-        const PAGE_SIZE = 20;
+        const PAGE_SIZE = 50;
         const TIME_LIMIT = new Date('2026-01-04T20:00:00Z');
         
         // Access Environment Variables
@@ -1013,6 +1013,7 @@
             
             isLoading = false;
             renderLeaderboard();
+            checkFillScreen();
         }
 
         async function loadMore() {
@@ -1031,6 +1032,7 @@
             
             isLoading = false;
             renderLeaderboard();
+            checkFillScreen();
         }
 
         // === REPLAY LOGIC ===
@@ -1323,6 +1325,18 @@
             }
         }
 
+        function checkFillScreen() {
+            if (isLoading || !hasMore) return;
+            
+            // Check if content fills the screen, load more if not
+            setTimeout(() => {
+                const { scrollHeight, clientHeight } = listEl;
+                if (scrollHeight <= clientHeight + 100) {
+                    loadMore();
+                }
+            }, 100);
+        }
+
         // === COUNTDOWN TIMER ===
         function updateCountdown() {
             countdownEl.textContent = getRemainingTimeUntilEnd();
@@ -1352,6 +1366,7 @@
                     leaderboardContainer.classList.remove('compact-mode');
                 }
                 localStorage.setItem('tpotracer_compact_mode', isCompact);
+                checkFillScreen();
             });
             
             // Note: We don't have raw/acc in simple local storage key, so they will be null/'-'
