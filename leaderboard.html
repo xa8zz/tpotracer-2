@@ -747,10 +747,14 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
         // === CONFIGURATION ===
         const PAGE_SIZE = 20;
         const TIME_LIMIT = new Date('2026-01-04T20:00:00Z');
+        
+        // Access Environment Variables
+        const API_KEY = import.meta.env.VITE_API_KEY;
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
         
         // === STATE ===
         let leaderboardData = [];
@@ -831,7 +835,10 @@
         // Use relative URLs - Vite proxy handles in dev, deployment handles in prod
         async function fetchLeaderboardPage(offset = 0) {
             try {
-                const response = await fetch(`/api/leaderboard?limit=${PAGE_SIZE}&offset=${offset}`);
+                const headers = {};
+                if (API_KEY) headers['x-api-key'] = API_KEY;
+
+                const response = await fetch(`${API_BASE_URL}/api/leaderboard?limit=${PAGE_SIZE}&offset=${offset}`, { headers });
                 if (response.ok) {
                     return await response.json();
                 }
@@ -847,7 +854,10 @@
             if (!username || username === 'guest') return null;
             
             try {
-                const response = await fetch(`/api/rank/${encodeURIComponent(username)}`);
+                const headers = {};
+                if (API_KEY) headers['x-api-key'] = API_KEY;
+
+                const response = await fetch(`${API_BASE_URL}/api/rank/${encodeURIComponent(username)}`, { headers });
                 if (response.ok) {
                     return await response.json();
                 }
@@ -860,7 +870,10 @@
         
         async function fetchReplayData(username) {
             try {
-                const response = await fetch(`/api/replay/${encodeURIComponent(username)}`);
+                const headers = {};
+                if (API_KEY) headers['x-api-key'] = API_KEY;
+
+                const response = await fetch(`${API_BASE_URL}/api/replay/${encodeURIComponent(username)}`, { headers });
                 if (response.ok) {
                     return await response.json();
                 }
@@ -1042,6 +1055,9 @@
             
             startReplay(data);
         }
+        
+        // Make openReplay available globally for onclick handlers
+        window.openReplay = openReplay;
         
         function startReplay(data) {
             const words = data.words;
