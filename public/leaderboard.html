@@ -39,7 +39,8 @@
         body {
             font-family: 'ProggyCleanTT', 'Roboto Mono', monospace;
             background-color: var(--tr-300);
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
             color: var(--tr-100);
             display: flex;
             flex-direction: column;
@@ -65,10 +66,11 @@
 
         .leaderboard-wrapper {
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
             display: flex;
             flex-direction: column;
             flex: 1;
+            min-height: 0;
         }
 
         .leaderboard-header {
@@ -80,7 +82,7 @@
             width: 180px;
             height: auto;
             margin-bottom: 20px;
-            filter: drop-shadow(0 0 4px var(--tr-100));
+            filter: drop-shadow(0 0 0.125vh var(--tr-100)) drop-shadow(0 0 0.25vh var(--tr-100));
         }
 
         .leaderboard-title {
@@ -101,7 +103,7 @@
         .table-header {
             display: flex;
             align-items: center;
-            padding: 12px 16px;
+            padding: 12px 22px 12px 16px;
             font-size: 24px;
             color: var(--tr-100);
             text-shadow: 0 0 2px var(--tr-100);
@@ -123,6 +125,19 @@
         }
 
         .col-wpm {
+            width: 100px;
+            text-align: right;
+            padding-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .col-raw {
+            width: 80px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .col-acc {
             width: 80px;
             text-align: center;
             flex-shrink: 0;
@@ -131,7 +146,7 @@
         .current-user-row {
             display: flex;
             align-items: center;
-            padding: 14px 16px;
+            padding: 14px 22px 14px 16px;
             font-size: 24px;
             color: var(--tr-100);
             text-shadow: 0 0 3px var(--tr-100);
@@ -155,7 +170,8 @@
 
         .leaderboard-list {
             flex: 1;
-            overflow-y: auto;
+            overflow-y: scroll;
+            overflow-x: hidden;
             padding-bottom: 20px;
         }
 
@@ -253,6 +269,18 @@
 
         .wpm-value {
             text-shadow: 0 0 2px var(--tr-100);
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .wpm-decimal {
+            font-size: 0.65em;
+            opacity: 0.8;
+            margin-left: 1px;
+        }
+        
+        .raw-value, .acc-value {
+            opacity: 0.8;
+            font-size: 20px;
         }
 
         .loading-row {
@@ -300,12 +328,11 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: 
-                radial-gradient(circle at center, var(--tr-200) 0%, var(--tr-300) 70%),
-                var(--tr-300);
+            background: var(--tr-300);
             border-radius: 12px;
             border: 1px solid rgba(167, 241, 250, 0.15);
             overflow: hidden;
+            min-height: 0;
         }
 
         @keyframes pulse {
@@ -360,7 +387,16 @@
             }
 
             .col-wpm {
-                width: 60px;
+                width: 70px;
+            }
+            
+            .col-raw, .col-acc {
+                width: 50px;
+                font-size: 16px;
+            }
+            
+            .raw-value, .acc-value {
+                font-size: 16px;
             }
 
             .rank-badge {
@@ -386,7 +422,6 @@
     <div class="leaderboard-wrapper">
         <div class="leaderboard-header">
             <img src="/logosm.png" alt="tpotracer" class="leaderboard-logo" />
-            <h1 class="leaderboard-title">LEADERBOARD</h1>
             <div class="leaderboard-countdown" id="countdown">-0:00:00:00</div>
         </div>
 
@@ -395,6 +430,8 @@
                 <div class="col-rank">#</div>
                 <div class="col-user">USERNAME</div>
                 <div class="col-wpm">WPM</div>
+                <div class="col-raw">RAW</div>
+                <div class="col-acc">ACC</div>
             </div>
 
             <div class="current-user-row" id="current-user-row">
@@ -409,6 +446,12 @@
                 </div>
                 <div class="col-wpm">
                     <span class="wpm-value" id="current-wpm">0</span>
+                </div>
+                <div class="col-raw">
+                    <span class="raw-value" id="current-raw">-</span>
+                </div>
+                <div class="col-acc">
+                    <span class="acc-value" id="current-acc">-</span>
                 </div>
             </div>
 
@@ -432,6 +475,8 @@
         let currentUser = null;
         let userRank = null;
         let userWpm = 0;
+        let userRaw = null;
+        let userAcc = null;
 
         // === DOM ELEMENTS ===
         const countdownEl = document.getElementById('countdown');
@@ -440,6 +485,8 @@
         const currentUsernameEl = document.getElementById('current-username');
         const currentAvatarEl = document.getElementById('current-avatar');
         const currentWpmEl = document.getElementById('current-wpm');
+        const currentRawEl = document.getElementById('current-raw');
+        const currentAccEl = document.getElementById('current-acc');
         const currentUserLink = document.getElementById('current-user-link');
         const listEl = document.getElementById('leaderboard-list');
 
@@ -473,6 +520,13 @@
                 const avatarUrl = `https://unavatar.io/x/${username}`;
                 element.style.backgroundImage = `url(${avatarUrl})`;
             }
+        }
+        
+        function formatWpm(wpm) {
+            const val = parseFloat(wpm);
+            const integerPart = Math.floor(val);
+            const decimalPart = (val - integerPart).toFixed(2).substring(1); // .xx
+            return `${integerPart}<span class="wpm-decimal">${decimalPart}</span>`;
         }
 
         // === API FUNCTIONS ===
@@ -511,6 +565,9 @@
             const row = document.createElement('div');
             row.className = 'leaderboard-row';
             
+            const rawWpm = entry.raw_wpm !== undefined ? Math.round(entry.raw_wpm) : '-';
+            const accuracy = entry.accuracy !== undefined ? Math.round(entry.accuracy) + '%' : '-';
+            
             row.innerHTML = `
                 <div class="col-rank">
                     <span class="rank-badge ${getBadgeClass(rank)}">${rank}</span>
@@ -522,7 +579,13 @@
                     </a>
                 </div>
                 <div class="col-wpm">
-                    <span class="wpm-value" title="${entry.wpm.toFixed(3)}">${Math.round(entry.wpm)}</span>
+                    <span class="wpm-value" title="${parseFloat(entry.wpm).toFixed(3)}">${formatWpm(entry.wpm)}</span>
+                </div>
+                <div class="col-raw">
+                    <span class="raw-value">${rawWpm}</span>
+                </div>
+                <div class="col-acc">
+                    <span class="acc-value">${accuracy}</span>
                 </div>
             `;
             
@@ -546,7 +609,9 @@
                 currentRankEl.textContent = '-';
                 currentRankEl.className = 'rank-badge rank-badge-plain';
                 currentUsernameEl.textContent = '@guest';
-                currentWpmEl.textContent = '0';
+                currentWpmEl.innerHTML = '0<span class="wpm-decimal">.00</span>';
+                currentRawEl.textContent = '-';
+                currentAccEl.textContent = '-';
                 currentUserLink.href = '#';
                 currentUserLink.onclick = (e) => e.preventDefault();
             } else {
@@ -554,8 +619,11 @@
                 currentRankEl.textContent = userRank || '-';
                 currentRankEl.className = `rank-badge ${getBadgeClass(userRank || 999)}`;
                 currentUsernameEl.textContent = `@${currentUser}`;
-                currentWpmEl.textContent = Math.round(userWpm);
-                currentWpmEl.title = userWpm.toFixed(3);
+                currentWpmEl.innerHTML = formatWpm(userWpm);
+                currentWpmEl.title = typeof userWpm === 'number' ? userWpm.toFixed(3) : userWpm;
+                currentRawEl.textContent = userRaw !== null ? Math.round(userRaw) : '-';
+                currentAccEl.textContent = userAcc !== null ? Math.round(userAcc) + '%' : '-';
+                
                 currentUserLink.href = `https://x.com/${currentUser}`;
                 currentUserLink.onclick = null;
                 setAvatarBackground(currentAvatarEl, currentUser);
@@ -598,6 +666,8 @@
                         const userEntry = leaderboardData.find(e => e.username === currentUser);
                         if (userEntry) {
                             userWpm = userEntry.wpm;
+                            userRaw = userEntry.raw_wpm;
+                            userAcc = userEntry.accuracy;
                         }
                     }
                 }
@@ -653,6 +723,9 @@
             const storedHighScore = localStorage.getItem('tpotracer_high_score');
             userWpm = storedHighScore ? parseFloat(storedHighScore) : 0;
             
+            // Note: We don't have raw/acc in simple local storage key, so they will be null/'-'
+            // unless found in leaderboard array during loadInitialData
+            
             // Update countdown every second
             updateCountdown();
             setInterval(updateCountdown, 1000);
@@ -678,4 +751,3 @@
     </script>
 </body>
 </html>
-

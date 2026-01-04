@@ -163,7 +163,7 @@ export const getLeaderboard = async (req, res) => {
     // Build query to get the best score for each user, potentially filtered by search
     let baseQuery = `
       SELECT DISTINCT ON (username)
-        username, wpm, timestamp
+        username, wpm, raw_wpm, accuracy, timestamp
       FROM scores
     `;
     const queryParams = [];
@@ -181,7 +181,7 @@ export const getLeaderboard = async (req, res) => {
     // Wrap to apply the overall WPM sorting, limit and offset *after* getting distinct users
     const finalQuery = `
       WITH distinct_user_scores AS (${baseQuery})
-      SELECT username, wpm, timestamp
+      SELECT username, wpm, raw_wpm, accuracy, timestamp
       FROM distinct_user_scores
       ORDER BY wpm DESC
       LIMIT $${paramIndex}
