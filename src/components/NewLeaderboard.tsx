@@ -222,7 +222,16 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                 </span>
               </a>
             </div>
-            <div style={{ width: pct(COL_WIDTH, CONTENT_WIDTH) }} title={currentUserLeaderboardData.wpm.toFixed(3)}>{Math.round(currentUserLeaderboardData.wpm)}</div>
+            <a 
+                href={`/leaderboard.html?replay=${currentUserLeaderboardData.username}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:opacity-80 hover:underline transition-opacity"
+                style={{ width: pct(COL_WIDTH, CONTENT_WIDTH), display: 'block' }} 
+                title={currentUserLeaderboardData.wpm.toFixed(3)}
+            >
+                {Math.round(currentUserLeaderboardData.wpm)}
+            </a>
             <div className="current-user-background" style={{ left: pct(-35, CONTENT_WIDTH) }}></div>
           </div>
           
@@ -282,7 +291,16 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                     </span>
                   </a>
                 </div>
-                <div style={{ width: pct(COL_WIDTH, CONTENT_WIDTH), textShadow: glowTextShadow(2) }} title={entry.wpm.toFixed(3)}>{Math.round(entry.wpm)}</div>
+                <a 
+                    href={`/leaderboard.html?replay=${entry.username}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:opacity-80 hover:underline transition-opacity"
+                    style={{ width: pct(COL_WIDTH, CONTENT_WIDTH), textShadow: glowTextShadow(2), display: 'block' }} 
+                    title={entry.wpm.toFixed(3)}
+                >
+                    {Math.round(entry.wpm)}
+                </a>
               </div>
             ))}
             {isLoadingMore && (

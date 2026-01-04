@@ -1386,6 +1386,16 @@
             setInterval(() => {
                 loadInitialData();
             }, 5 * 60 * 1000);
+
+            // Check for replay query param
+            const urlParams = new URLSearchParams(window.location.search);
+            const replayUser = urlParams.get('replay');
+            if (replayUser) {
+                // specific replay request
+                setTimeout(() => {
+                    openReplay(replayUser);
+                }, 100);
+            }
         }
 
         // Start when DOM is ready
