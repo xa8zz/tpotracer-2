@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tpotracer - Leaderboard</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" href="/tpotracericon.png" />
+    <link rel="apple-touch-icon" href="/tpotracericon.png" />
+    
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="tpotracer - Leaderboard" />
+    <meta name="description" content="View the tpotracer typing leaderboard" />
+    <meta name="theme-color" content="#02182D" />
+    
+    <style>
+        @font-face {
+            font-family: 'ProggyCleanTT';
+            src: url('/ProggyClean.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --tr-100: #A7F1FA;
+            --tr-150: #77DFF6;
+            --tr-200: #2A8FC3;
+            --tr-250: #0d3f62;
+            --tr-300: #03223F;
+            --tr-400: #02182D;
+        }
+
+        body {
+            font-family: 'ProggyCleanTT', 'Roboto Mono', monospace;
+            background-color: var(--tr-300);
+            min-height: 100vh;
+            color: var(--tr-100);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            font-size: 20px;
+            color: var(--tr-100);
+            text-decoration: none;
+            text-shadow: 0 0 8px var(--tr-100);
+            transition: opacity 0.15s ease;
+            z-index: 100;
+        }
+
+        .back-button:hover {
+            opacity: 0.7;
+        }
+
+        .leaderboard-wrapper {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .leaderboard-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .leaderboard-logo {
+            width: 180px;
+            height: auto;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 4px var(--tr-100));
+        }
+
+        .leaderboard-title {
+            font-size: 52px;
+            color: var(--tr-100);
+            text-shadow: 0 0 6px var(--tr-100);
+            margin-bottom: 12px;
+            font-weight: normal;
+            letter-spacing: 4px;
+        }
+
+        .leaderboard-countdown {
+            font-size: 32px;
+            color: var(--tr-200);
+            text-shadow: 0 0 4px var(--tr-200);
+        }
+
+        .table-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            font-size: 24px;
+            color: var(--tr-100);
+            text-shadow: 0 0 2px var(--tr-100);
+            border-bottom: 1px solid rgba(167, 241, 250, 0.2);
+            background: rgba(3, 34, 63, 0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        .col-rank {
+            width: 70px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .col-user {
+            flex: 1;
+            text-align: left;
+            padding-left: 8px;
+        }
+
+        .col-wpm {
+            width: 80px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .current-user-row {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            font-size: 24px;
+            color: var(--tr-100);
+            text-shadow: 0 0 3px var(--tr-100);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: linear-gradient(
+                to right, 
+                rgba(167, 241, 250, 0) 0%, 
+                rgba(167, 241, 250, 0.15) 10%, 
+                rgba(167, 241, 250, 0.15) 90%, 
+                rgba(167, 241, 250, 0) 100%
+            );
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(167, 241, 250, 0.1);
+        }
+
+        .current-user-row.guest-row {
+            opacity: 0.6;
+        }
+
+        .leaderboard-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+
+        .leaderboard-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            font-size: 24px;
+            transition: background 0.15s ease;
+        }
+
+        .leaderboard-row:hover {
+            background: rgba(167, 241, 250, 0.05);
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 28px;
+            padding: 0 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 22px;
+        }
+
+        .rank-badge-plain {
+            background-color: rgba(167, 241, 250, 0.2);
+            box-shadow: 0 0 3px rgba(167, 241, 250, 0.3);
+            color: var(--tr-100);
+            text-shadow: 0 0 2px var(--tr-100);
+        }
+
+        .rank-badge-1 {
+            background: linear-gradient(to bottom, #ffd700 0%, #b8860b 90%, #ffd700 100%);
+            box-shadow: 0 0 4px #ffd700;
+            color: #fff;
+            text-shadow: 0 0 2px #fff;
+        }
+
+        .rank-badge-2 {
+            background: linear-gradient(to bottom, #c0c0c0 0%, #808080 90%, #c0c0c0 100%);
+            box-shadow: 0 0 4px #c0c0c0;
+            color: #fff;
+            text-shadow: 0 0 2px #fff;
+        }
+
+        .rank-badge-3 {
+            background: linear-gradient(to bottom, #cd7f32 0%, #8b4513 90%, #cd7f32 100%);
+            box-shadow: 0 0 4px #cd7f32;
+            color: #fff;
+            text-shadow: 0 0 2px #fff;
+        }
+
+        .user-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .user-link:hover .username {
+            text-decoration: underline;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: rgba(167, 241, 250, 0.2);
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .user-avatar::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            background: inherit;
+            background-size: cover;
+            background-position: center;
+            filter: blur(4px);
+            opacity: 0.6;
+            z-index: -1;
+        }
+
+        .username {
+            text-shadow: 0 0 2px var(--tr-100);
+        }
+
+        .wpm-value {
+            text-shadow: 0 0 2px var(--tr-100);
+        }
+
+        .loading-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 16px;
+            font-size: 22px;
+            color: var(--tr-100);
+            text-shadow: 0 0 2px var(--tr-100);
+            opacity: 0.6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--tr-200);
+            font-size: 26px;
+            text-shadow: 0 0 2px var(--tr-200);
+            opacity: 0.7;
+        }
+
+        /* Scrollbar styling */
+        .leaderboard-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .leaderboard-list::-webkit-scrollbar-track {
+            background: rgba(167, 241, 250, 0.05);
+            border-radius: 3px;
+        }
+
+        .leaderboard-list::-webkit-scrollbar-thumb {
+            background: rgba(167, 241, 250, 0.2);
+            border-radius: 3px;
+        }
+
+        .leaderboard-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(167, 241, 250, 0.3);
+        }
+
+        /* Leaderboard container with circular radial gradient */
+        .leaderboard-container {
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: 
+                radial-gradient(circle at center, var(--tr-200) 0%, var(--tr-300) 70%),
+                var(--tr-300);
+            border-radius: 12px;
+            border: 1px solid rgba(167, 241, 250, 0.15);
+            overflow: hidden;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading-dots {
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            body {
+                padding: 16px;
+            }
+
+            .back-button {
+                top: 16px;
+                left: 16px;
+                font-size: 16px;
+            }
+
+            .leaderboard-logo {
+                width: 140px;
+                margin-bottom: 12px;
+            }
+
+            .leaderboard-title {
+                font-size: 36px;
+                letter-spacing: 2px;
+                margin-bottom: 8px;
+            }
+
+            .leaderboard-countdown {
+                font-size: 22px;
+            }
+
+            .leaderboard-header {
+                margin-bottom: 20px;
+            }
+
+            .table-header,
+            .current-user-row,
+            .leaderboard-row {
+                font-size: 18px;
+                padding: 10px 12px;
+            }
+
+            .col-rank {
+                width: 50px;
+            }
+
+            .col-wpm {
+                width: 60px;
+            }
+
+            .rank-badge {
+                min-width: 28px;
+                height: 22px;
+                font-size: 16px;
+            }
+
+            .user-avatar {
+                width: 24px;
+                height: 24px;
+            }
+
+            .user-link {
+                gap: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-button">← back to game</a>
+
+    <div class="leaderboard-wrapper">
+        <div class="leaderboard-header">
+            <img src="/logosm.png" alt="tpotracer" class="leaderboard-logo" />
+            <h1 class="leaderboard-title">LEADERBOARD</h1>
+            <div class="leaderboard-countdown" id="countdown">-0:00:00:00</div>
+        </div>
+
+        <div class="leaderboard-container">
+            <div class="table-header">
+                <div class="col-rank">#</div>
+                <div class="col-user">USERNAME</div>
+                <div class="col-wpm">WPM</div>
+            </div>
+
+            <div class="current-user-row" id="current-user-row">
+                <div class="col-rank">
+                    <span class="rank-badge rank-badge-plain" id="current-rank">-</span>
+                </div>
+                <div class="col-user">
+                    <a href="#" class="user-link" id="current-user-link" target="_blank" rel="noopener noreferrer">
+                        <span class="user-avatar" id="current-avatar"></span>
+                        <span class="username" id="current-username">@guest</span>
+                    </a>
+                </div>
+                <div class="col-wpm">
+                    <span class="wpm-value" id="current-wpm">0</span>
+                </div>
+            </div>
+
+            <div class="leaderboard-list" id="leaderboard-list">
+                <div class="loading-row">
+                    <span class="loading-dots">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === CONFIGURATION ===
+        const PAGE_SIZE = 20;
+        const TIME_LIMIT = new Date('2026-01-04T20:00:00Z');
+        
+        // === STATE ===
+        let leaderboardData = [];
+        let isLoading = false;
+        let hasMore = true;
+        let currentUser = null;
+        let userRank = null;
+        let userWpm = 0;
+
+        // === DOM ELEMENTS ===
+        const countdownEl = document.getElementById('countdown');
+        const currentUserRow = document.getElementById('current-user-row');
+        const currentRankEl = document.getElementById('current-rank');
+        const currentUsernameEl = document.getElementById('current-username');
+        const currentAvatarEl = document.getElementById('current-avatar');
+        const currentWpmEl = document.getElementById('current-wpm');
+        const currentUserLink = document.getElementById('current-user-link');
+        const listEl = document.getElementById('leaderboard-list');
+
+        // === UTILITY FUNCTIONS ===
+        function getRemainingTimeUntilEnd() {
+            const now = new Date();
+            const timeLeft = TIME_LIMIT.getTime() - now.getTime();
+            
+            if (timeLeft <= 0) {
+                return "-0:00:00:00";
+            }
+            
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            
+            const pad = (num) => num.toString().padStart(2, '0');
+            return `-${days}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+        }
+
+        function getBadgeClass(place) {
+            if (place === 1) return 'rank-badge-1';
+            if (place === 2) return 'rank-badge-2';
+            if (place === 3) return 'rank-badge-3';
+            return 'rank-badge-plain';
+        }
+
+        function setAvatarBackground(element, username) {
+            if (username && username !== 'guest') {
+                const avatarUrl = `https://unavatar.io/x/${username}`;
+                element.style.backgroundImage = `url(${avatarUrl})`;
+            }
+        }
+
+        // === API FUNCTIONS ===
+        // Use relative URLs - Vite proxy handles in dev, deployment handles in prod
+        async function fetchLeaderboardPage(offset = 0) {
+            try {
+                const response = await fetch(`/api/leaderboard?limit=${PAGE_SIZE}&offset=${offset}`);
+                if (response.ok) {
+                    return await response.json();
+                }
+                console.log('API response not ok:', response.status);
+            } catch (e) {
+                console.log('API fetch failed:', e);
+            }
+            
+            return [];
+        }
+
+        async function fetchUserRank(username) {
+            if (!username || username === 'guest') return null;
+            
+            try {
+                const response = await fetch(`/api/rank/${encodeURIComponent(username)}`);
+                if (response.ok) {
+                    return await response.json();
+                }
+            } catch (e) {
+                console.log('Rank fetch failed:', e);
+            }
+            
+            return null;
+        }
+
+        // === RENDER FUNCTIONS ===
+        function renderLeaderboardRow(entry, rank) {
+            const row = document.createElement('div');
+            row.className = 'leaderboard-row';
+            
+            row.innerHTML = `
+                <div class="col-rank">
+                    <span class="rank-badge ${getBadgeClass(rank)}">${rank}</span>
+                </div>
+                <div class="col-user">
+                    <a href="https://x.com/${entry.username}" class="user-link" target="_blank" rel="noopener noreferrer">
+                        <span class="user-avatar" data-username="${entry.username}"></span>
+                        <span class="username">@${entry.username}</span>
+                    </a>
+                </div>
+                <div class="col-wpm">
+                    <span class="wpm-value" title="${entry.wpm.toFixed(3)}">${Math.round(entry.wpm)}</span>
+                </div>
+            `;
+            
+            // Set avatar
+            const avatar = row.querySelector('.user-avatar');
+            setAvatarBackground(avatar, entry.username);
+            
+            return row;
+        }
+
+        function renderLoadingRow() {
+            const row = document.createElement('div');
+            row.className = 'loading-row';
+            row.innerHTML = '<span class="loading-dots">Loading...</span>';
+            return row;
+        }
+
+        function updateCurrentUser() {
+            if (!currentUser || currentUser === 'guest') {
+                currentUserRow.classList.add('guest-row');
+                currentRankEl.textContent = '-';
+                currentRankEl.className = 'rank-badge rank-badge-plain';
+                currentUsernameEl.textContent = '@guest';
+                currentWpmEl.textContent = '0';
+                currentUserLink.href = '#';
+                currentUserLink.onclick = (e) => e.preventDefault();
+            } else {
+                currentUserRow.classList.remove('guest-row');
+                currentRankEl.textContent = userRank || '-';
+                currentRankEl.className = `rank-badge ${getBadgeClass(userRank || 999)}`;
+                currentUsernameEl.textContent = `@${currentUser}`;
+                currentWpmEl.textContent = Math.round(userWpm);
+                currentWpmEl.title = userWpm.toFixed(3);
+                currentUserLink.href = `https://x.com/${currentUser}`;
+                currentUserLink.onclick = null;
+                setAvatarBackground(currentAvatarEl, currentUser);
+            }
+        }
+
+        function renderLeaderboard() {
+            listEl.innerHTML = '';
+            
+            if (leaderboardData.length === 0 && !isLoading) {
+                listEl.innerHTML = '<div class="empty-state">No entries yet</div>';
+                return;
+            }
+            
+            leaderboardData.forEach((entry, index) => {
+                listEl.appendChild(renderLeaderboardRow(entry, index + 1));
+            });
+            
+            if (isLoading) {
+                listEl.appendChild(renderLoadingRow());
+            }
+        }
+
+        // === DATA LOADING ===
+        async function loadInitialData() {
+            isLoading = true;
+            renderLeaderboard();
+            
+            try {
+                const data = await fetchLeaderboardPage(0);
+                leaderboardData = data;
+                hasMore = data.length === PAGE_SIZE;
+                
+                // Also fetch user rank if we have a logged in user
+                if (currentUser && currentUser !== 'guest') {
+                    const rankData = await fetchUserRank(currentUser);
+                    if (rankData) {
+                        userRank = rankData.rank;
+                        // Get WPM from leaderboard data if user is in top entries
+                        const userEntry = leaderboardData.find(e => e.username === currentUser);
+                        if (userEntry) {
+                            userWpm = userEntry.wpm;
+                        }
+                    }
+                }
+                
+                updateCurrentUser();
+            } catch (e) {
+                console.error('Failed to load leaderboard:', e);
+            }
+            
+            isLoading = false;
+            renderLeaderboard();
+        }
+
+        async function loadMore() {
+            if (isLoading || !hasMore) return;
+            
+            isLoading = true;
+            listEl.appendChild(renderLoadingRow());
+            
+            try {
+                const data = await fetchLeaderboardPage(leaderboardData.length);
+                leaderboardData = [...leaderboardData, ...data];
+                hasMore = data.length === PAGE_SIZE;
+            } catch (e) {
+                console.error('Failed to load more:', e);
+            }
+            
+            isLoading = false;
+            renderLeaderboard();
+        }
+
+        // === SCROLL HANDLER ===
+        function handleScroll() {
+            const { scrollTop, scrollHeight, clientHeight } = listEl;
+            const isNearBottom = scrollHeight - scrollTop <= clientHeight + 100;
+            
+            if (isNearBottom && !isLoading && hasMore) {
+                loadMore();
+            }
+        }
+
+        // === COUNTDOWN TIMER ===
+        function updateCountdown() {
+            countdownEl.textContent = getRemainingTimeUntilEnd();
+        }
+
+        // === INITIALIZATION ===
+        function init() {
+            // Get current user from localStorage (same key as main app)
+            currentUser = localStorage.getItem('tpotracer_username') || 'guest';
+            
+            // Try to get high score from localStorage
+            const storedHighScore = localStorage.getItem('tpotracer_high_score');
+            userWpm = storedHighScore ? parseFloat(storedHighScore) : 0;
+            
+            // Update countdown every second
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+            
+            // Setup scroll handler
+            listEl.addEventListener('scroll', handleScroll);
+            
+            // Load initial data
+            loadInitialData();
+            
+            // Refresh every 5 minutes
+            setInterval(() => {
+                loadInitialData();
+            }, 5 * 60 * 1000);
+        }
+
+        // Start when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
+
