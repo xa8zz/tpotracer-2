@@ -8,6 +8,14 @@ export default defineConfig(({ mode }) => {
   
   return {
     plugins: [react()],
+    build: {
+      rollupOptions: {
+        input: {
+          main: 'index.html',
+          leaderboard: 'leaderboard.html',
+        },
+      },
+    },
     server: {
       proxy: {
         // Proxy /api requests to backend in development
