@@ -282,27 +282,52 @@ export const getUserRank = async (req, res) => {
       wpmToBeatRaw = wpmToBeatResult.rows[0]?.raw_wpm ? Math.round(wpmToBeatResult.rows[0].raw_wpm) : null;
     }
 
-    // Store in cache (10 minute TTL)
-    // cacheService.set(cacheKey, rank, 600);
-    // console.log(`Cache set for rank:${username}, rank: ${rank}`);
-
-    // Since we now return more than just rank, we shouldn't cache just the number or should update structure
-    // For now, let's bypass cache set or update it to object. 
-    // To keep it simple and compatible with simple get(), we will just return object without caching for now, 
-    // or cache the object.
-    
-    // Let's modify the cache key content to be an object
-    // Note: older cache entries might be just numbers. 
-    // Ideally we invalidate old keys or use a new key prefix, but rank:username is standard.
-    // If the client expects just { rank }, this is fine. 
-    // But we want { rank, wpmToBeat, wpmToBeatRaw }.
-    
     const responseData = { rank, wpmToBeat, wpmToBeatRaw };
-    // cacheService.set(cacheKey, responseData, 600); // Be careful if existing cache is number
     
     res.json(responseData);
   } catch (error) {
     console.error('Error fetching user rank:', error);
     res.status(500).json({ error: 'Failed to fetch user rank' });
+  }
+};
+
+/**
+ * Get replay data for a user's best score
+ * @param {object} req - Request object with username parameter
+ * @param {object} res - Response object
+ */
+export const getReplayData = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    if (!username) {
+      return res.status(400).json({ error: 'Username is required' });
+    }
+
+    // Query to find the user's best score (same logic as leaderboard)
+    // DISTINCT ON (username) ORDER BY username, wpm DESC
+    const query = `
+      SELECT username, keystrokes, words, wpm, raw_wpm, accuracy
+      FROM scores
+      WHERE username = $1
+      ORDER BY wpm DESC, timestamp ASC
+      LIMIT 1;
+    `;
+
+    const result = await db.query(query, [username]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Score not found' });
+    }
+
+    const score = result.rows[0];
+    
+    // Parse keystrokes if they are stringified (pg might handle JSONB automatically but just in case)
+    // Note: pg node driver automatically parses JSONB columns
+    
+    res.json(score);
+  } catch (error) {
+    console.error('Error fetching replay data:', error);
+    res.status(500).json({ error: 'Failed to fetch replay data' });
   }
 };

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { submitScore, getLeaderboard, getUserRank } from '../controllers/scoreController.js';
+import { submitScore, getLeaderboard, getUserRank, getReplayData } from '../controllers/scoreController.js';
 
 const router = Router();
 
@@ -12,4 +12,7 @@ router.get('/leaderboard', getLeaderboard);
 // GET /api/rank/:username
 router.get('/rank/:username', getUserRank);
 
-export default router; 
+// GET /api/replay/:username
+router.get('/replay/:username', getReplayData);
+
+export default router;

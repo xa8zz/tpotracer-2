@@ -45,13 +45,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 24px;
+            padding: 12px;
         }
 
         .back-button {
             position: fixed;
-            top: 24px;
-            left: 24px;
+            top: 12px;
+            left: 12px;
             font-size: 20px;
             color: var(--tr-100);
             text-decoration: none;
@@ -75,13 +75,13 @@
 
         .leaderboard-header {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 8px;
         }
 
         .leaderboard-logo {
-            width: 180px;
+            width: 140px;
             height: auto;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             filter: drop-shadow(0 0 0.125vh var(--tr-100)) drop-shadow(0 0 0.25vh var(--tr-100));
         }
 
@@ -89,13 +89,13 @@
             font-size: 52px;
             color: var(--tr-100);
             text-shadow: 0 0 6px var(--tr-100);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             font-weight: normal;
             letter-spacing: 4px;
         }
 
         .leaderboard-countdown {
-            font-size: 32px;
+            font-size: 24px;
             color: var(--tr-200);
             text-shadow: 0 0 4px var(--tr-200);
         }
@@ -103,8 +103,8 @@
         .table-header {
             display: flex;
             align-items: center;
-            padding: 12px 22px 12px 16px;
-            font-size: 24px;
+            padding: 8px 22px 8px 16px;
+            font-size: 22px;
             color: var(--tr-100);
             text-shadow: 0 0 2px var(--tr-100);
             border-bottom: 1px solid rgba(167, 241, 250, 0.2);
@@ -142,12 +142,40 @@
             text-align: center;
             flex-shrink: 0;
         }
+        
+        .col-replay {
+            width: 60px;
+            text-align: center;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .replay-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--tr-100);
+            opacity: 0.5;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            border-radius: 50%;
+        }
+        
+        .replay-btn:hover {
+            opacity: 1;
+            background: rgba(167, 241, 250, 0.1);
+            box-shadow: 0 0 10px rgba(167, 241, 250, 0.3);
+        }
 
         .current-user-row {
             display: flex;
             align-items: center;
-            padding: 14px 22px 14px 16px;
-            font-size: 24px;
+            padding: 8px 22px 8px 16px;
+            font-size: 22px;
             color: var(--tr-100);
             text-shadow: 0 0 3px var(--tr-100);
             position: sticky;
@@ -178,8 +206,8 @@
         .leaderboard-row {
             display: flex;
             align-items: center;
-            padding: 12px 16px;
-            font-size: 24px;
+            padding: 8px 16px;
+            font-size: 22px;
             transition: background 0.15s ease;
         }
 
@@ -413,6 +441,230 @@
             .user-link {
                 gap: 6px;
             }
+            
+            .col-replay {
+                width: 40px;
+            }
+            
+            .replay-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+        
+        /* Replay Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(2, 24, 45, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: var(--tr-300);
+            border: 1px solid var(--tr-150);
+            border-radius: 12px;
+            padding: 24px;
+            width: 90%;
+            max-width: 900px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--tr-100);
+            font-family: inherit;
+            font-size: 32px;
+            line-height: 1;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+            z-index: 10;
+        }
+
+        .close-modal:hover {
+            opacity: 1;
+        }
+
+        .replay-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .replay-stats {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--tr-150);
+            margin-top: 8px;
+        }
+        
+        .replay-username {
+            font-size: 32px;
+            color: var(--tr-100);
+            text-shadow: 0 0 4px var(--tr-100);
+        }
+
+        .replay-container {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 32px;
+            border-radius: 8px;
+            font-size: 28px;
+            line-height: 1.8;
+            height: 300px;
+            overflow-y: auto;
+            position: relative;
+            font-family: 'ProggyCleanTT', monospace;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7em; /* Space between words */
+            align-content: flex-start;
+        }
+        
+        .word {
+            display: inline-flex;
+            white-space: nowrap;
+        }
+
+        .char {
+            color: #6b7280; /* gray-500 */
+        }
+        
+        .char.correct {
+            color: #4ade80; /* green-400 */
+            text-shadow: 0 0 2px rgba(74, 222, 128, 0.5);
+        }
+        
+        .char.incorrect {
+            color: #ef4444; /* red-500 */
+            text-shadow: 0 0 2px rgba(239, 68, 68, 0.5);
+        }
+        
+        .char.extra {
+            color: #ef4444; /* red-500 */
+        }
+        
+        .cursor {
+            width: 2px;
+            height: 1.2em;
+            background-color: var(--tr-100);
+            box-shadow: 0 0 4px var(--tr-100);
+            position: absolute;
+            transition: left 0.05s linear, top 0.05s linear;
+            pointer-events: none;
+            margin-top: 0.2em;
+        }
+
+        /* Compact Mode Styles */
+        .compact-mode .table-header,
+        .compact-mode .current-user-row,
+        .compact-mode .leaderboard-row {
+            padding: 4px 16px;
+            font-size: 18px;
+        }
+
+        .compact-mode .table-header,
+        .compact-mode .current-user-row {
+            padding: 4px 22px 4px 16px;
+        }
+
+        .compact-mode .rank-badge {
+            min-width: 28px;
+            height: 22px;
+            font-size: 16px;
+            padding: 0 4px;
+        }
+
+        .compact-mode .user-avatar {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .compact-mode .raw-value, 
+        .compact-mode .acc-value {
+            font-size: 16px;
+        }
+
+        .compact-mode .replay-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .compact-toggle-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 4px;
+            width: 100%;
+            padding-right: 4px;
+        }
+
+        .compact-toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--tr-100);
+            font-size: 18px;
+            cursor: pointer;
+            user-select: none;
+            text-shadow: 0 0 2px var(--tr-100);
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .compact-toggle-label:hover {
+            opacity: 1;
+        }
+
+        .compact-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--tr-100);
+            border-radius: 3px;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            outline: none;
+        }
+
+        .compact-checkbox:checked {
+            background: var(--tr-100);
+            box-shadow: 0 0 4px var(--tr-100);
+        }
+
+        .compact-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            color: var(--tr-300);
+            font-size: 14px;
+            top: -2px;
+            left: 1px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -425,13 +677,21 @@
             <div class="leaderboard-countdown" id="countdown">-0:00:00:00</div>
         </div>
 
-        <div class="leaderboard-container">
+        <div class="compact-toggle-container">
+            <label class="compact-toggle-label">
+                <input type="checkbox" id="compact-toggle" class="compact-checkbox">
+                Compact Mode
+            </label>
+        </div>
+
+        <div class="leaderboard-container" id="leaderboard-container">
             <div class="table-header">
                 <div class="col-rank">#</div>
                 <div class="col-user">USERNAME</div>
                 <div class="col-wpm">WPM</div>
                 <div class="col-raw">RAW</div>
                 <div class="col-acc">ACC</div>
+                <div class="col-replay"></div>
             </div>
 
             <div class="current-user-row" id="current-user-row">
@@ -453,12 +713,36 @@
                 <div class="col-acc">
                     <span class="acc-value" id="current-acc">-</span>
                 </div>
+                <div class="col-replay">
+                    <button class="replay-btn" id="current-replay-btn" title="Watch Replay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <div class="leaderboard-list" id="leaderboard-list">
                 <div class="loading-row">
                     <span class="loading-dots">Loading...</span>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="replay-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal" id="close-replay">×</button>
+            <div class="replay-header">
+                <div class="replay-username" id="replay-username">@user</div>
+                <div class="replay-stats">
+                    <span>WPM: <span id="replay-wpm">0</span></span>
+                    <span>ACC: <span id="replay-acc">0%</span></span>
+                </div>
+            </div>
+            <div id="replay-container" class="replay-container">
+                <!-- Words injected here -->
+                <div id="replay-cursor" class="cursor"></div>
             </div>
         </div>
     </div>
@@ -489,6 +773,20 @@
         const currentAccEl = document.getElementById('current-acc');
         const currentUserLink = document.getElementById('current-user-link');
         const listEl = document.getElementById('leaderboard-list');
+        const currentReplayBtn = document.getElementById('current-replay-btn');
+        const leaderboardContainer = document.getElementById('leaderboard-container');
+        const compactToggle = document.getElementById('compact-toggle');
+        
+        // Replay Modal Elements
+        const replayModal = document.getElementById('replay-modal');
+        const closeReplayBtn = document.getElementById('close-replay');
+        const replayContainer = document.getElementById('replay-container');
+        const replayUsernameEl = document.getElementById('replay-username');
+        const replayWpmEl = document.getElementById('replay-wpm');
+        const replayAccEl = document.getElementById('replay-acc');
+        const replayCursor = document.getElementById('replay-cursor');
+        
+        let replayAnimationId = null;
 
         // === UTILITY FUNCTIONS ===
         function getRemainingTimeUntilEnd() {
@@ -559,6 +857,18 @@
             
             return null;
         }
+        
+        async function fetchReplayData(username) {
+            try {
+                const response = await fetch(`/api/replay/${encodeURIComponent(username)}`);
+                if (response.ok) {
+                    return await response.json();
+                }
+            } catch (e) {
+                console.error('Replay fetch failed:', e);
+            }
+            return null;
+        }
 
         // === RENDER FUNCTIONS ===
         function renderLeaderboardRow(entry, rank) {
@@ -587,6 +897,13 @@
                 <div class="col-acc">
                     <span class="acc-value">${accuracy}</span>
                 </div>
+                <div class="col-replay">
+                    <button class="replay-btn" onclick="openReplay('${entry.username}')" title="Watch Replay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                    </button>
+                </div>
             `;
             
             // Set avatar
@@ -614,6 +931,7 @@
                 currentAccEl.textContent = '-';
                 currentUserLink.href = '#';
                 currentUserLink.onclick = (e) => e.preventDefault();
+                currentReplayBtn.style.display = 'none';
             } else {
                 currentUserRow.classList.remove('guest-row');
                 currentRankEl.textContent = userRank || '-';
@@ -627,6 +945,9 @@
                 currentUserLink.href = `https://x.com/${currentUser}`;
                 currentUserLink.onclick = null;
                 setAvatarBackground(currentAvatarEl, currentUser);
+                
+                currentReplayBtn.style.display = 'flex';
+                currentReplayBtn.onclick = () => openReplay(currentUser);
             }
         }
 
@@ -699,6 +1020,283 @@
             renderLeaderboard();
         }
 
+        // === REPLAY LOGIC ===
+        async function openReplay(username) {
+            replayUsernameEl.textContent = 'Loading...';
+            replayWpmEl.textContent = '-';
+            replayAccEl.textContent = '-';
+            replayContainer.innerHTML = '<div class="loading-dots" style="margin: auto; color: var(--tr-100);">Loading replay data...</div>';
+            replayModal.classList.add('visible');
+            
+            const data = await fetchReplayData(username);
+            
+            if (!data) {
+                replayContainer.innerHTML = '<div style="margin: auto; color: var(--tr-200);">Replay unavailable</div>';
+                replayUsernameEl.textContent = `@${username}`;
+                return;
+            }
+            
+            replayUsernameEl.textContent = `@${data.username || username}`;
+            replayWpmEl.innerHTML = formatWpm(data.wpm);
+            replayAccEl.textContent = Math.round(data.accuracy) + '%';
+            
+            startReplay(data);
+        }
+        
+        function startReplay(data) {
+            const words = data.words;
+            const keystrokes = typeof data.keystrokes === 'string' ? JSON.parse(data.keystrokes) : data.keystrokes;
+            
+            if (!words || !keystrokes || keystrokes.length === 0) {
+                replayContainer.innerHTML = '<div style="margin: auto; color: var(--tr-200);">Invalid replay data</div>';
+                return;
+            }
+            
+            // Build DOM structure
+            replayContainer.innerHTML = '';
+            const wordEls = [];
+            const charEls = []; // Map: wordIndex -> charIndex -> element
+            
+            words.forEach((word, wIdx) => {
+                const wordEl = document.createElement('div');
+                wordEl.className = 'word';
+                const chars = [];
+                
+                word.split('').forEach((char, cIdx) => {
+                    const charEl = document.createElement('span');
+                    charEl.className = 'char';
+                    charEl.textContent = char;
+                    wordEl.appendChild(charEl);
+                    chars.push(charEl);
+                });
+                
+                replayContainer.appendChild(wordEl);
+                wordEls.push(wordEl);
+                charEls.push(chars);
+            });
+            
+            // Add cursor
+            replayContainer.appendChild(replayCursor);
+            
+            // Replay State
+            let currentWordIndex = 0;
+            let typedText = '';
+            let typedHistory = [];
+            let keyIndex = 0;
+            const startTime = performance.now();
+            const firstKeyTime = keystrokes[0].timestamp;
+            
+            function updateCursor() {
+                // Find where the cursor should be
+                let targetEl = null;
+                let position = 'before';
+                
+                // If typedText is empty, cursor is before the first char of current word
+                // Or if we finished a word, it might be waiting for space
+                
+                if (currentWordIndex >= words.length) {
+                    // Completed
+                    return;
+                }
+                
+                const currentWordEl = wordEls[currentWordIndex];
+                
+                if (typedText.length === 0) {
+                    const firstChar = charEls[currentWordIndex][0];
+                    if (firstChar) {
+                        targetEl = firstChar;
+                        position = 'before';
+                    }
+                } else {
+                    // Check if we typed more than word length
+                    const wordLen = words[currentWordIndex].length;
+                    
+                    if (typedText.length <= wordLen) {
+                        // Cursor is after the last typed char
+                        const lastTypedChar = charEls[currentWordIndex][typedText.length - 1];
+                        targetEl = lastTypedChar;
+                        position = 'after';
+                    } else {
+                        // Extra characters... cursor is after the last extra char
+                        // We need to render extra chars dynamically if we haven't
+                        // But for simplicity in this DOM implementation:
+                        // We attached extra chars to the word element
+                        // Let's find the last child of current word element
+                        targetEl = currentWordEl.lastElementChild;
+                        position = 'after';
+                    }
+                }
+                
+                if (targetEl) {
+                    const rect = targetEl.getBoundingClientRect();
+                    const containerRect = replayContainer.getBoundingClientRect();
+                    
+                    // Calculate relative position
+                    let left = rect.left - containerRect.left + replayContainer.scrollLeft;
+                    if (position === 'after') {
+                        left += rect.width;
+                    }
+                    
+                    const top = rect.top - containerRect.top + replayContainer.scrollTop;
+                    
+                    replayCursor.style.left = `${left}px`;
+                    replayCursor.style.top = `${top}px`;
+                    
+                    // Auto scroll
+                    if (rect.bottom > containerRect.bottom - 20) {
+                        replayContainer.scrollTop += 30;
+                    }
+                }
+            }
+            
+            function renderWordState(wIdx) {
+                if (wIdx >= words.length) return;
+                
+                const targetWord = words[wIdx];
+                const input = wIdx === currentWordIndex ? typedText : (typedHistory[wIdx] || '');
+                const wordEl = wordEls[wIdx];
+                const chars = charEls[wIdx];
+                
+                // Reset standard chars
+                chars.forEach((charEl, cIdx) => {
+                    if (cIdx < input.length) {
+                        if (input[cIdx] === targetWord[cIdx]) {
+                            charEl.className = 'char correct';
+                        } else {
+                            charEl.className = 'char incorrect';
+                        }
+                    } else {
+                        charEl.className = 'char';
+                    }
+                });
+                
+                // Handle extra chars
+                // Remove existing extra chars first (those not in charEls list)
+                while (wordEl.children.length > chars.length) {
+                    wordEl.removeChild(wordEl.lastChild);
+                }
+                
+                if (input.length > targetWord.length) {
+                    const extras = input.slice(targetWord.length);
+                    extras.split('').forEach(char => {
+                        const span = document.createElement('span');
+                        span.className = 'char extra';
+                        span.textContent = char;
+                        wordEl.appendChild(span);
+                    });
+                }
+            }
+            
+            function loop() {
+                const now = performance.now();
+                const elapsed = now - startTime;
+                
+                let processed = false;
+                
+                while (keyIndex < keystrokes.length) {
+                    const k = keystrokes[keyIndex];
+                    const relativeTime = k.timestamp - firstKeyTime;
+                    
+                    if (relativeTime <= elapsed) {
+                        // Process keystroke
+                        const key = k.key;
+                        
+                        if (key === 'Backspace') {
+                            typedText = typedText.slice(0, -1);
+                        } else if (key === ' ' && typedText.length > 0) {
+                             // Space: check if word matches roughly (game logic: if matches strictly? no, usually space moves next)
+                             // Game logic: space moves next if typedText == currentWord. 
+                             // Wait, looking at GameScreen.tsx: 
+                             // if (e.key === ' ' && typedText.length > 0) { if (typedText === currentWord) ... setCurrentWordIndex... }
+                             // The original game ONLY moves to next word if the word is typed CORRECTLY.
+                             // Wait, check GameScreen.tsx lines 151-174 again.
+                             
+                             /*
+                              if (e.key === ' ' && typedText.length > 0) {
+                                // ...
+                                if (typedText === currentWord) {
+                                  // ...
+                                }
+                                // If this is the last word...
+                                // ...
+                                setCurrentWordIndex(prev => prev + 1);
+                                setTypedText('');
+                              }
+                             */
+                             // Ah, it moves to next word regardless of correctness?
+                             // Re-reading GameScreen.tsx:
+                             /*
+                             if (e.key === ' ' && typedText.length > 0) {
+                               const currentWord = words[currentWordIndex];
+                               if (typedText === currentWord) {
+                                 // increment correct count
+                               }
+                               // ...
+                               setCurrentWordIndex(prev => prev + 1);
+                               setTypedText('');
+                               return;
+                             }
+                             */
+                             // Yes, Space ALWAYS moves to next word if typedText > 0.
+                             
+                             typedHistory[currentWordIndex] = typedText;
+                             currentWordIndex++;
+                             typedText = '';
+                        } else if (key.length === 1) {
+                            typedText += key;
+                        }
+                        
+                        // Update UI for the affected word
+                        if (key === ' ' && typedText.length === 0) {
+                             // Moved to next word, render previous word final state
+                             renderWordState(currentWordIndex - 1);
+                             // And render new current word (initial)
+                             renderWordState(currentWordIndex);
+                        } else {
+                             renderWordState(currentWordIndex);
+                        }
+                        
+                        keyIndex++;
+                        processed = true;
+                    } else {
+                        break;
+                    }
+                }
+                
+                if (processed || keyIndex === 0) { // Update cursor initially too
+                    updateCursor();
+                }
+                
+                if (keyIndex < keystrokes.length) {
+                    replayAnimationId = requestAnimationFrame(loop);
+                }
+            }
+            
+            // Initial render
+            updateCursor();
+            
+            // Start loop
+            replayAnimationId = requestAnimationFrame(loop);
+        }
+
+        function closeReplay() {
+            replayModal.classList.remove('visible');
+            if (replayAnimationId) {
+                cancelAnimationFrame(replayAnimationId);
+                replayAnimationId = null;
+            }
+        }
+        
+        closeReplayBtn.addEventListener('click', closeReplay);
+        replayModal.addEventListener('click', (e) => {
+            if (e.target === replayModal) closeReplay();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && replayModal.classList.contains('visible')) {
+                closeReplay();
+            }
+        });
+
         // === SCROLL HANDLER ===
         function handleScroll() {
             const { scrollTop, scrollHeight, clientHeight } = listEl;
@@ -722,6 +1320,23 @@
             // Try to get high score from localStorage
             const storedHighScore = localStorage.getItem('tpotracer_high_score');
             userWpm = storedHighScore ? parseFloat(storedHighScore) : 0;
+            
+            // Initialize compact mode
+            const savedCompactMode = localStorage.getItem('tpotracer_compact_mode') === 'true';
+            compactToggle.checked = savedCompactMode;
+            if (savedCompactMode) {
+                leaderboardContainer.classList.add('compact-mode');
+            }
+            
+            compactToggle.addEventListener('change', (e) => {
+                const isCompact = e.target.checked;
+                if (isCompact) {
+                    leaderboardContainer.classList.add('compact-mode');
+                } else {
+                    leaderboardContainer.classList.remove('compact-mode');
+                }
+                localStorage.setItem('tpotracer_compact_mode', isCompact);
+            });
             
             // Note: We don't have raw/acc in simple local storage key, so they will be null/'-'
             // unless found in leaderboard array during loadInitialData
