@@ -73,10 +73,11 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
   };
 
   // Use actual game data for current user
+  const place = leaderboardPosition || userPosition;
   const currentUserLeaderboardData = {
     username: currentUsername || "guest",
     wpm: highScore,
-    place: leaderboardPosition || userPosition || 999
+    place: place || null
   };
 
   // Handle scroll - load more when near bottom
@@ -187,7 +188,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
           >
             <div style={{ width: pct(COL_WIDTH, CONTENT_WIDTH) }}>
               <span 
-                className={`inline-block text-tpotracer-100 font-bold ${getBadgeClass(currentUserLeaderboardData.place)}`}
+                className={`inline-block text-tpotracer-100 font-bold ${getBadgeClass(currentUserLeaderboardData.place || 999)}`}
                 style={{
                     width: `${(30 / LB_WIDTH) * 100}cqw`,
                     height: `${(25 / LB_WIDTH) * 100}cqw`,
@@ -195,7 +196,7 @@ const NewLeaderboard: React.FC<LeaderboardProps> = ({
                     borderRadius: relBorderRadius(4)
                 }}
               >
-              {currentUserLeaderboardData.place}
+              {currentUserLeaderboardData.place || "-"}
               </span>
             </div>
             <div className="flex-1 text-left">
