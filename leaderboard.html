@@ -523,10 +523,115 @@
             margin-top: 8px;
         }
         
+        .replay-stats .live-stat {
+            min-width: 80px;
+            font-variant-numeric: tabular-nums;
+        }
+        
         .replay-username {
             font-size: 32px;
             color: var(--tr-100);
             text-shadow: 0 0 4px var(--tr-100);
+        }
+        
+        /* Replay scrubber/timeline */
+        .replay-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 4px;
+        }
+        
+        .replay-time {
+            font-size: 16px;
+            color: var(--tr-150);
+            min-width: 45px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .replay-scrubber {
+            flex: 1;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(167, 241, 250, 0.15);
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        .replay-scrubber::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--tr-100);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 8px var(--tr-100);
+            transition: transform 0.1s ease;
+        }
+        
+        .replay-scrubber::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        
+        .replay-scrubber::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: var(--tr-100);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 8px var(--tr-100);
+        }
+        
+        .replay-play-btn {
+            background: none;
+            border: 1px solid var(--tr-150);
+            border-radius: 6px;
+            color: var(--tr-100);
+            cursor: pointer;
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .replay-play-btn:hover {
+            background: rgba(167, 241, 250, 0.1);
+            box-shadow: 0 0 8px rgba(167, 241, 250, 0.3);
+        }
+        
+        .replay-speed {
+            background: none;
+            border: 1px solid var(--tr-150);
+            border-radius: 4px;
+            color: var(--tr-100);
+            cursor: pointer;
+            padding: 4px 8px;
+            font-family: inherit;
+            font-size: 14px;
+            min-width: 50px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        
+        .replay-speed:hover {
+            background: rgba(167, 241, 250, 0.1);
+        }
+        
+        .replay-finished-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: rgba(74, 222, 128, 0.2);
+            border: 1px solid rgba(74, 222, 128, 0.5);
+            border-radius: 4px;
+            font-size: 14px;
+            color: #4ade80;
+            margin-left: 8px;
         }
 
         .replay-container {
@@ -736,9 +841,25 @@
             <div class="replay-header">
                 <div class="replay-username" id="replay-username">@user</div>
                 <div class="replay-stats">
-                    <span>WPM: <span id="replay-wpm">0</span></span>
-                    <span>ACC: <span id="replay-acc">0%</span></span>
+                    <span class="live-stat">WPM: <span id="replay-wpm">0</span></span>
+                    <span class="live-stat">RAW: <span id="replay-raw">0</span></span>
+                    <span class="live-stat">ACC: <span id="replay-acc">100%</span></span>
                 </div>
+            </div>
+            <div class="replay-controls">
+                <button class="replay-play-btn" id="replay-play-btn" title="Play/Pause">
+                    <svg id="play-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    <svg id="pause-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                        <rect x="6" y="4" width="4" height="16"></rect>
+                        <rect x="14" y="4" width="4" height="16"></rect>
+                    </svg>
+                </button>
+                <span class="replay-time" id="replay-time-current">0.0s</span>
+                <input type="range" class="replay-scrubber" id="replay-scrubber" min="0" max="100" value="0" step="0.1">
+                <span class="replay-time" id="replay-time-total">0.0s</span>
+                <button class="replay-speed" id="replay-speed" title="Playback Speed">1x</button>
             </div>
             <div id="replay-container" class="replay-container">
                 <!-- Words injected here -->
@@ -787,10 +908,19 @@
         const replayContainer = document.getElementById('replay-container');
         const replayUsernameEl = document.getElementById('replay-username');
         const replayWpmEl = document.getElementById('replay-wpm');
+        const replayRawEl = document.getElementById('replay-raw');
         const replayAccEl = document.getElementById('replay-acc');
         const replayCursor = document.getElementById('replay-cursor');
+        const replayPlayBtn = document.getElementById('replay-play-btn');
+        const playIcon = document.getElementById('play-icon');
+        const pauseIcon = document.getElementById('pause-icon');
+        const replayScrubber = document.getElementById('replay-scrubber');
+        const replayTimeCurrent = document.getElementById('replay-time-current');
+        const replayTimeTotal = document.getElementById('replay-time-total');
+        const replaySpeedBtn = document.getElementById('replay-speed');
         
         let replayAnimationId = null;
+        let replayState = null; // Will hold all replay state
 
         // === UTILITY FUNCTIONS ===
         function getRemainingTimeUntilEnd() {
@@ -1036,11 +1166,37 @@
         }
 
         // === REPLAY LOGIC ===
+        
+        // Score calculation - matches game's exact formula
+        function calculateScores(correctChars, totalChars, elapsedTimeInMinutes) {
+            const rawWpm = totalChars > 0 && elapsedTimeInMinutes > 0
+                ? (totalChars / 5) / elapsedTimeInMinutes
+                : 0;
+            
+            const wpm = correctChars > 0 && elapsedTimeInMinutes > 0
+                ? (correctChars / 5) / elapsedTimeInMinutes
+                : 0;
+            
+            const accuracy = totalChars > 0
+                ? (correctChars / totalChars) * 100
+                : 100;
+            
+            return { wpm, rawWpm, accuracy };
+        }
+        
         async function openReplay(username) {
+            // Reset UI
             replayUsernameEl.textContent = 'Loading...';
             replayWpmEl.textContent = '-';
+            replayRawEl.textContent = '-';
             replayAccEl.textContent = '-';
             replayContainer.innerHTML = '<div class="loading-dots" style="margin: auto; color: var(--tr-100);">Loading replay data...</div>';
+            replayScrubber.value = 0;
+            replayTimeCurrent.textContent = '0.0s';
+            replayTimeTotal.textContent = '0.0s';
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+            replaySpeedBtn.textContent = '1x';
             replayModal.classList.add('visible');
             
             const data = await fetchReplayData(username);
@@ -1052,8 +1208,6 @@
             }
             
             replayUsernameEl.textContent = `@${data.username || username}`;
-            replayWpmEl.innerHTML = formatWpm(data.wpm);
-            replayAccEl.textContent = Math.round(data.accuracy) + '%';
             
             startReplay(data);
         }
@@ -1096,206 +1250,340 @@
             // Add cursor
             replayContainer.appendChild(replayCursor);
             
-            // Replay State
-            let currentWordIndex = 0;
-            let typedText = '';
-            let typedHistory = [];
-            let keyIndex = 0;
-            const startTime = performance.now();
+            // Calculate total duration from keystrokes
             const firstKeyTime = keystrokes[0].timestamp;
+            const lastKeyTime = keystrokes[keystrokes.length - 1].timestamp;
+            const totalDuration = lastKeyTime - firstKeyTime;
             
-            function updateCursor() {
-                // Find where the cursor should be
-                let targetEl = null;
-                let position = 'before';
-                
-                // If typedText is empty, cursor is before the first char of current word
-                // Or if we finished a word, it might be waiting for space
-                
-                if (currentWordIndex >= words.length) {
-                    // Completed
-                    return;
-                }
-                
-                const currentWordEl = wordEls[currentWordIndex];
-                
-                if (typedText.length === 0) {
-                    const firstChar = charEls[currentWordIndex][0];
-                    if (firstChar) {
-                        targetEl = firstChar;
-                        position = 'before';
-                    }
-                } else {
-                    // Check if we typed more than word length
-                    const wordLen = words[currentWordIndex].length;
-                    
-                    if (typedText.length <= wordLen) {
-                        // Cursor is after the last typed char
-                        const lastTypedChar = charEls[currentWordIndex][typedText.length - 1];
-                        targetEl = lastTypedChar;
-                        position = 'after';
-                    } else {
-                        // Extra characters... cursor is after the last extra char
-                        // We need to render extra chars dynamically if we haven't
-                        // But for simplicity in this DOM implementation:
-                        // We attached extra chars to the word element
-                        // Let's find the last child of current word element
-                        targetEl = currentWordEl.lastElementChild;
-                        position = 'after';
-                    }
-                }
-                
-                if (targetEl) {
-                    const rect = targetEl.getBoundingClientRect();
-                    const containerRect = replayContainer.getBoundingClientRect();
-                    
-                    // Calculate relative position
-                    let left = rect.left - containerRect.left + replayContainer.scrollLeft;
-                    if (position === 'after') {
-                        left += rect.width;
-                    }
-                    
-                    const top = rect.top - containerRect.top + replayContainer.scrollTop;
-                    
-                    replayCursor.style.left = `${left}px`;
-                    replayCursor.style.top = `${top}px`;
-                    
-                    // Auto scroll
-                    if (rect.bottom > containerRect.bottom - 20) {
-                        replayContainer.scrollTop += 30;
-                    }
-                }
-            }
+            // Initialize replay state
+            replayState = {
+                words,
+                keystrokes,
+                wordEls,
+                charEls,
+                firstKeyTime,
+                totalDuration,
+                currentWordIndex: 0,
+                typedText: '',
+                typedHistory: [],
+                correctChars: 0,
+                totalChars: 0,
+                keyIndex: 0,
+                isPlaying: true,
+                playbackSpeed: 1,
+                currentTime: 0, // Virtual time in ms relative to first keystroke
+                lastFrameTime: performance.now(),
+                isFinished: false
+            };
             
-            function renderWordState(wIdx) {
-                if (wIdx >= words.length) return;
-                
-                const targetWord = words[wIdx];
-                const input = wIdx === currentWordIndex ? typedText : (typedHistory[wIdx] || '');
-                const wordEl = wordEls[wIdx];
-                const chars = charEls[wIdx];
-                
-                // Reset standard chars
-                chars.forEach((charEl, cIdx) => {
-                    if (cIdx < input.length) {
-                        if (input[cIdx] === targetWord[cIdx]) {
-                            charEl.className = 'char correct';
-                        } else {
-                            charEl.className = 'char incorrect';
-                        }
-                    } else {
-                        charEl.className = 'char';
-                    }
-                });
-                
-                // Handle extra chars
-                // Remove existing extra chars first (those not in charEls list)
-                while (wordEl.children.length > chars.length) {
-                    wordEl.removeChild(wordEl.lastChild);
-                }
-                
-                if (input.length > targetWord.length) {
-                    const extras = input.slice(targetWord.length);
-                    extras.split('').forEach(char => {
-                        const span = document.createElement('span');
-                        span.className = 'char extra';
-                        span.textContent = char;
-                        wordEl.appendChild(span);
-                    });
-                }
-            }
-            
-            function loop() {
-                const now = performance.now();
-                const elapsed = now - startTime;
-                
-                let processed = false;
-                
-                while (keyIndex < keystrokes.length) {
-                    const k = keystrokes[keyIndex];
-                    const relativeTime = k.timestamp - firstKeyTime;
-                    
-                    if (relativeTime <= elapsed) {
-                        // Process keystroke
-                        const key = k.key;
-                        
-                        if (key === 'Backspace') {
-                            typedText = typedText.slice(0, -1);
-                        } else if (key === ' ' && typedText.length > 0) {
-                             // Space: check if word matches roughly (game logic: if matches strictly? no, usually space moves next)
-                             // Game logic: space moves next if typedText == currentWord. 
-                             // Wait, looking at GameScreen.tsx: 
-                             // if (e.key === ' ' && typedText.length > 0) { if (typedText === currentWord) ... setCurrentWordIndex... }
-                             // The original game ONLY moves to next word if the word is typed CORRECTLY.
-                             // Wait, check GameScreen.tsx lines 151-174 again.
-                             
-                             /*
-                              if (e.key === ' ' && typedText.length > 0) {
-                                // ...
-                                if (typedText === currentWord) {
-                                  // ...
-                                }
-                                // If this is the last word...
-                                // ...
-                                setCurrentWordIndex(prev => prev + 1);
-                                setTypedText('');
-                              }
-                             */
-                             // Ah, it moves to next word regardless of correctness?
-                             // Re-reading GameScreen.tsx:
-                             /*
-                             if (e.key === ' ' && typedText.length > 0) {
-                               const currentWord = words[currentWordIndex];
-                               if (typedText === currentWord) {
-                                 // increment correct count
-                               }
-                               // ...
-                               setCurrentWordIndex(prev => prev + 1);
-                               setTypedText('');
-                               return;
-                             }
-                             */
-                             // Yes, Space ALWAYS moves to next word if typedText > 0.
-                             
-                             typedHistory[currentWordIndex] = typedText;
-                             currentWordIndex++;
-                             typedText = '';
-                        } else if (key.length === 1) {
-                            typedText += key;
-                        }
-                        
-                        // Update UI for the affected word
-                        if (key === ' ' && typedText.length === 0) {
-                             // Moved to next word, render previous word final state
-                             renderWordState(currentWordIndex - 1);
-                             // And render new current word (initial)
-                             renderWordState(currentWordIndex);
-                        } else {
-                             renderWordState(currentWordIndex);
-                        }
-                        
-                        keyIndex++;
-                        processed = true;
-                    } else {
-                        break;
-                    }
-                }
-                
-                if (processed || keyIndex === 0) { // Update cursor initially too
-                    updateCursor();
-                }
-                
-                if (keyIndex < keystrokes.length) {
-                    replayAnimationId = requestAnimationFrame(loop);
-                }
-            }
+            // Set up timeline
+            replayTimeTotal.textContent = (totalDuration / 1000).toFixed(1) + 's';
+            replayScrubber.max = totalDuration;
+            replayScrubber.value = 0;
             
             // Initial render
+            updateReplayUI();
             updateCursor();
             
             // Start loop
-            replayAnimationId = requestAnimationFrame(loop);
+            replayAnimationId = requestAnimationFrame(replayLoop);
         }
+        
+        function updateCursor() {
+            if (!replayState) return;
+            
+            const { words, wordEls, charEls, currentWordIndex, typedText } = replayState;
+            
+            let targetEl = null;
+            let position = 'before';
+            
+            if (currentWordIndex >= words.length) {
+                return;
+            }
+            
+            const currentWordEl = wordEls[currentWordIndex];
+            
+            if (typedText.length === 0) {
+                const firstChar = charEls[currentWordIndex]?.[0];
+                if (firstChar) {
+                    targetEl = firstChar;
+                    position = 'before';
+                }
+            } else {
+                const wordLen = words[currentWordIndex].length;
+                
+                if (typedText.length <= wordLen) {
+                    const lastTypedChar = charEls[currentWordIndex][typedText.length - 1];
+                    targetEl = lastTypedChar;
+                    position = 'after';
+                } else {
+                    targetEl = currentWordEl.lastElementChild;
+                    position = 'after';
+                }
+            }
+            
+            if (targetEl) {
+                const rect = targetEl.getBoundingClientRect();
+                const containerRect = replayContainer.getBoundingClientRect();
+                
+                let left = rect.left - containerRect.left + replayContainer.scrollLeft;
+                if (position === 'after') {
+                    left += rect.width;
+                }
+                
+                const top = rect.top - containerRect.top + replayContainer.scrollTop;
+                
+                replayCursor.style.left = `${left}px`;
+                replayCursor.style.top = `${top}px`;
+                
+                // Auto scroll
+                if (rect.bottom > containerRect.bottom - 20) {
+                    replayContainer.scrollTop += 30;
+                }
+            }
+        }
+        
+        function renderWordState(wIdx) {
+            if (!replayState || wIdx >= replayState.words.length) return;
+            
+            const { words, wordEls, charEls, currentWordIndex, typedText, typedHistory } = replayState;
+            
+            const targetWord = words[wIdx];
+            const input = wIdx === currentWordIndex ? typedText : (typedHistory[wIdx] || '');
+            const wordEl = wordEls[wIdx];
+            const chars = charEls[wIdx];
+            
+            // Reset standard chars
+            chars.forEach((charEl, cIdx) => {
+                if (cIdx < input.length) {
+                    if (input[cIdx] === targetWord[cIdx]) {
+                        charEl.className = 'char correct';
+                    } else {
+                        charEl.className = 'char incorrect';
+                    }
+                } else {
+                    charEl.className = 'char';
+                }
+            });
+            
+            // Handle extra chars
+            while (wordEl.children.length > chars.length) {
+                wordEl.removeChild(wordEl.lastChild);
+            }
+            
+            if (input.length > targetWord.length) {
+                const extras = input.slice(targetWord.length);
+                extras.split('').forEach(char => {
+                    const span = document.createElement('span');
+                    span.className = 'char extra';
+                    span.textContent = char;
+                    wordEl.appendChild(span);
+                });
+            }
+        }
+        
+        function updateReplayUI() {
+            if (!replayState) return;
+            
+            const { currentTime, totalDuration, correctChars, totalChars, firstKeyTime, isFinished } = replayState;
+            
+            // Update timeline
+            replayScrubber.value = currentTime;
+            replayTimeCurrent.textContent = (currentTime / 1000).toFixed(1) + 's';
+            
+            // Calculate live stats
+            const elapsedTimeInMinutes = currentTime / 1000 / 60;
+            const scores = calculateScores(correctChars, totalChars, elapsedTimeInMinutes);
+            
+            replayWpmEl.innerHTML = totalChars > 0 ? formatWpm(scores.wpm) : '0<span class="wpm-decimal">.00</span>';
+            replayRawEl.textContent = totalChars > 0 ? Math.round(scores.rawWpm) : '0';
+            replayAccEl.textContent = Math.round(scores.accuracy) + '%';
+        }
+        
+        function processKeystrokesUpTo(targetTime) {
+            if (!replayState) return;
+            
+            const { words, keystrokes, firstKeyTime } = replayState;
+            
+            // Reset state if we're seeking backwards
+            if (targetTime < replayState.currentTime || replayState.keyIndex === 0) {
+                replayState.currentWordIndex = 0;
+                replayState.typedText = '';
+                replayState.typedHistory = [];
+                replayState.correctChars = 0;
+                replayState.totalChars = 0;
+                replayState.keyIndex = 0;
+                replayState.isFinished = false;
+                
+                // Reset all word displays
+                replayState.wordEls.forEach((wordEl, wIdx) => {
+                    const chars = replayState.charEls[wIdx];
+                    chars.forEach(charEl => {
+                        charEl.className = 'char';
+                    });
+                    // Remove extra chars
+                    while (wordEl.children.length > chars.length) {
+                        wordEl.removeChild(wordEl.lastChild);
+                    }
+                });
+                
+                replayContainer.scrollTop = 0;
+            }
+            
+            // Process keystrokes up to target time
+            while (replayState.keyIndex < keystrokes.length) {
+                const k = keystrokes[replayState.keyIndex];
+                const relativeTime = k.timestamp - firstKeyTime;
+                
+                if (relativeTime > targetTime) {
+                    break;
+                }
+                
+                processKeystroke(k);
+                replayState.keyIndex++;
+            }
+            
+            // Check if we've processed all keystrokes
+            if (replayState.keyIndex >= keystrokes.length) {
+                replayState.isFinished = true;
+            }
+            
+            replayState.currentTime = targetTime;
+            
+            // Re-render current word
+            renderWordState(replayState.currentWordIndex);
+            updateCursor();
+            updateReplayUI();
+        }
+        
+        function processKeystroke(k) {
+            if (!replayState) return;
+            
+            const { words } = replayState;
+            const key = k.key;
+            
+            if (key === 'Backspace') {
+                // Backspace is disabled in the game, but handle it for completeness
+                replayState.typedText = replayState.typedText.slice(0, -1);
+            } else if (key === ' ' && replayState.typedText.length > 0) {
+                // Space moves to next word
+                
+                // Count space as a correct character when the word is typed correctly (matching game logic)
+                const currentWord = words[replayState.currentWordIndex];
+                if (replayState.typedText === currentWord) {
+                    replayState.correctChars++;
+                    replayState.totalChars++;
+                }
+                
+                replayState.typedHistory[replayState.currentWordIndex] = replayState.typedText;
+                renderWordState(replayState.currentWordIndex);
+                replayState.currentWordIndex++;
+                replayState.typedText = '';
+                if (replayState.currentWordIndex < words.length) {
+                    renderWordState(replayState.currentWordIndex);
+                }
+            } else if (key.length === 1) {
+                // Regular character - track stats matching game logic
+                const currentWord = words[replayState.currentWordIndex];
+                const newTypedText = replayState.typedText + key;
+                
+                replayState.totalChars++;
+                
+                // Check if character is correct (same logic as game)
+                if (newTypedText.length <= currentWord.length && 
+                    currentWord[newTypedText.length - 1] === key) {
+                    replayState.correctChars++;
+                }
+                
+                replayState.typedText = newTypedText;
+                renderWordState(replayState.currentWordIndex);
+            }
+        }
+        
+        function replayLoop() {
+            if (!replayState || !replayState.isPlaying) {
+                return;
+            }
+            
+            const now = performance.now();
+            const deltaTime = (now - replayState.lastFrameTime) * replayState.playbackSpeed;
+            replayState.lastFrameTime = now;
+            
+            const newTime = Math.min(replayState.currentTime + deltaTime, replayState.totalDuration);
+            
+            // Process keystrokes up to current time
+            processKeystrokesUpTo(newTime);
+            
+            // Continue loop if not finished
+            if (!replayState.isFinished && replayState.isPlaying) {
+                replayAnimationId = requestAnimationFrame(replayLoop);
+            } else if (replayState.isFinished) {
+                // Show finished state
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+                replayState.isPlaying = false;
+            }
+        }
+        
+        // Play/Pause button
+        replayPlayBtn.addEventListener('click', () => {
+            if (!replayState) return;
+            
+            if (replayState.isPlaying) {
+                // Pause
+                replayState.isPlaying = false;
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+                if (replayAnimationId) {
+                    cancelAnimationFrame(replayAnimationId);
+                    replayAnimationId = null;
+                }
+            } else {
+                // Play
+                if (replayState.isFinished) {
+                    // Restart from beginning
+                    processKeystrokesUpTo(0);
+                    replayState.isFinished = false;
+                }
+                replayState.isPlaying = true;
+                replayState.lastFrameTime = performance.now();
+                playIcon.style.display = 'none';
+                pauseIcon.style.display = 'block';
+                replayAnimationId = requestAnimationFrame(replayLoop);
+            }
+        });
+        
+        // Scrubber input
+        replayScrubber.addEventListener('input', (e) => {
+            if (!replayState) return;
+            
+            const targetTime = parseFloat(e.target.value);
+            processKeystrokesUpTo(targetTime);
+        });
+        
+        // Pause while scrubbing
+        replayScrubber.addEventListener('mousedown', () => {
+            if (replayState && replayState.isPlaying) {
+                replayState.isPlaying = false;
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+                if (replayAnimationId) {
+                    cancelAnimationFrame(replayAnimationId);
+                    replayAnimationId = null;
+                }
+            }
+        });
+        
+        // Speed button
+        const speeds = [1, 0.5, 0.25, 2, 4];
+        let speedIndex = 0;
+        replaySpeedBtn.addEventListener('click', () => {
+            if (!replayState) return;
+            
+            speedIndex = (speedIndex + 1) % speeds.length;
+            replayState.playbackSpeed = speeds[speedIndex];
+            replaySpeedBtn.textContent = speeds[speedIndex] + 'x';
+        });
 
         function closeReplay() {
             replayModal.classList.remove('visible');
@@ -1303,6 +1591,7 @@
                 cancelAnimationFrame(replayAnimationId);
                 replayAnimationId = null;
             }
+            replayState = null;
         }
         
         closeReplayBtn.addEventListener('click', closeReplay);
@@ -1312,6 +1601,11 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && replayModal.classList.contains('visible')) {
                 closeReplay();
+            }
+            // Space to play/pause
+            if (e.key === ' ' && replayModal.classList.contains('visible') && replayState) {
+                e.preventDefault();
+                replayPlayBtn.click();
             }
         });
 
